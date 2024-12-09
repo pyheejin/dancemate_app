@@ -33,39 +33,39 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 80),
             const Row(
               children: [
-                Text('Email'),
+                Text('이메일'),
               ],
             ),
             const SizedBox(height: 5),
-            const TextField(
+            TextField(
               decoration: InputDecoration(
                 hintText: 'Enter your email',
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Color.fromARGB(255, 161, 147, 147),
+                    color: Colors.grey.shade400,
                     width: 1.0,
                   ),
                 ),
-                suffixIcon: Icon(Icons.cancel_outlined),
+                suffixIcon: const Icon(Icons.cancel_outlined),
               ),
             ),
             const SizedBox(height: 30),
             const Row(
               children: [
-                Text('Password'),
+                Text('비밀번호'),
               ],
             ),
             const SizedBox(height: 5),
-            const TextField(
+            TextField(
               decoration: InputDecoration(
                 hintText: 'Enter your password',
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Color.fromARGB(255, 161, 147, 147),
+                    color: Colors.grey.shade400,
                     width: 1.0,
                   ),
                 ),
-                suffixIcon: Icon(Icons.cancel_outlined),
+                suffixIcon: const Icon(Icons.cancel_outlined),
               ),
             ),
             const SizedBox(height: 40),
