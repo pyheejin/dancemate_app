@@ -15,10 +15,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         actions: const [
-          Icon(Icons.send_outlined),
+          Icon(
+            Icons.send_outlined,
+            size: 27,
+          ),
           SizedBox(width: 5),
-          Icon(Icons.notifications_outlined),
+          Icon(
+            Icons.notifications_outlined,
+            size: 27,
+          ),
+          SizedBox(width: 17),
         ],
       ),
       body: Padding(
