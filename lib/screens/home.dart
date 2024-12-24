@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:dancemate_app/contants/api_urls.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,6 +14,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final controller = PageController(viewportFraction: 0.8, keepPage: true);
+
+  Future<List<Map<String, dynamic>>> _recommendUsers() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/home'),
+      headers: {
+        'Authorization':
+            'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NiwiZXhwIjoxNzM1NjIwMDE5LCJleHBpcmVkX2F0IjoiMjAyNC0xMi0zMSAxMzo0MDoxOSJ9.FDNtGwiLum40DdFiwJ-evvAoa1vF1fe9-UvtK0lk2bg',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+      return responseBody['result_data']['recommend_users'];
+    } else {
+      print('?????');
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,39 +58,20 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(35),
-                  ),
-                ),
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(35),
-                  ),
-                ),
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(35),
-                  ),
-                ),
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(35),
-                  ),
+                FutureBuilder(
+                  future: _recommendUsers(),
+                  builder: (context, snapshot) {
+                    print(snapshot.data);
+                    return Container(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade400),
+                        borderRadius: BorderRadius.circular(35),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
