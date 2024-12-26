@@ -63,12 +63,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   future: _recommendUsers(),
                   builder: (context, snapshot) {
                     print(snapshot.data);
-                    return Container(
-                      width: 70,
+                    return SizedBox(
+                      width: 390,
                       height: 70,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade400),
-                        borderRadius: BorderRadius.circular(35),
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 13,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            width: 70,
+                            height: 70,
+                            margin: const EdgeInsets.only(right: 20),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade400),
+                              borderRadius: BorderRadius.circular(35),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
