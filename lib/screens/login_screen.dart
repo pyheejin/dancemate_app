@@ -1,97 +1,34 @@
-import 'dart:convert';
-
-import 'package:dancemate_app/contants/api_urls.dart';
+import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
-import 'package:dancemate_app/widgets/storage.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginScreen extends ConsumerWidget {
+  const LoginScreen({
+    super.key,
+  });
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
 
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+    void onLoginTap() async {
+      final email = emailController.text;
+      final password = passwordController.text;
 
-  // FlutterSecureStorage를 storage로 저장
-  static const storage = FlutterSecureStorage();
+      final loginResult =
+          ref.read(postLoginProvider.notifier).postLogin(email, password);
 
-  // storage에 있는 유저 정보를 저장
-  dynamic userInfo = '';
-
-  //flutter_secure_storage 사용을 위한 초기화 작업
-  @override
-  void initState() {
-    super.initState();
-
-    // 비동기로 flutter secure storage 정보를 불러오는 작업
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _asyncMethod();
-    });
-  }
-
-  void _asyncMethod() async {
-    // read 함수로 key값에 맞는 정보를 불러오고 데이터타입은 String 타입
-    // 데이터가 없을때는 null을 반환
-    userInfo = await storage.read(key: 'login');
-
-    // user의 정보가 있다면 로그인 후 들어가는 첫 페이지로 넘어가게 합니다.
-    if (userInfo != null) {
-      if (mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const MainNavigationScreen(),
-          ),
-        );
-      }
-    } else {
-      print('로그인이 필요합니다');
-    }
-  }
-
-  void _onLoginTap() async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/user/login'),
-      body: {
-        'username': emailController.text,
-        'password': passwordController.text,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-      final accessToken = responseBody['access_token'];
-
-      final payload = jsonEncode({emailController.text: accessToken});
-
-      await storage.write(
-        key: 'login',
-        value: payload,
+      if (loginResult == true) {}
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const MainNavigationScreen(),
+        ),
       );
-
-      emailController.clear();
-      passwordController.clear();
-
-      final value = await storage.read(key: 'login');
-      print(value);
-
-      if (mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const MainNavigationScreen(),
-          ),
-        );
-      }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -154,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 40),
             TextButton(
-              onPressed: _onLoginTap,
+              onPressed: onLoginTap,
               style: TextButton.styleFrom(
                 backgroundColor: const Color(0xFFA48AFF),
                 shape: RoundedRectangleBorder(

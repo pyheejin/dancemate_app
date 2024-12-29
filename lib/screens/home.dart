@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:dancemate_app/contants/api_urls.dart';
+import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,14 +14,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final storage = const FlutterSecureStorage();
   final controller = PageController(viewportFraction: 0.8, keepPage: true);
 
+  dynamic getAccessToken() async {
+    final loginStorage = await storage.read(key: 'login');
+    final accessToken = jsonDecode(loginStorage!)['access_token'];
+    return accessToken;
+  }
+
   Future<List<Map<String, dynamic>>> _recommendUsers() async {
+    final accessToken = getAccessToken();
     final response = await http.get(
       Uri.parse('$baseUrl/home'),
       headers: {
-        'Authorization':
-            'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NiwiZXhwIjoxNzM1NjIwMDE5LCJleHBpcmVkX2F0IjoiMjAyNC0xMi0zMSAxMzo0MDoxOSJ9.FDNtGwiLum40DdFiwJ-evvAoa1vF1fe9-UvtK0lk2bg',
+        'Authorization': 'Bearer $accessToken',
       },
     );
 
@@ -38,17 +46,30 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        actions: const [
-          Icon(
+        actions: [
+          GestureDetector(
+            onTap: () async {
+              await storage.delete(key: 'login');
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ),
+              );
+            },
+            child: const Text('로그아웃'),
+          ),
+          const SizedBox(width: 10),
+          const Icon(
             Icons.send_outlined,
             size: 27,
           ),
-          SizedBox(width: 5),
-          Icon(
+          const SizedBox(width: 5),
+          const Icon(
             Icons.notifications_outlined,
             size: 27,
           ),
-          SizedBox(width: 17),
+          const SizedBox(width: 17),
         ],
       ),
       body: Padding(
