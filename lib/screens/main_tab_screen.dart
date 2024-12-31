@@ -1,4 +1,4 @@
-import 'package:dancemate_app/screens/home.dart';
+import 'package:dancemate_app/screens/home_screen.dart';
 import 'package:dancemate_app/widgets/nav_tab.dart';
 import 'package:flutter/material.dart';
 
