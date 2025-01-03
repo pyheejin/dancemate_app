@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:dancemate_app/screens/signup_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
@@ -105,7 +106,7 @@ class LoginScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Login',
+                      '로그인',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -118,18 +119,27 @@ class LoginScreen extends ConsumerWidget {
             const SizedBox(height: 10),
             const Row(
               children: [
-                Text('Forgot your password?'),
+                Text('비밀번호를 잊으셨나요?'),
               ],
             ),
             const SizedBox(height: 30),
-            const Row(
+            Row(
               children: [
-                Text("Don't have an account?"),
-                SizedBox(width: 5),
-                Text(
-                  'Sign up',
-                  style: TextStyle(
-                    color: Color(0xFFA48AFF),
+                const Text("Don't have an account?"),
+                const SizedBox(width: 5),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const SignUpScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    '회원가입',
+                    style: TextStyle(
+                      color: Color(0xFFA48AFF),
+                    ),
                   ),
                 ),
               ],
@@ -139,7 +149,7 @@ class LoginScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'or sign up with',
+                  '소셜 로그인',
                   style: TextStyle(color: Colors.grey.shade500),
                 ),
               ],

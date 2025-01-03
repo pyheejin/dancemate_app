@@ -1,19 +1,57 @@
+import 'package:dancemate_app/database/model.dart';
+import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum UserType { Dancer, Mate }
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class SignUpScreen extends ConsumerWidget {
+  const SignUpScreen({
+    super.key,
+  });
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    final TextEditingController nicknameController = TextEditingController();
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController phoneController = TextEditingController();
+    final TextEditingController introductionController =
+        TextEditingController();
 
-class _SignUpScreenState extends State<SignUpScreen> {
-  UserType? _userType = UserType.Mate;
+    UserType userType = UserType.Mate;
 
-  @override
-  Widget build(BuildContext context) {
+    void onSignUpTap() {
+      final email = emailController.text;
+      final password = passwordController.text;
+      final nickname = nicknameController.text;
+      final name = nameController.text;
+      final phone = phoneController.text;
+      final introduction = introductionController.text;
+
+      print(userType);
+
+      UserModel userData = UserModel(
+        type: userType == UserType.Dancer ? 50 : 1,
+        email: email,
+        password: password,
+        nickname: nickname,
+        name: name,
+        phone: phone,
+        introduction: introduction,
+      );
+
+      ref.read(postUserJoinProvider(userData));
+
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+      );
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -32,11 +70,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     children: [
                       Radio(
                         value: UserType.Dancer,
-                        groupValue: _userType,
+                        groupValue: userType,
                         onChanged: (UserType? value) {
-                          setState(() {
-                            _userType = value;
-                          });
+                          // setState(() {
+                          //   userType = value;
+                          // });
+                          userType =
+                              ref.watch(userTypeProvider(UserType.Dancer));
+
+                          print(userType);
                         },
                       ),
                       const Text(
@@ -51,11 +93,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     children: [
                       Radio(
                         value: UserType.Mate,
-                        groupValue: _userType,
+                        groupValue: userType,
                         onChanged: (UserType? value) {
-                          setState(() {
-                            _userType = value;
-                          });
+                          // setState(() {
+                          //   userType = value;
+                          // });
+                          userType = ref.watch(userTypeProvider(UserType.Mate));
+                          print(userType);
                         },
                       ),
                       const Text(
@@ -91,6 +135,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 height: 50,
                 child: TextField(
+                  controller: emailController,
                   decoration: InputDecoration(
                     hintText: 'Enter your email',
                     enabledBorder: OutlineInputBorder(
@@ -126,6 +171,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 height: 50,
                 child: TextField(
+                  controller: passwordController,
                   decoration: InputDecoration(
                     hintText: 'Enter your password',
                     enabledBorder: OutlineInputBorder(
@@ -161,6 +207,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 height: 50,
                 child: TextField(
+                  controller: nicknameController,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
@@ -195,6 +242,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 height: 50,
                 child: TextField(
+                  controller: nameController,
                   decoration: InputDecoration(
                     hintText: '',
                     enabledBorder: OutlineInputBorder(
@@ -230,6 +278,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 height: 50,
                 child: TextField(
+                  controller: phoneController,
                   decoration: InputDecoration(
                     hintText: '핸드폰 번호(숫자만 입력)',
                     enabledBorder: OutlineInputBorder(
@@ -305,6 +354,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 height: 100,
                 child: TextField(
+                  controller: introductionController,
                   expands: true,
                   maxLines: null,
                   decoration: InputDecoration(
@@ -326,7 +376,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: TextButton(
-            onPressed: () {},
+            onPressed: onSignUpTap,
             style: TextButton.styleFrom(
               backgroundColor: const Color(0xFFA48AFF),
               shape: RoundedRectangleBorder(
