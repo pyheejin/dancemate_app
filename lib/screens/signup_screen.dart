@@ -1,6 +1,7 @@
 import 'package:dancemate_app/database/model.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/login_screen.dart';
+import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,15 +24,21 @@ class SignUpScreen extends ConsumerWidget {
 
     UserType userType = UserType.Mate;
 
-    void onSignUpTap() {
+    void showSnackBar(BuildContext context, Text text) {
+      final snackBar = SnackBar(
+        content: text,
+        backgroundColor: Colors.red,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
+    void onSignUpTap() async {
       final email = emailController.text;
       final password = passwordController.text;
       final nickname = nicknameController.text;
       final name = nameController.text;
       final phone = phoneController.text;
       final introduction = introductionController.text;
-
-      print(userType);
 
       UserModel userData = UserModel(
         type: userType == UserType.Dancer ? 50 : 1,
@@ -43,13 +50,16 @@ class SignUpScreen extends ConsumerWidget {
         introduction: introduction,
       );
 
-      ref.read(postUserJoinProvider(userData));
-
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
-        ),
-      );
+      final result = await ref.watch(postUserJoinProvider(userData).future);
+      if (result['result_code'] == 200) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const MainNavigationScreen(),
+          ),
+        );
+      } else {
+        showSnackBar(context, const Text('회원가입 실패'));
+      }
     }
 
     return Scaffold(
@@ -72,13 +82,8 @@ class SignUpScreen extends ConsumerWidget {
                         value: UserType.Dancer,
                         groupValue: userType,
                         onChanged: (UserType? value) {
-                          // setState(() {
-                          //   userType = value;
-                          // });
                           userType =
                               ref.watch(userTypeProvider(UserType.Dancer));
-
-                          print(userType);
                         },
                       ),
                       const Text(
@@ -95,11 +100,7 @@ class SignUpScreen extends ConsumerWidget {
                         value: UserType.Mate,
                         groupValue: userType,
                         onChanged: (UserType? value) {
-                          // setState(() {
-                          //   userType = value;
-                          // });
                           userType = ref.watch(userTypeProvider(UserType.Mate));
-                          print(userType);
                         },
                       ),
                       const Text(
@@ -172,6 +173,7 @@ class SignUpScreen extends ConsumerWidget {
                 height: 50,
                 child: TextField(
                   controller: passwordController,
+                  obscureText: true,
                   decoration: InputDecoration(
                     hintText: 'Enter your password',
                     enabledBorder: OutlineInputBorder(

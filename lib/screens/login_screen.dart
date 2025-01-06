@@ -15,18 +15,19 @@ class LoginScreen extends ConsumerWidget {
     final TextEditingController passwordController = TextEditingController();
 
     void onLoginTap() async {
-      final email = emailController.text;
-      final password = passwordController.text;
+      List<dynamic> args = [
+        emailController.text,
+        passwordController.text,
+      ];
+      final result = await ref.watch(postUserLoginProvider(args).future);
 
-      final loginResult =
-          ref.read(postLoginProvider.notifier).postLogin(email, password);
-
-      if (loginResult == true) {}
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const MainNavigationScreen(),
-        ),
-      );
+      if (result['result_code'] == 200) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const MainNavigationScreen(),
+          ),
+        );
+      }
     }
 
     return Scaffold(
@@ -78,6 +79,7 @@ class LoginScreen extends ConsumerWidget {
             const SizedBox(height: 5),
             TextField(
               controller: passwordController,
+              obscureText: true,
               decoration: InputDecoration(
                 hintText: 'Enter your password',
                 enabledBorder: OutlineInputBorder(

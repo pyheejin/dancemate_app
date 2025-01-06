@@ -58,6 +58,7 @@ class HomeScreen extends ConsumerWidget {
                       recommendUsers.when(
                         loading: () => const CircularProgressIndicator(),
                         error: (error, stack) {
+                          ref.refresh(getHomeRecommendUserProvider.future);
                           return SizedBox(
                             width: 300,
                             child: Text('error: $error'),
@@ -111,7 +112,9 @@ class HomeScreen extends ConsumerWidget {
               child: todayCourses.when(
                 loading: () => const CircularProgressIndicator(),
                 error: (error, stack) {
+                  ref.refresh(getHomeTodayCourseProvider.future);
                   print(error);
+
                   return SizedBox(
                     width: 300,
                     child: Text('error: $error'),
@@ -234,6 +237,7 @@ class HomeScreen extends ConsumerWidget {
               child: reserveCourses.when(
                 loading: () => const CircularProgressIndicator(),
                 error: (error, stack) {
+                  ref.refresh(getHomeReserveCourseProvider.future);
                   print(error);
                   return SizedBox(
                     width: 300,

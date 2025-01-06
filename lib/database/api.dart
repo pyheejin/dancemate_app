@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dancemate_app/contants/api_urls.dart';
 import 'package:dancemate_app/database/model.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -75,7 +76,8 @@ class ApiServices {
     );
   }
 
-  Future<bool> postUserLogin(String email, String password) async {
+  Future<Map<String, dynamic>> postUserLogin(
+      String email, String password) async {
     await storage.delete(key: 'login');
 
     final response = await http.post(
@@ -86,7 +88,9 @@ class ApiServices {
       },
     );
 
-    if (response.statusCode == 200) {
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    if (resultData['result_code'] == 200) {
       final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
       final accessToken = responseBody['access_token'];
 
@@ -99,16 +103,19 @@ class ApiServices {
         key: 'login',
         value: payload,
       );
-      return true;
+      return responseBody;
     } else {
-      return false;
+      throw Exception('user login api fail');
     }
   }
 
-  Future<void> postUserJoin(UserModel userData) async {
+  Future<Map<String, dynamic>> postUserJoin(UserModel userData) async {
     final response = await http.post(
       Uri.parse('$baseUrl/user/join'),
-      body: {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
         'type': userData.type,
         'name': userData.name,
         'nickname': userData.nickname,
@@ -116,34 +123,37 @@ class ApiServices {
         'password': userData.password,
         'phone': userData.phone,
         'introduction': userData.introduction,
-      },
+      }),
     );
-    final resultData =
-        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
-    print('api 호출 결과: $resultData');
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
 
-    // 회원가입 후 바로 로그인
-    final loginResponse = await http.post(
-      Uri.parse('$baseUrl/user/login'),
-      body: {
-        'username': userData.email,
-        'password': userData.password,
-      },
-    );
-
-    if (loginResponse.statusCode == 200) {
-      final responseBody = jsonDecode(utf8.decode(loginResponse.bodyBytes));
-      final accessToken = responseBody['access_token'];
-
-      final payload = jsonEncode({
-        'email': userData.email,
-        'access_token': accessToken,
-      });
-
-      await storage.write(
-        key: 'login',
-        value: payload,
+    if (resultData['result_code'] == 200) {
+      // 회원가입 후 바로 로그인
+      final loginResponse = await http.post(
+        Uri.parse('$baseUrl/user/login'),
+        body: {
+          'username': userData.email,
+          'password': userData.password,
+        },
       );
+
+      if (loginResponse.statusCode == 200) {
+        final responseBody = jsonDecode(utf8.decode(loginResponse.bodyBytes));
+        final accessToken = responseBody['access_token'];
+
+        final payload = jsonEncode({
+          'email': userData.email,
+          'access_token': accessToken,
+        });
+
+        await storage.write(
+          key: 'login',
+          value: payload,
+        );
+      }
+      return resultData;
+    } else {
+      throw Exception('user join api fail');
     }
   }
 }
