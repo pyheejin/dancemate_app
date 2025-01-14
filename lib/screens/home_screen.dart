@@ -279,7 +279,7 @@ class HomeScreen extends ConsumerWidget {
                                   ),
                                   Positioned(
                                     top: 5,
-                                    left: 10,
+                                    left: 5,
                                     child: Container(
                                       width: 40,
                                       height: 40,

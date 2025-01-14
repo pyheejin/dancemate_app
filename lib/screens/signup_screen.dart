@@ -1,6 +1,5 @@
 import 'package:dancemate_app/database/model.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
-import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

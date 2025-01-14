@@ -11,7 +11,7 @@ final getHomeRecommendUserProvider =
 });
 
 final getHomeTodayCourseProvider =
-    FutureProvider<List<HomeCourseModel>>((ref) async {
+    FutureProvider<List<CourseModel>>((ref) async {
   final ApiServices api = ApiServices();
 
   final result = await api.getHomeTodayCourses();
@@ -19,7 +19,7 @@ final getHomeTodayCourseProvider =
 });
 
 final getHomeReserveCourseProvider =
-    FutureProvider<List<HomeCourseModel>>((ref) async {
+    FutureProvider<List<CourseModel>>((ref) async {
   final ApiServices api = ApiServices();
 
   final result = await api.getHomeReserveCourses();

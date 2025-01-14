@@ -33,7 +33,7 @@ class RecommendUserModel {
   }
 }
 
-class HomeCourseModel {
+class CourseModel {
   int? id;
   int userId;
   String title;
@@ -44,7 +44,7 @@ class HomeCourseModel {
   Map<String, dynamic> dancer;
 
   // 생성자
-  HomeCourseModel({
+  CourseModel({
     this.id,
     required this.userId,
     required this.title,
@@ -70,8 +70,8 @@ class HomeCourseModel {
   }
 
   // JSON 데이터를 Model객체로 변환하는 팩토리 생성자
-  factory HomeCourseModel.fromJson(Map<String, dynamic> json) {
-    return HomeCourseModel(
+  factory CourseModel.fromJson(Map<String, dynamic> json) {
+    return CourseModel(
       id: json['id'],
       userId: json['user_id'],
       title: json['title'],

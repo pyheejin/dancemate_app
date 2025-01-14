@@ -42,7 +42,7 @@ class ApiServices {
     }
   }
 
-  Future<List<HomeCourseModel>> getHomeTodayCourses() async {
+  Future<List<CourseModel>> getHomeTodayCourses() async {
     final accessToken = await getAccessToken();
     final response = await http.get(
       Uri.parse('$baseUrl/home'),
@@ -54,12 +54,12 @@ class ApiServices {
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
     final todayCourses = resultData['today_courses'];
 
-    return List<HomeCourseModel>.from(
-      todayCourses.map((map) => HomeCourseModel.fromJson(map)),
+    return List<CourseModel>.from(
+      todayCourses.map((map) => CourseModel.fromJson(map)),
     );
   }
 
-  Future<List<HomeCourseModel>> getHomeReserveCourses() async {
+  Future<List<CourseModel>> getHomeReserveCourses() async {
     final accessToken = await getAccessToken();
     final response = await http.get(
       Uri.parse('$baseUrl/home'),
@@ -71,8 +71,8 @@ class ApiServices {
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
     final reserveCourses = resultData['reserve_courses'];
 
-    return List<HomeCourseModel>.from(
-      reserveCourses.map((map) => HomeCourseModel.fromJson(map)),
+    return List<CourseModel>.from(
+      reserveCourses.map((map) => CourseModel.fromJson(map)),
     );
   }
 
@@ -155,5 +155,33 @@ class ApiServices {
     } else {
       throw Exception('user join api fail');
     }
+  }
+
+  Future<dynamic> getSearch(String keyword) async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/search?keyword=$keyword'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+
+    return resultData;
+  }
+
+  Future<dynamic> getSearchPre() async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/search/pre'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+
+    return resultData;
   }
 }
