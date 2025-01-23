@@ -250,15 +250,19 @@ class HomeScreen extends ConsumerWidget {
                     scrollDirection: Axis.vertical,
                     itemCount: reserveCourseList.length,
                     itemBuilder: (context, index) {
-                      final dancerData = reserveCourseList[index].dancer;
+                      final dancerData =
+                          reserveCourseList[index]['course']['dancer'];
                       final dancerNickname = dancerData['nickname'];
                       final dancerEmail = dancerData['email'];
                       final dancerImageUrl = dancerData['image_url'];
 
-                      final courseDetailData =
-                          reserveCourseList[index].courseDetail[0];
-                      final courseDate = courseDetailData['course_date'];
-                      final courseTitle = courseDetailData['title'];
+                      final courseDetailData = reserveCourseList[index];
+                      final courseDetailDate = courseDetailData['course_date'];
+                      final courseDetailTitle = courseDetailData['title'];
+
+                      final courseData = reserveCourseList[index]['course'];
+                      final courseImage = courseData['image_url'];
+                      final courseTitle = courseData['title'];
                       return GestureDetector(
                         onTap: () {},
                         child: Padding(
@@ -275,7 +279,7 @@ class HomeScreen extends ConsumerWidget {
                                     width: 120,
                                     height: 120,
                                     fit: BoxFit.cover,
-                                    reserveCourseList[index].imageUrl,
+                                    courseImage,
                                   ),
                                   Positioned(
                                     top: 5,
@@ -342,14 +346,14 @@ class HomeScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 5),
                                   Text(
-                                    reserveCourseList[index].title,
+                                    courseTitle,
                                     style: const TextStyle(
                                       color: Color(0xff3F51B5),
                                       fontSize: 18,
                                     ),
                                   ),
                                   Text(
-                                    '$courseDate $courseTitle',
+                                    '$courseDetailDate $courseDetailTitle',
                                     style: const TextStyle(
                                       fontSize: 16,
                                     ),

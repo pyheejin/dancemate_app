@@ -59,7 +59,7 @@ class ApiServices {
     );
   }
 
-  Future<List<CourseModel>> getHomeReserveCourses() async {
+  Future<dynamic> getHomeReserveCourses() async {
     final accessToken = await getAccessToken();
     final response = await http.get(
       Uri.parse('$baseUrl/home'),
@@ -71,9 +71,7 @@ class ApiServices {
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
     final reserveCourses = resultData['reserve_courses'];
 
-    return List<CourseModel>.from(
-      reserveCourses.map((map) => CourseModel.fromJson(map)),
-    );
+    return reserveCourses;
   }
 
   Future<Map<String, dynamic>> postUserLogin(
@@ -181,6 +179,20 @@ class ApiServices {
     );
     final resultData =
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+
+    return resultData;
+  }
+
+  Future<dynamic> getUser() async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/user'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data']['user'];
 
     return resultData;
   }

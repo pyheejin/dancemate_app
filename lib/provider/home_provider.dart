@@ -18,8 +18,7 @@ final getHomeTodayCourseProvider =
   return result;
 });
 
-final getHomeReserveCourseProvider =
-    FutureProvider<List<CourseModel>>((ref) async {
+final getHomeReserveCourseProvider = FutureProvider<dynamic>((ref) async {
   final ApiServices api = ApiServices();
 
   final result = await api.getHomeReserveCourses();

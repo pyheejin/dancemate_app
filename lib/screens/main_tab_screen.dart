@@ -1,4 +1,6 @@
 import 'package:dancemate_app/screens/home_screen.dart';
+import 'package:dancemate_app/screens/profile_screen.dart';
+import 'package:dancemate_app/screens/search_screen.dart';
 import 'package:dancemate_app/widgets/nav_tab.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +32,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           Offstage(
             offstage: _selectedIndex != 1,
-            child: const Scaffold(),
+            child: const SearchScreen(),
           ),
           Offstage(
             offstage: _selectedIndex != 2,
@@ -42,7 +44,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           Offstage(
             offstage: _selectedIndex != 4,
-            child: const Scaffold(),
+            child: const ProfileScreen(),
           ),
         ],
       ),
