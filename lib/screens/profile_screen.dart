@@ -9,6 +9,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userProfile = ref.watch(getUserProvider);
+    var userTickets = userProfile.value['mate_ticket'];
 
     return SafeArea(
       child: DefaultTabController(
@@ -212,9 +213,50 @@ class ProfileScreen extends ConsumerWidget {
                     },
                   ),
                 ),
-                const Center(
-                  child: Text('Page two'),
-                ),
+                ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: userTickets.length,
+                    itemBuilder: (context, index) {
+                      final ticketCount = userTickets[index]['count'];
+                      final ticketRemainCount =
+                          userTickets[index]['remain_count'];
+                      final expiredDate = userTickets[index]['expired_date'];
+
+                      final ticketData = userTickets[index]['ticket'];
+
+                      final dancerData = ticketData['dancer'];
+                      final dancerNickname = dancerData['nickname'];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 5,
+                          horizontal: 5,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xff6555FF),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: Text(
+                                  dancerNickname,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Text('$ticketRemainCount회권 / $ticketCount회권'),
+                            Text(expiredDate),
+                          ],
+                        ),
+                      );
+                    }),
               ],
             ),
           ),
