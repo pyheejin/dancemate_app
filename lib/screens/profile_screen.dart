@@ -9,7 +9,6 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userProfile = ref.watch(getUserProvider);
-    var userTickets = userProfile.value['mate_ticket'];
 
     return SafeArea(
       child: DefaultTabController(
@@ -39,38 +38,58 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     child: Row(
                       children: [
-                        CircleAvatar(
-                          radius: 50,
-                          foregroundImage:
-                              NetworkImage(userProfile.value['image_url']),
-                          child: Text(userProfile.value['nickname']),
+                        userProfile.when(
+                          loading: () => const CircularProgressIndicator(),
+                          error: (error, stack) {
+                            print(error);
+                            return SizedBox(
+                              width: 300,
+                              child: Text('error: $error'),
+                            );
+                          },
+                          data: (dataList) => CircleAvatar(
+                            radius: 50,
+                            foregroundImage:
+                                NetworkImage(dataList['image_url']),
+                            child: Text(dataList['nickname']),
+                          ),
                         ),
                         const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  '@${userProfile.value['email']}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 18,
+                        userProfile.when(
+                          loading: () => const CircularProgressIndicator(),
+                          error: (error, stack) {
+                            print(error);
+                            return SizedBox(
+                              width: 300,
+                              child: Text('error: $error'),
+                            );
+                          },
+                          data: (dataList) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '@${dataList['email']}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18,
+                                    ),
                                   ),
-                                ),
-                                const Icon(
-                                  Icons.mode_edit_outline_outlined,
-                                  size: 17,
-                                ),
-                              ],
-                            ),
-                            Text(
-                              userProfile.value['introduction'],
-                              style: const TextStyle(
-                                fontSize: 15,
+                                  const Icon(
+                                    Icons.mode_edit_outline_outlined,
+                                    size: 17,
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              Text(
+                                dataList['introduction'],
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -213,16 +232,28 @@ class ProfileScreen extends ConsumerWidget {
                     },
                   ),
                 ),
-                ListView.builder(
+                userProfile.when(
+                  loading: () => const CircularProgressIndicator(),
+                  error: (error, stack) {
+                    print(error);
+                    return SizedBox(
+                      width: 300,
+                      child: Text('error: $error'),
+                    );
+                  },
+                  data: (dataList) => ListView.builder(
                     shrinkWrap: true,
-                    itemCount: userTickets.length,
+                    itemCount: dataList['mate_ticket'].length,
                     itemBuilder: (context, index) {
-                      final ticketCount = userTickets[index]['count'];
+                      final ticketCount =
+                          dataList['mate_ticket'][index]['count'];
                       final ticketRemainCount =
-                          userTickets[index]['remain_count'];
-                      final expiredDate = userTickets[index]['expired_date'];
+                          dataList['mate_ticket'][index]['remain_count'];
+                      final expiredDate =
+                          dataList['mate_ticket'][index]['expired_date'];
 
-                      final ticketData = userTickets[index]['ticket'];
+                      final ticketData =
+                          dataList['mate_ticket'][index]['ticket'];
 
                       final dancerData = ticketData['dancer'];
                       final dancerNickname = dancerData['nickname'];
@@ -256,7 +287,9 @@ class ProfileScreen extends ConsumerWidget {
                           ],
                         ),
                       );
-                    }),
+                    },
+                  ),
+                ),
               ],
             ),
           ),
