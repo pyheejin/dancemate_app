@@ -225,6 +225,7 @@ class SearchResult extends StatelessWidget {
                         );
                       },
                       data: (dataList) => ListView.builder(
+                        padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         itemCount: dataList['recommend_courses'].length,
                         itemBuilder: (context, index) {

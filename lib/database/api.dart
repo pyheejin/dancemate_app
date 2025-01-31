@@ -196,4 +196,19 @@ class ApiServices {
 
     return resultData;
   }
+
+  Future<dynamic> getCourses(String date) async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/course?date=$date'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+    final reserveCourses = resultData['courses'];
+
+    return reserveCourses;
+  }
 }
