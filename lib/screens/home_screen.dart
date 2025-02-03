@@ -11,9 +11,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const storage = FlutterSecureStorage();
 
-    final recommendUsers = ref.watch(getHomeRecommendUserProvider);
-    final todayCourses = ref.watch(getHomeTodayCourseProvider);
-    final reserveCourses = ref.watch(getHomeReserveCourseProvider);
+    final homeData = ref.watch(getHomeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -55,22 +53,27 @@ class HomeScreen extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      recommendUsers.when(
+                      homeData.when(
                         loading: () => const CircularProgressIndicator(),
                         error: (error, stack) {
-                          ref.refresh(getHomeRecommendUserProvider.future);
+                          ref.refresh(getHomeProvider.future);
                           return SizedBox(
                             width: 300,
                             child: Text('error: $error'),
                           );
                         },
-                        data: (recommendUserList) => SizedBox(
+                        data: (homeData) => SizedBox(
                           width: 390,
                           height: 100,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: recommendUserList.length,
+                            itemCount: homeData['recommend_users'].length,
                             itemBuilder: (context, index) {
+                              final userData =
+                                  homeData['recommend_users'][index];
+
+                              final imageUrl = userData['image_url'];
+                              final nickname = userData['nickname'];
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 10,
@@ -89,12 +92,12 @@ class HomeScreen extends ConsumerWidget {
                                       ),
                                       child: CircleAvatar(
                                         backgroundImage: NetworkImage(
-                                          recommendUserList[index].imageUrl,
+                                          imageUrl,
                                         ),
                                       ),
                                     ),
                                     const SizedBox(height: 5),
-                                    Text(recommendUserList[index].nickname),
+                                    Text(nickname),
                                   ],
                                 ),
                               );
@@ -109,10 +112,10 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             SliverToBoxAdapter(
-              child: todayCourses.when(
+              child: homeData.when(
                 loading: () => const CircularProgressIndicator(),
                 error: (error, stack) {
-                  ref.refresh(getHomeTodayCourseProvider.future);
+                  ref.refresh(getHomeProvider.future);
                   print(error);
 
                   return SizedBox(
@@ -120,19 +123,21 @@ class HomeScreen extends ConsumerWidget {
                     child: Text('error: $error'),
                   );
                 },
-                data: (todayCourseList) => SizedBox(
+                data: (homeData) => SizedBox(
                   height: 320,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: todayCourseList.length,
+                    itemCount: homeData['today_courses'].length,
                     itemBuilder: (context, index) {
-                      final dancerData = todayCourseList[index].dancer;
+                      final todayCoursesData = homeData['today_courses'][index];
+
+                      final dancerData = todayCoursesData['dancer'];
                       final dancerNickname = dancerData['nickname'];
                       final dancerEmail = dancerData['email'];
                       final dancerImageUrl = dancerData['image_url'];
 
                       final courseDetailData =
-                          todayCourseList[index].courseDetail[0];
+                          todayCoursesData['course_detail'][0];
                       final courseDate = courseDetailData['course_date'];
                       final courseTitle = courseDetailData['title'];
                       return GestureDetector(
@@ -150,7 +155,7 @@ class HomeScreen extends ConsumerWidget {
                                     width: 170,
                                     height: 200,
                                     fit: BoxFit.cover,
-                                    todayCourseList[index].imageUrl,
+                                    todayCoursesData['image_url'],
                                   ),
                                   Positioned(
                                     top: 5,
@@ -212,7 +217,7 @@ class HomeScreen extends ConsumerWidget {
                                 ],
                               ),
                               Text(
-                                todayCourseList[index].title,
+                                todayCoursesData['title'],
                                 style: const TextStyle(
                                   color: Color(0xff3F51B5),
                                   fontSize: 18,
@@ -234,33 +239,35 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             SliverToBoxAdapter(
-              child: reserveCourses.when(
+              child: homeData.when(
                 loading: () => const CircularProgressIndicator(),
                 error: (error, stack) {
-                  ref.refresh(getHomeReserveCourseProvider.future);
+                  ref.refresh(getHomeProvider.future);
                   print(error);
                   return SizedBox(
                     width: 300,
                     child: Text('error: $error'),
                   );
                 },
-                data: (reserveCourseList) => SizedBox(
+                data: (homeData) => SizedBox(
                   height: 400,
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
-                    itemCount: reserveCourseList.length,
+                    itemCount: homeData['reserve_courses'].length,
                     itemBuilder: (context, index) {
-                      final dancerData =
-                          reserveCourseList[index]['course']['dancer'];
+                      final reserveCourseData =
+                          homeData['reserve_courses'][index];
+
+                      final dancerData = reserveCourseData['course']['dancer'];
                       final dancerNickname = dancerData['nickname'];
                       final dancerEmail = dancerData['email'];
                       final dancerImageUrl = dancerData['image_url'];
 
-                      final courseDetailData = reserveCourseList[index];
+                      final courseDetailData = reserveCourseData;
                       final courseDetailDate = courseDetailData['course_date'];
                       final courseDetailTitle = courseDetailData['title'];
 
-                      final courseData = reserveCourseList[index]['course'];
+                      final courseData = reserveCourseData['course'];
                       final courseImage = courseData['image_url'];
                       final courseTitle = courseData['title'];
                       return GestureDetector(

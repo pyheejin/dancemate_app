@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dancemate_app/contants/api_urls.dart';
 import 'package:dancemate_app/database/model.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -19,30 +18,7 @@ class ApiServices {
     return accessToken;
   }
 
-  Future<List<RecommendUserModel>> getHomeRecommendUsers() async {
-    final accessToken = await getAccessToken();
-    final response = await http.get(
-      Uri.parse('$baseUrl/home'),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final resultData =
-          jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
-      final recommendUsers = resultData['recommend_users'];
-
-      return List<RecommendUserModel>.from(
-        recommendUsers.map((map) => RecommendUserModel.fromJson(map)),
-      );
-    } else {
-      print('api error ${response.statusCode}');
-      throw const FormatException('home api error');
-    }
-  }
-
-  Future<List<CourseModel>> getHomeTodayCourses() async {
+  Future<dynamic> getHome() async {
     final accessToken = await getAccessToken();
     final response = await http.get(
       Uri.parse('$baseUrl/home'),
@@ -52,26 +28,8 @@ class ApiServices {
     );
     final resultData =
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
-    final todayCourses = resultData['today_courses'];
 
-    return List<CourseModel>.from(
-      todayCourses.map((map) => CourseModel.fromJson(map)),
-    );
-  }
-
-  Future<dynamic> getHomeReserveCourses() async {
-    final accessToken = await getAccessToken();
-    final response = await http.get(
-      Uri.parse('$baseUrl/home'),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-      },
-    );
-    final resultData =
-        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
-    final reserveCourses = resultData['reserve_courses'];
-
-    return reserveCourses;
+    return resultData;
   }
 
   Future<Map<String, dynamic>> postUserLogin(
@@ -208,6 +166,21 @@ class ApiServices {
     final resultData =
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
     final reserveCourses = resultData['courses'];
+
+    return reserveCourses;
+  }
+
+  Future<dynamic> getCourseDetail(int courseDetailId) async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/course/$courseDetailId'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+    final reserveCourses = resultData['course_detail'];
 
     return reserveCourses;
   }

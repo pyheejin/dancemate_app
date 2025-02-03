@@ -8,3 +8,11 @@ final getCourseProvider =
   final result = await api.getCourses(date);
   return result;
 });
+
+final getCourseDetailProvider =
+    FutureProvider.family<dynamic, int>((ref, courseDetailId) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.getCourseDetail(courseDetailId);
+  return result;
+});
