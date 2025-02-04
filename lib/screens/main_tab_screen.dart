@@ -1,3 +1,4 @@
+import 'package:dancemate_app/screens/calendar_screen.dart';
 import 'package:dancemate_app/screens/home_screen.dart';
 import 'package:dancemate_app/screens/profile_screen.dart';
 import 'package:dancemate_app/screens/search_screen.dart';
@@ -36,7 +37,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           Offstage(
             offstage: _selectedIndex != 2,
-            child: const Scaffold(),
+            child: const CalendarScreen(),
           ),
           Offstage(
             offstage: _selectedIndex != 3,

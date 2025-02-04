@@ -180,7 +180,7 @@ class ApiServices {
     );
     final resultData =
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
-    final reserveCourses = resultData['course_detail'];
+    final reserveCourses = resultData['course'];
 
     return reserveCourses;
   }
