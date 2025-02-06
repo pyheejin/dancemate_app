@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/course_provider.dart';
+import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -9,6 +10,14 @@ class CalendarScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final courses = ref.watch(getCourseProvider('2025-02-03'));
+
+    void onCourseTap(int courseId) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CourseDetailScreen(courseId: courseId),
+        ),
+      );
+    }
 
     return Scaffold(
       body: Padding(
@@ -55,7 +64,9 @@ class CalendarScreen extends ConsumerWidget {
                     final courseImage = courseData['image_url'];
                     final courseTitle = courseData['title'];
                     return GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        onCourseTap(courseData['id']);
+                      },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 5,

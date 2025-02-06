@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,14 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userProfile = ref.watch(getUserProvider);
+
+    void onCourseTap(int courseId) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CourseDetailScreen(courseId: courseId),
+        ),
+      );
+    }
 
     return SafeArea(
       child: DefaultTabController(
@@ -130,7 +139,9 @@ class ProfileScreen extends ConsumerWidget {
                       final dancerEmail = dancerData['email'];
                       final dancerImageUrl = dancerData['image_url'];
                       return GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          onCourseTap(courseData['id']);
+                        },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             vertical: 5,

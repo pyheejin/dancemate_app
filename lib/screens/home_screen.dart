@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/home_provider.dart';
+import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,8 +11,15 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     const storage = FlutterSecureStorage();
-
     final homeData = ref.watch(getHomeProvider);
+
+    void onCourseTap(int courseId) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CourseDetailScreen(courseId: courseId),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -141,7 +149,9 @@ class HomeScreen extends ConsumerWidget {
                       final courseDate = courseDetailData['course_date'];
                       final courseTitle = courseDetailData['title'];
                       return GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          onCourseTap(todayCoursesData['id']);
+                        },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 7,
@@ -271,7 +281,9 @@ class HomeScreen extends ConsumerWidget {
                       final courseImage = courseData['image_url'];
                       final courseTitle = courseData['title'];
                       return GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          onCourseTap(courseData['id']);
+                        },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             vertical: 5,
