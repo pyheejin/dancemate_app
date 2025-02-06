@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/search_provider.dart';
+import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -72,6 +73,14 @@ class SearchResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void onCourseTap(int courseId) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CourseDetailScreen(courseId: courseId),
+        ),
+      );
+    }
+
     if (text.isEmpty) {
       return Expanded(
         child: CustomScrollView(
@@ -244,7 +253,9 @@ class SearchResult extends StatelessWidget {
                           final courseDate = courseDetailData['course_date'];
                           final courseTitle = courseDetailData['title'];
                           return GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              onCourseTap(courseData['id']);
+                            },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 vertical: 5,

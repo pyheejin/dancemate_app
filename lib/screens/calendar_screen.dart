@@ -26,17 +26,25 @@ class CalendarScreen extends ConsumerWidget {
           left: 20,
           right: 20,
         ),
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: TableCalendar(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TableCalendar(
                 firstDay: DateTime.utc(2010, 10, 16),
                 lastDay: DateTime.utc(2030, 3, 14),
                 focusedDay: DateTime.now(),
+                locale: 'ko-KR',
+                headerStyle: const HeaderStyle(
+                  titleCentered: true,
+                  formatButtonVisible: false,
+                ),
+                calendarStyle: const CalendarStyle(
+                  selectedDecoration: BoxDecoration(
+                    color: Color(0xFFA48AFF),
+                  ),
+                ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: courses.when(
+              courses.when(
                 loading: () => const CircularProgressIndicator(),
                 error: (error, stack) {
                   print(error);
@@ -168,8 +176,8 @@ class CalendarScreen extends ConsumerWidget {
                   },
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

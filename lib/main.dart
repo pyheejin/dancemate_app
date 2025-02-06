@@ -3,9 +3,11 @@ import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MyApp()));
+  initializeDateFormatting()
+      .then((_) => runApp(const ProviderScope(child: MyApp())));
 }
 
 class MyApp extends StatefulWidget {
