@@ -8,12 +8,16 @@ class SearchScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TextEditingController textController =
-        TextEditingController(text: '');
+    final TextEditingController textController = TextEditingController();
 
-    final keyword = textController.text;
-    final courses = ref.watch(getSearchProvider(keyword));
-    final searchPre = ref.watch(getSearchPreProvider);
+    String keyword = textController.text;
+    dynamic courses = ref.watch(getSearchProvider(keyword));
+    dynamic searchPre = ref.watch(getSearchPreProvider);
+
+    void onTap(String searchKeyword) {
+      courses = ref.watch(getSearchProvider(searchKeyword));
+      searchPre = ref.watch(getSearchPreProvider);
+    }
 
     return Scaffold(
       body: Padding(
@@ -40,9 +44,15 @@ class SearchScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  const Icon(
-                    Icons.search_outlined,
-                    size: 30,
+                  GestureDetector(
+                    onTap: () {
+                      print('???? ${textController.text}');
+                      onTap(textController.text);
+                    },
+                    child: const Icon(
+                      Icons.search_outlined,
+                      size: 30,
+                    ),
                   ),
                 ],
               ),
@@ -370,7 +380,6 @@ class SearchResult extends StatelessWidget {
     } else {
       return Column(
         children: [
-          const SizedBox(height: 20),
           const Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -381,6 +390,7 @@ class SearchResult extends StatelessWidget {
           courses.when(
             data: (courseList) {
               return ListView.builder(
+                padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 scrollDirection: Axis.vertical,
                 itemCount: courseList.length,

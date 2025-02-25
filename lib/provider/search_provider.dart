@@ -15,3 +15,8 @@ final getSearchPreProvider = FutureProvider<dynamic>((ref) async {
   final result = await api.getSearchPre();
   return result;
 });
+
+final searchKeywordProvider =
+    StateProvider.family<String, String>((ref, keyword) {
+  return keyword;
+});

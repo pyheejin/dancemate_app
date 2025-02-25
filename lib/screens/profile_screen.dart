@@ -1,14 +1,17 @@
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    const storage = FlutterSecureStorage();
     final userProfile = ref.watch(getUserProvider);
 
     void onCourseTap(int courseId) {
@@ -32,7 +35,15 @@ class ProfileScreen extends ConsumerWidget {
                 SliverAppBar(
                   actions: [
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        await storage.delete(key: 'login');
+
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      },
                       icon: const Icon(
                         Icons.settings,
                         size: 20,
