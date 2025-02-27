@@ -16,7 +16,10 @@ final getSearchPreProvider = FutureProvider<dynamic>((ref) async {
   return result;
 });
 
-final searchKeywordProvider =
-    StateProvider.family<String, String>((ref, keyword) {
-  return keyword;
+final searchKeywordProvider = StateProvider<String>((ref) {
+  return '';
+});
+
+final searchResultCountProvider = StateProvider<int>((ref) {
+  return 0;
 });

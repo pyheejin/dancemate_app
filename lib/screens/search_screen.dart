@@ -10,13 +10,21 @@ class SearchScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final TextEditingController textController = TextEditingController();
 
-    String keyword = textController.text;
+    int resultCount = ref.watch(searchResultCountProvider);
+    String keyword = ref.watch(searchKeywordProvider);
     dynamic courses = ref.watch(getSearchProvider(keyword));
     dynamic searchPre = ref.watch(getSearchPreProvider);
 
     void onTap(String searchKeyword) {
+      ref.read(searchKeywordProvider.notifier).update((state) => searchKeyword);
+
       courses = ref.watch(getSearchProvider(searchKeyword));
       searchPre = ref.watch(getSearchPreProvider);
+      print(courses);
+
+      ref
+          .read(searchResultCountProvider.notifier)
+          .update((state) => courses.value['result_count']);
     }
 
     return Scaffold(
@@ -46,7 +54,6 @@ class SearchScreen extends ConsumerWidget {
                   const SizedBox(width: 15),
                   GestureDetector(
                     onTap: () {
-                      print('???? ${textController.text}');
                       onTap(textController.text);
                     },
                     child: const Icon(
@@ -62,6 +69,7 @@ class SearchScreen extends ConsumerWidget {
               courses: courses,
               searchPre: searchPre,
               text: keyword,
+              resultCount: resultCount,
             ),
           ],
         ),
@@ -76,10 +84,12 @@ class SearchResult extends StatelessWidget {
     required this.searchPre,
     required this.courses,
     required this.text,
+    required this.resultCount,
   });
 
   final AsyncValue searchPre, courses;
   final String text;
+  final int resultCount;
 
   @override
   Widget build(BuildContext context) {
@@ -380,10 +390,10 @@ class SearchResult extends StatelessWidget {
     } else {
       return Column(
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text('검색결과 총 N개'),
+              Text('검색결과 총 $resultCount개'),
             ],
           ),
           const SizedBox(height: 20),

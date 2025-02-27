@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:dancemate_app/provider/calendar_provider.dart';
 import 'package:dancemate_app/provider/course_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
@@ -21,11 +19,12 @@ class CalendarScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+
     DateTime now = DateTime.now();
     CalendarFormat calendarFormat = CalendarFormat.month;
-    DateTime sDay = DateTime.now();
-    var selectDay = ref.watch(selectDateProvider(sDay));
-    var courses = ref.watch(getCourseProvider(selectDay));
+    DateTime selectDay = ref.watch(selectDateProvider);
+    var courses = ref.watch(getCourseProvider(dateFormat.format(selectDay)));
     List<String> days = ['_', '월', '화', '수', '목', '금', '토', '일'];
 
     Map<DateTime, List<Event>> events = {
@@ -60,7 +59,7 @@ class CalendarScreen extends ConsumerWidget {
               firstDay: DateTime(now.year - 1, now.month, 1),
               // 달에 마지막 날
               lastDay: DateTime(now.year + 10, 12, 31),
-              focusedDay: DateTime.parse(selectDay),
+              focusedDay: selectDay,
               calendarFormat: calendarFormat,
               locale: 'ko-KR',
               headerStyle: const HeaderStyle(
@@ -72,18 +71,27 @@ class CalendarScreen extends ConsumerWidget {
                   color: const Color(0xFFA48AFF),
                   borderRadius: BorderRadius.circular(20),
                 ),
+                defaultDecoration: BoxDecoration(
+                  // color: Colors.white,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                todayDecoration: BoxDecoration(
+                  color: Colors.blueAccent.shade100,
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
               selectedDayPredicate: (day) {
-                return isSameDay(sDay, day);
+                return isSameDay(selectDay, day);
               },
               // 사용자가 캘린더에 요일을 클릭했을 때
               onDaySelected: (selectedDay, focusedDay) {
-                selectDay = DateFormat('yyyy-MM-dd').format(selectedDay);
+                selectDay = selectedDay;
                 now = focusedDay;
-                courses = ref.watch(getCourseProvider(selectDay));
 
-                print(selectDay);
-                print(courses);
+                ref
+                    .read(selectDateProvider.notifier)
+                    .update((state) => selectDay);
+                courses = ref.watch(getCourseProvider(selectDay));
               },
               onPageChanged: (focusedDay) {
                 now = focusedDay;
@@ -100,11 +108,11 @@ class CalendarScreen extends ConsumerWidget {
                 // },
               ),
 
-              eventLoader: (day) {
-                final dateFormat = DateFormat('yyyy-MM-dd');
-                final newDay = dateFormat.format(day);
-                return getEventsForDay(day);
-              },
+              // eventLoader: (day) {
+              //   final dateFormat = DateFormat('yyyy-MM-dd');
+              //   final newDay = dateFormat.format(day);
+              //   return getEventsForDay(day);
+              // },
             ),
             Expanded(
               child: courses.when(

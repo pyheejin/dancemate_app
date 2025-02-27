@@ -1,50 +1,45 @@
+import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/screens/calendar_screen.dart';
 import 'package:dancemate_app/screens/home_screen.dart';
 import 'package:dancemate_app/screens/profile_screen.dart';
 import 'package:dancemate_app/screens/search_screen.dart';
 import 'package:dancemate_app/widgets/nav_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MainNavigationScreen extends StatefulWidget {
+class MainNavigationScreen extends ConsumerWidget {
   const MainNavigationScreen({super.key});
 
   @override
-  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    int selectedIndex = ref.watch(mainTapProvider);
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _selectedIndex = 0;
+    void onTap(int index) {
+      ref.read(mainTapProvider.notifier).update((state) => index);
+    }
 
-  void _onTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Offstage(
-            offstage: _selectedIndex != 0,
+            offstage: selectedIndex != 0,
             child: const HomeScreen(),
           ),
           Offstage(
-            offstage: _selectedIndex != 1,
+            offstage: selectedIndex != 1,
             child: const SearchScreen(),
           ),
           Offstage(
-            offstage: _selectedIndex != 2,
+            offstage: selectedIndex != 2,
             child: const CalendarScreen(),
           ),
           Offstage(
-            offstage: _selectedIndex != 3,
+            offstage: selectedIndex != 3,
             child: const Scaffold(),
           ),
           Offstage(
-            offstage: _selectedIndex != 4,
+            offstage: selectedIndex != 4,
             child: const ProfileScreen(),
           ),
         ],
@@ -57,43 +52,43 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           children: [
             NavTab(
               text: '홈',
-              isSelected: _selectedIndex == 0,
+              isSelected: selectedIndex == 0,
               icon: Icons.home_outlined,
               selectedIcon: Icons.home_outlined,
-              onTap: () => _onTap(0),
-              selectedIndex: _selectedIndex,
+              onTap: () => onTap(0),
+              selectedIndex: selectedIndex,
             ),
             NavTab(
               text: '검색',
-              isSelected: _selectedIndex == 1,
+              isSelected: selectedIndex == 1,
               icon: Icons.search_outlined,
               selectedIcon: Icons.search,
-              onTap: () => _onTap(1),
-              selectedIndex: _selectedIndex,
+              onTap: () => onTap(1),
+              selectedIndex: selectedIndex,
             ),
             NavTab(
               text: '달력',
-              isSelected: _selectedIndex == 2,
+              isSelected: selectedIndex == 2,
               icon: Icons.calendar_month_outlined,
               selectedIcon: Icons.calendar_month,
-              onTap: () => _onTap(2),
-              selectedIndex: _selectedIndex,
+              onTap: () => onTap(2),
+              selectedIndex: selectedIndex,
             ),
             NavTab(
               text: '커뮤니티',
-              isSelected: _selectedIndex == 3,
+              isSelected: selectedIndex == 3,
               icon: Icons.forum_outlined,
               selectedIcon: Icons.forum,
-              onTap: () => _onTap(3),
-              selectedIndex: _selectedIndex,
+              onTap: () => onTap(3),
+              selectedIndex: selectedIndex,
             ),
             NavTab(
               text: '프로필',
-              isSelected: _selectedIndex == 4,
+              isSelected: selectedIndex == 4,
               icon: Icons.person_outline,
               selectedIcon: Icons.person,
-              onTap: () => _onTap(4),
-              selectedIndex: _selectedIndex,
+              onTap: () => onTap(4),
+              selectedIndex: selectedIndex,
             ),
           ],
         ),
