@@ -20,7 +20,6 @@ class SearchScreen extends ConsumerWidget {
 
       courses = ref.watch(getSearchProvider(searchKeyword));
       searchPre = ref.watch(getSearchPreProvider);
-      print(courses);
 
       ref
           .read(searchResultCountProvider.notifier)
@@ -66,6 +65,7 @@ class SearchScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             SearchResult(
+              ref: ref,
               courses: courses,
               searchPre: searchPre,
               text: keyword,
@@ -81,18 +81,28 @@ class SearchScreen extends ConsumerWidget {
 class SearchResult extends StatelessWidget {
   const SearchResult({
     super.key,
+    required this.ref,
     required this.searchPre,
     required this.courses,
     required this.text,
     required this.resultCount,
   });
 
+  final WidgetRef ref;
   final AsyncValue searchPre, courses;
   final String text;
   final int resultCount;
 
   @override
   Widget build(BuildContext context) {
+    void onTap(String searchKeyword) {
+      ref.read(searchKeywordProvider.notifier).update((state) => searchKeyword);
+
+      ref
+          .read(searchResultCountProvider.notifier)
+          .update((state) => courses.value['result_count']);
+    }
+
     void onCourseTap(int courseId) {
       Navigator.of(context).push(
         MaterialPageRoute(
@@ -139,20 +149,25 @@ class SearchResult extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   final keywordData =
                                       dataList['latest_keyword'][index];
-                                  return Container(
-                                    margin: const EdgeInsets.only(right: 10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                          color: Colors.grey.shade400),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 15,
+                                  return GestureDetector(
+                                    onTap: () {
+                                      onTap(keywordData['keyword']);
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                            color: Colors.grey.shade400),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          keywordData['keyword'],
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 15,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            keywordData['keyword'],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -405,12 +420,18 @@ class SearchResult extends StatelessWidget {
                 scrollDirection: Axis.vertical,
                 itemCount: courseList.length,
                 itemBuilder: (context, index) {
-                  final courseData = courseList['courses'][index];
-                  final courseDate = courseData['course_date'];
-                  final courseTitle = courseData['title'];
-                  final courseImage = courseData['course']['image_url'];
+                  if (courseList['courses'].isEmpty) {
+                    return null;
+                  }
+                  final courseDetailData = courseList['courses'][index];
+                  final courseDetailTitle = courseDetailData['title'];
+                  final courseDetailDate = courseDetailData['course_date'];
 
-                  final dancerData = courseData['course']['dancer'];
+                  final courseData = courseDetailData['course'];
+                  final courseTitle = courseData['title'];
+                  final courseImage = courseData['image_url'];
+
+                  final dancerData = courseData['dancer'];
                   final dancerNickname = dancerData['nickname'];
                   final dancerEmail = dancerData['email'];
                   final dancerImageUrl = dancerData['image_url'];
@@ -503,7 +524,7 @@ class SearchResult extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '$courseDate $courseTitle',
+                                '$courseDetailDate $courseDetailTitle',
                                 style: const TextStyle(
                                   fontSize: 16,
                                 ),
