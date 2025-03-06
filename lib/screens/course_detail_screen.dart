@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/course_provider.dart';
+import 'package:dancemate_app/screens/reserve_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,10 +15,19 @@ class CourseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final courseDetailData = ref.watch(getCourseDetailProvider(courseId));
     dynamic selectCourseDetailId = ref.watch(selectCourseDetailIdProvider);
+
     if (courseDetailData.value != null) {
       if (selectCourseDetailId == 0) {
         selectCourseDetailId = courseDetailData.value['course_detail'][0]['id'];
       }
+    }
+
+    void onReserveTap(int courseDetailId) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ReserveScreen(courseDetailId: courseDetailId),
+        ),
+      );
     }
 
     return Scaffold(
@@ -285,7 +295,9 @@ class CourseDetailScreen extends ConsumerWidget {
                 },
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  onReserveTap(selectCourseDetailId);
+                },
                 style: TextButton.styleFrom(
                   backgroundColor: const Color(0xFFA48AFF),
                   shape: RoundedRectangleBorder(
