@@ -7,6 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 //   return stringDate;
 // });
 
-final selectDateProvider = StateProvider<DateTime>((ref) {
+final selectDateProvider = StateProvider.autoDispose<DateTime>((ref) {
   return DateTime.now();
 });

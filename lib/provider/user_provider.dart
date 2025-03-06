@@ -33,3 +33,11 @@ final getUserProvider = FutureProvider<dynamic>((ref) async {
   final result = await api.getUser();
   return result;
 });
+
+final getUserTicketProvider =
+    FutureProvider.family<dynamic, dynamic>((ref, dancerId) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.getUserTicket(dancerId);
+  return result;
+});

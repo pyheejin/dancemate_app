@@ -16,3 +16,7 @@ final getCourseDetailProvider =
   final result = await api.getCourseDetail(courseDetailId);
   return result;
 });
+
+final selectCourseDetailIdProvider = StateProvider.autoDispose<int>((ref) {
+  return 0;
+});

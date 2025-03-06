@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/course_provider.dart';
+import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +14,12 @@ class CourseDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final courseDetailData = ref.watch(getCourseDetailProvider(courseId));
+    dynamic selectCourseDetailId = ref.watch(selectCourseDetailIdProvider);
+    if (courseDetailData.value != null) {
+      if (selectCourseDetailId == 0) {
+        selectCourseDetailId = courseDetailData.value['course_detail'][0]['id'];
+      }
+    }
 
     return Scaffold(
       body: Padding(
@@ -225,32 +232,88 @@ class CourseDetailScreen extends ConsumerWidget {
       bottomNavigationBar: BottomAppBar(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFFA48AFF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 5,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '예약하기',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              courseDetailData.when(
+                loading: () => const CircularProgressIndicator(),
+                error: (error, stack) {
+                  print(error);
+                  return SizedBox(
+                    width: 300,
+                    child: Text('error: $error'),
+                  );
+                },
+                data: (courseDetail) {
+                  final courseDetailList = courseDetail['course_detail'];
+
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFFA48AFF),
+                      ),
+                      borderRadius: BorderRadius.circular(5),
                     ),
-                  ),
-                ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                      ),
+                      child: DropdownButton(
+                        value: selectCourseDetailId,
+                        items: courseDetailList
+                            .map<DropdownMenuItem<Object>>(
+                              (dynamic e) => DropdownMenuItem<Object>(
+                                value: e['id'],
+                                child: Text(
+                                  '${e['course_date']} ${e['title']}',
+                                  style: const TextStyle(
+                                    color: Color(0xFFA48AFF),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          ref
+                              .read(selectCourseDetailIdProvider.notifier)
+                              .update((state) => value as int);
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
-            ),
+              TextButton(
+                onPressed: () {},
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFFA48AFF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 3,
+                    horizontal: 15,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '예약하기',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
