@@ -24,30 +24,17 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        actions: [
-          GestureDetector(
-            onTap: () async {
-              await storage.delete(key: 'login');
-
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const LoginScreen(),
-                ),
-              );
-            },
-            child: const Text('로그아웃'),
-          ),
-          const SizedBox(width: 10),
-          const Icon(
+        actions: const [
+          Icon(
             Icons.send_outlined,
             size: 27,
           ),
-          const SizedBox(width: 5),
-          const Icon(
+          SizedBox(width: 5),
+          Icon(
             Icons.notifications_outlined,
             size: 27,
           ),
-          const SizedBox(width: 17),
+          SizedBox(width: 17),
         ],
       ),
       body: Padding(

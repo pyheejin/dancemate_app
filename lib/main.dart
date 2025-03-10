@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +24,11 @@ class _MyAppState extends State<MyApp> {
 
   void isloginData() async {
     const storage = FlutterSecureStorage();
+
     String? data = await storage.read(key: 'login');
-    print(data);
-    if (data != null) {
+    String accessToken = json.decode(data!)['access_token'];
+
+    if (accessToken != '') {
       setState(() {
         isLogin = true;
       });
@@ -40,6 +44,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    print(isLogin);
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(

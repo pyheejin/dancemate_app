@@ -13,6 +13,15 @@ class ReserveScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final reserveData = ref.watch(getReserveProvider(courseDetailId));
+    int selectUserTicket = ref.watch(selectUserTicketProvider);
+
+    if (reserveData.value != null) {
+      if (selectUserTicket == 0) {
+        if (reserveData.value['tickets'].length > 0) {
+          selectUserTicket = reserveData.value['tickets'][0]['id'];
+        }
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -148,9 +157,11 @@ class ReserveScreen extends ConsumerWidget {
                                   materialTapTargetSize:
                                       MaterialTapTargetSize.shrinkWrap,
                                   value: ticketId,
-                                  groupValue: 0,
+                                  groupValue: selectUserTicket,
                                   onChanged: (value) {
-                                    print(ticketId);
+                                    ref
+                                        .read(selectUserTicketProvider.notifier)
+                                        .update((state) => value as int);
                                   },
                                 ),
                                 Container(

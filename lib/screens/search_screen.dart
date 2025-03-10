@@ -435,11 +435,7 @@ class SearchResult extends StatelessWidget {
                     if (courseList['courses'].isEmpty) {
                       return null;
                     }
-                    final courseDetailData = courseList['courses'][index];
-                    final courseDetailTitle = courseDetailData['title'];
-                    final courseDetailDate = courseDetailData['course_date'];
-
-                    final courseData = courseDetailData['course'];
+                    final courseData = courseList['courses'][index];
                     final courseTitle = courseData['title'];
                     final courseImage = courseData['image_url'];
 
@@ -529,18 +525,12 @@ class SearchResult extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 5),
+                                const SizedBox(height: 10),
                                 Text(
                                   courseTitle,
                                   style: const TextStyle(
                                     color: Color(0xff3F51B5),
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                Text(
-                                  '$courseDetailDate $courseDetailTitle',
-                                  style: const TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 20,
                                   ),
                                 ),
                               ],

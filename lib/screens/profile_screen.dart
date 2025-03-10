@@ -1,17 +1,15 @@
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
-import 'package:dancemate_app/screens/login_screen.dart';
+import 'package:dancemate_app/screens/setting_screen.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const storage = FlutterSecureStorage();
     final userProfile = ref.watch(getUserProvider);
 
     void onCourseTap(int courseId) {
@@ -35,12 +33,10 @@ class ProfileScreen extends ConsumerWidget {
                 SliverAppBar(
                   actions: [
                     IconButton(
-                      onPressed: () async {
-                        await storage.delete(key: 'login');
-
+                      onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
+                            builder: (context) => const SettingScreen(),
                           ),
                         );
                       },
@@ -282,7 +278,7 @@ class ProfileScreen extends ConsumerWidget {
                       return Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 5,
-                          horizontal: 5,
+                          horizontal: 10,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -290,21 +286,28 @@ class ProfileScreen extends ConsumerWidget {
                             Container(
                               decoration: BoxDecoration(
                                 color: const Color(0xff6555FF),
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(15),
                               ),
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 5,
+                                  horizontal: 15,
+                                ),
                                 child: Text(
                                   dancerNickname,
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 16,
+                                    fontSize: 18,
                                   ),
                                 ),
                               ),
                             ),
-                            Text('$ticketRemainCount회권 / $ticketCount회권'),
+                            Text(
+                              '$ticketRemainCount회권 / $ticketCount회권',
+                              style: const TextStyle(
+                                fontSize: 17,
+                              ),
+                            ),
                             Text(expiredDate),
                           ],
                         ),

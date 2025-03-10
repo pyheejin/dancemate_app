@@ -12,3 +12,7 @@ final getReserveProvider =
 final selectCourseDetailIdProvider = StateProvider.autoDispose<int>((ref) {
   return 0;
 });
+
+final selectUserTicketProvider = StateProvider.autoDispose<int>((ref) {
+  return 0;
+});
