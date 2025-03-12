@@ -44,31 +44,11 @@ class LikeCourseScreen extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Stack(
-                      children: [
-                        Image.network(
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          'https://image.bugsm.co.kr/album/images/500/41087/4108755.jpg',
-                        ),
-                        Positioned(
-                          top: 5,
-                          left: 5,
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: const Color(0xff9475FF),
-                            ),
-                            child: const Icon(
-                              Icons.favorite_border,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
+                    Image.network(
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      'https://image.bugsm.co.kr/album/images/500/41087/4108755.jpg',
                     ),
                     const SizedBox(width: 10),
                     Column(
