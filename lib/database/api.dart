@@ -212,4 +212,31 @@ class ApiServices {
 
     return resultData;
   }
+
+  Future<dynamic> getCourseLike() async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/course/like'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+
+    return resultData;
+  }
+
+  Future<dynamic> postCourseDetailLike(int courseId) async {
+    final accessToken = await getAccessToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl/course/$courseId/like'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
 }
