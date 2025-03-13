@@ -50,6 +50,7 @@ class CourseDetailScreen extends ConsumerWidget {
               final courseTitle = courseDetail['title'];
               final courseImageUrl = courseDetail['image_url'];
               final courseDescription = courseDetail['description'];
+              final isCourseLike = courseDetail['is_like'];
 
               final dancerData = courseDetail['dancer'];
               final dancerEmail = dancerData['email'];
@@ -60,12 +61,55 @@ class CourseDetailScreen extends ConsumerWidget {
               return Column(
                 children: [
                   const SizedBox(height: 40),
-                  Image.network(
-                    width: 430,
-                    height: 270,
-                    fit: BoxFit.fitWidth,
-                    courseImageUrl,
+                  Stack(
+                    children: [
+                      Image.network(
+                        width: 430,
+                        height: 270,
+                        fit: BoxFit.fitWidth,
+                        courseImageUrl,
+                      ),
+                      Positioned(
+                        top: 5,
+                        left: 5,
+                        child: GestureDetector(
+                          onTap: () async {
+                            final result = await ref.watch(
+                                postCourseLikeProvider(courseDetail['id'])
+                                    .future);
+                            print(result['result_code']);
+                            if (result['result_code'] == 200) {
+                              ref.refresh(getCourseDetailProvider(courseId));
+                            } else {
+                              print('like fail');
+                            }
+                          },
+                          child: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(35),
+                              color: const Color(0xff9475FF),
+                            ),
+                            child: Icon(
+                              isCourseLike
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+
+                  // Image.network(
+                  //   width: 430,
+                  //   height: 270,
+                  //   fit: BoxFit.fitWidth,
+                  //   courseImageUrl,
+                  // ),
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(

@@ -143,6 +143,7 @@ class CalendarScreen extends ConsumerWidget {
                       final courseData = reserveCourseList[index]['course'];
                       final courseImage = courseData['image_url'];
                       final courseTitle = courseData['title'];
+                      final isCourseLike = courseData['is_like'];
                       return GestureDetector(
                         onTap: () {
                           onCourseTap(courseData['id']);
@@ -155,31 +156,11 @@ class CalendarScreen extends ConsumerWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Stack(
-                                children: [
-                                  Image.network(
-                                    width: 120,
-                                    height: 120,
-                                    fit: BoxFit.cover,
-                                    courseImage,
-                                  ),
-                                  Positioned(
-                                    top: 5,
-                                    left: 5,
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: const Color(0xff9475FF),
-                                      ),
-                                      child: const Icon(
-                                        Icons.favorite_border,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              Image.network(
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                                courseImage,
                               ),
                               const SizedBox(width: 10),
                               Column(

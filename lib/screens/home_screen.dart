@@ -1,16 +1,14 @@
+import 'package:dancemate_app/provider/course_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
-import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const storage = FlutterSecureStorage();
     final homeData = ref.watch(getHomeProvider);
 
     void onCourseTap(int courseId) {
@@ -135,9 +133,21 @@ class HomeScreen extends ConsumerWidget {
                           todayCoursesData['course_detail'][0];
                       final courseDate = courseDetailData['course_date'];
                       final courseTitle = courseDetailData['title'];
+                      bool isCourseLike = todayCoursesData['is_like'];
                       return GestureDetector(
                         onTap: () {
                           onCourseTap(todayCoursesData['id']);
+                        },
+                        onDoubleTap: () async {
+                          final result = await ref.watch(
+                              postCourseLikeProvider(todayCoursesData['id'])
+                                  .future);
+                          print(result['result_code']);
+                          if (result['result_code'] == 200) {
+                            ref.refresh(getHomeProvider);
+                          } else {
+                            print('like fail');
+                          }
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -156,17 +166,34 @@ class HomeScreen extends ConsumerWidget {
                                   ),
                                   Positioned(
                                     top: 5,
-                                    right: 5,
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: const Color(0xff9475FF),
-                                      ),
-                                      child: const Icon(
-                                        Icons.favorite_border,
-                                        color: Colors.white,
+                                    left: 5,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        final result = await ref.watch(
+                                            postCourseLikeProvider(
+                                                    todayCoursesData['id'])
+                                                .future);
+                                        print(result['result_code']);
+                                        if (result['result_code'] == 200) {
+                                          ref.refresh(getHomeProvider);
+                                        } else {
+                                          print('like fail');
+                                        }
+                                      },
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          color: const Color(0xff9475FF),
+                                        ),
+                                        child: Icon(
+                                          isCourseLike
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -267,6 +294,7 @@ class HomeScreen extends ConsumerWidget {
                       final courseData = reserveCourseData['course'];
                       final courseImage = courseData['image_url'];
                       final courseTitle = courseData['title'];
+                      bool isCourseLike = courseData['is_like'];
                       return GestureDetector(
                         onTap: () {
                           onCourseTap(courseData['id']);
@@ -281,25 +309,54 @@ class HomeScreen extends ConsumerWidget {
                             children: [
                               Stack(
                                 children: [
-                                  Image.network(
-                                    width: 120,
-                                    height: 120,
-                                    fit: BoxFit.cover,
-                                    courseImage,
+                                  GestureDetector(
+                                    onDoubleTap: () async {
+                                      final result = await ref.watch(
+                                          postCourseLikeProvider(
+                                                  courseData['id'])
+                                              .future);
+                                      if (result['result_code'] == 200) {
+                                        ref.refresh(getHomeProvider);
+                                      } else {
+                                        print('like fail');
+                                      }
+                                    },
+                                    child: Image.network(
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      courseImage,
+                                    ),
                                   ),
                                   Positioned(
                                     top: 5,
                                     left: 5,
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: const Color(0xff9475FF),
-                                      ),
-                                      child: const Icon(
-                                        Icons.favorite_border,
-                                        color: Colors.white,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        final result = await ref.watch(
+                                            postCourseLikeProvider(
+                                                    courseData['id'])
+                                                .future);
+                                        if (result['result_code'] == 200) {
+                                          ref.refresh(getHomeProvider);
+                                        } else {
+                                          print('like fail');
+                                        }
+                                      },
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          color: const Color(0xff9475FF),
+                                        ),
+                                        child: Icon(
+                                          isCourseLike
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   ),

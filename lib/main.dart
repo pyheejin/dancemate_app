@@ -26,12 +26,14 @@ class _MyAppState extends State<MyApp> {
     const storage = FlutterSecureStorage();
 
     String? data = await storage.read(key: 'login');
-    String accessToken = json.decode(data!)['access_token'];
+    if (data != null) {
+      String accessToken = json.decode(data)['access_token'];
 
-    if (accessToken != '') {
-      setState(() {
-        isLogin = true;
-      });
+      if (accessToken != '') {
+        setState(() {
+          isLogin = true;
+        });
+      }
     }
   }
 
