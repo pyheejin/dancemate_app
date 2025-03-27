@@ -197,8 +197,8 @@ class ReserveScreen extends ConsumerWidget {
                     const SizedBox(height: 20),
                     Container(
                       height: 200,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
+                      decoration: const BoxDecoration(
+                        color: Colors.black12,
                       ),
                       child: const Row(
                         crossAxisAlignment: CrossAxisAlignment.start,

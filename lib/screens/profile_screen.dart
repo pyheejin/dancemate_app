@@ -63,12 +63,18 @@ class ProfileScreen extends ConsumerWidget {
                               child: Text('error: $error'),
                             );
                           },
-                          data: (dataList) => CircleAvatar(
-                            radius: 50,
-                            foregroundImage:
-                                NetworkImage(dataList['image_url']),
-                            child: Text(dataList['nickname']),
-                          ),
+                          data: (dataList) {
+                            if (dataList == null) {
+                              return Container();
+                            } else {
+                              return CircleAvatar(
+                                radius: 50,
+                                foregroundImage:
+                                    NetworkImage(dataList['image_url']),
+                                child: Text(dataList['nickname']),
+                              );
+                            }
+                          },
                         ),
                         const SizedBox(width: 10),
                         userProfile.when(
@@ -80,32 +86,38 @@ class ProfileScreen extends ConsumerWidget {
                               child: Text('error: $error'),
                             );
                           },
-                          data: (dataList) => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                          data: (dataList) {
+                            if (dataList == null) {
+                              return Container();
+                            } else {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        '@${dataList['email']}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.mode_edit_outline_outlined,
+                                        size: 17,
+                                      ),
+                                    ],
+                                  ),
                                   Text(
-                                    '@${dataList['email']}',
+                                    dataList['introduction'],
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 18,
+                                      fontSize: 15,
                                     ),
                                   ),
-                                  const Icon(
-                                    Icons.mode_edit_outline_outlined,
-                                    size: 17,
-                                  ),
                                 ],
-                              ),
-                              Text(
-                                dataList['introduction'],
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ],
-                          ),
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -128,107 +140,116 @@ class ProfileScreen extends ConsumerWidget {
                       child: Text('error: $error'),
                     );
                   },
-                  data: (dataList) => ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: dataList['reserve_course'].length,
-                    itemBuilder: (context, index) {
-                      final courseDetailData =
-                          dataList['reserve_course'][index]['course_detail'];
-                      final courseDetailTitle = courseDetailData['title'];
-                      final courseDetailDate = courseDetailData['course_date'];
+                  data: (dataList) {
+                    if (dataList == null) {
+                      return Container();
+                    } else {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: dataList['reserve_course'].length,
+                        itemBuilder: (context, index) {
+                          final courseDetailData = dataList['reserve_course']
+                              [index]['course_detail'];
+                          final courseDetailTitle = courseDetailData['title'];
+                          final courseDetailDate =
+                              courseDetailData['course_date'];
 
-                      final courseData = courseDetailData['course'];
-                      final courseTitle = courseData['title'];
-                      final courseImage = courseData['image_url'];
+                          final courseData = courseDetailData['course'];
+                          final courseTitle = courseData['title'];
+                          final courseImage = courseData['image_url'];
 
-                      final dancerData = courseData['dancer'];
-                      final dancerNickname = dancerData['nickname'];
-                      final dancerEmail = dancerData['email'];
-                      final dancerImageUrl = dancerData['image_url'];
-                      return GestureDetector(
-                        onTap: () {
-                          onCourseTap(courseData['id']);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 5,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Image.network(
-                                width: 120,
-                                height: 120,
-                                fit: BoxFit.cover,
-                                courseImage,
+                          final dancerData = courseData['dancer'];
+                          final dancerNickname = dancerData['nickname'];
+                          final dancerEmail = dancerData['email'];
+                          final dancerImageUrl = dancerData['image_url'];
+                          return GestureDetector(
+                            onTap: () {
+                              onCourseTap(courseData['id']);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 5,
                               ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Row(
+                                  Image.network(
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                    courseImage,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                          dancerImageUrl,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 5),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      Row(
                                         children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xff6555FF),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                          CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                              dancerImageUrl,
                                             ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xff6555FF),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                       horizontal: 15),
-                                              child: Text(
-                                                dancerNickname,
+                                                  child: Text(
+                                                    dancerNickname,
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                dancerEmail,
                                                 style: const TextStyle(
-                                                  color: Colors.white,
                                                   fontSize: 16,
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                          Text(
-                                            dancerEmail,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                            ),
+                                            ],
                                           ),
                                         ],
                                       ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        courseTitle,
+                                        style: const TextStyle(
+                                          color: Color(0xff3F51B5),
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      Text(
+                                        '$courseDetailDate $courseDetailTitle',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
                                     ],
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    courseTitle,
-                                    style: const TextStyle(
-                                      color: Color(0xff3F51B5),
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                  Text(
-                                    '$courseDetailDate $courseDetailTitle',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                    ),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
+                          );
+                        },
                       );
-                    },
-                  ),
+                    }
+                  },
                 ),
                 userProfile.when(
                   loading: () => const CircularProgressIndicator(),
@@ -239,61 +260,67 @@ class ProfileScreen extends ConsumerWidget {
                       child: Text('error: $error'),
                     );
                   },
-                  data: (dataList) => ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: dataList['mate_ticket'].length,
-                    itemBuilder: (context, index) {
-                      final ticketCount =
-                          dataList['mate_ticket'][index]['count'];
-                      final ticketRemainCount =
-                          dataList['mate_ticket'][index]['remain_count'];
-                      final expiredDate =
-                          dataList['mate_ticket'][index]['expired_date'];
+                  data: (dataList) {
+                    if (dataList == null) {
+                      return Container();
+                    } else {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: dataList['mate_ticket'].length,
+                        itemBuilder: (context, index) {
+                          final ticketCount =
+                              dataList['mate_ticket'][index]['count'];
+                          final ticketRemainCount =
+                              dataList['mate_ticket'][index]['remain_count'];
+                          final expiredDate =
+                              dataList['mate_ticket'][index]['expired_date'];
 
-                      final ticketData =
-                          dataList['mate_ticket'][index]['ticket'];
+                          final ticketData =
+                              dataList['mate_ticket'][index]['ticket'];
 
-                      final dancerData = ticketData['dancer'];
-                      final dancerNickname = dancerData['nickname'];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 5,
-                          horizontal: 10,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xff6555FF),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 5,
-                                  horizontal: 15,
-                                ),
-                                child: Text(
-                                  dancerNickname,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
+                          final dancerData = ticketData['dancer'];
+                          final dancerNickname = dancerData['nickname'];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 5,
+                              horizontal: 10,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xff6555FF),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 5,
+                                      horizontal: 15,
+                                    ),
+                                    child: Text(
+                                      dancerNickname,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                                Text(
+                                  '$ticketRemainCount회권 / $ticketCount회권',
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                Text(expiredDate),
+                              ],
                             ),
-                            Text(
-                              '$ticketRemainCount회권 / $ticketCount회권',
-                              style: const TextStyle(
-                                fontSize: 17,
-                              ),
-                            ),
-                            Text(expiredDate),
-                          ],
-                        ),
+                          );
+                        },
                       );
-                    },
-                  ),
+                    }
+                  },
                 ),
               ],
             ),

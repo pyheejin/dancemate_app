@@ -1,4 +1,6 @@
 import 'package:dancemate_app/provider/course_provider.dart';
+import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:dancemate_app/screens/order_screen.dart';
 import 'package:dancemate_app/screens/reserve_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,12 +24,30 @@ class CourseDetailScreen extends ConsumerWidget {
       }
     }
 
-    void onReserveTap(int courseDetailId) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => ReserveScreen(courseDetailId: courseDetailId),
-        ),
-      );
+    void onReserveTap(int courseDetailId, int dancerId) {
+      final ticketData = ref.watch(getUserTicketProvider(dancerId));
+
+      if (ticketData.hasValue) {
+        print(ticketData.value['result_count']);
+
+        if (ticketData.value['result_count'] > 0) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>
+                  ReserveScreen(courseDetailId: courseDetailId),
+            ),
+          );
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => OrderScreen(
+                courseDetailId: courseDetailId,
+                dancerId: dancerId,
+              ),
+            ),
+          );
+        }
+      }
     }
 
     return Scaffold(
@@ -103,13 +123,6 @@ class CourseDetailScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-
-                  // Image.network(
-                  //   width: 430,
-                  //   height: 270,
-                  //   fit: BoxFit.fitWidth,
-                  //   courseImageUrl,
-                  // ),
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -340,7 +353,11 @@ class CourseDetailScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () {
-                  onReserveTap(selectCourseDetailId);
+                  if (courseDetailData.value != null) {
+                    final dancerId = courseDetailData.value['course_detail'][0]
+                        ['course']['dancer']['id'];
+                    onReserveTap(selectCourseDetailId, dancerId);
+                  }
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: const Color(0xFFA48AFF),

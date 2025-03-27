@@ -239,4 +239,39 @@ class ApiServices {
 
     return resultData;
   }
+
+  Future<dynamic> postPayment(int ticketId) async {
+    final accessToken = await getAccessToken();
+
+    dynamic body = {
+      'ticket_id': ticketId,
+    };
+    body = jsonEncode(body);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/payment'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
+
+  Future<dynamic> getDancerDetailTicket(int dancerId) async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/dancer/$dancerId/ticket'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+
+    return resultData;
+  }
 }
