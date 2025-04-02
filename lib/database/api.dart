@@ -213,6 +213,30 @@ class ApiServices {
     return resultData;
   }
 
+  Future<dynamic> postCourseDetailReserve(
+    int courseDetailId,
+    int userTicketId,
+  ) async {
+    final accessToken = await getAccessToken();
+
+    dynamic body = {
+      'user_ticket_id': userTicketId,
+    };
+    body = jsonEncode(body);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/course/$courseDetailId/reserve'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
+
   Future<dynamic> getCourseLike() async {
     final accessToken = await getAccessToken();
     final response = await http.get(

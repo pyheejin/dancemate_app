@@ -25,7 +25,6 @@ final selectedEasyNaverKakaoPaymentProvider =
 final postPaymentProvider =
     FutureProvider.family<dynamic, int>((ref, ticketId) async {
   final ApiServices api = ApiServices();
-  print('ticketId: $ticketId');
 
   final result = await api.postPayment(ticketId);
   return result;

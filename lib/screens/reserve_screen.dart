@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/reserve_provider.dart';
+import 'package:dancemate_app/screens/reserve_complete_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -224,7 +225,23 @@ class ReserveScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: TextButton(
-            onPressed: () {},
+            onPressed: () async {
+              List<int> args = [
+                courseDetailId,
+                selectUserTicket,
+              ];
+              final result =
+                  await ref.watch(postCourseDetailReserveProvider(args).future);
+              if (result['result_code'] == 200) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ReserveCompleteScreen(
+                      reserveData: reserveData.value,
+                    ),
+                  ),
+                );
+              }
+            },
             style: TextButton.styleFrom(
               backgroundColor: const Color(0xFFA48AFF),
               shape: RoundedRectangleBorder(

@@ -410,6 +410,7 @@ class OrderScreen extends ConsumerWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => OrderCompleteScreen(
+                      courseDetailId: courseDetailId,
                       paymentData: result['result_data'],
                     ),
                   ),

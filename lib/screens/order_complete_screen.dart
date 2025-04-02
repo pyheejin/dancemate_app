@@ -1,15 +1,15 @@
-import 'package:dancemate_app/provider/dancer_provider.dart';
-import 'package:dancemate_app/provider/order_provider.dart';
-import 'package:dancemate_app/provider/reserve_provider.dart';
+import 'package:dancemate_app/screens/reserve_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 class OrderCompleteScreen extends ConsumerWidget {
+  final int courseDetailId;
   final dynamic paymentData;
 
   const OrderCompleteScreen({
     super.key,
+    required this.courseDetailId,
     required this.paymentData,
   });
 
@@ -66,7 +66,7 @@ class OrderCompleteScreen extends ConsumerWidget {
             Container(
               decoration: const BoxDecoration(
                 border: Border.symmetric(
-                  horizontal: BorderSide(color: Colors.black12),
+                  horizontal: BorderSide(color: Colors.black38),
                 ),
               ),
               child: Padding(
@@ -238,7 +238,15 @@ class OrderCompleteScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ReserveScreen(
+                    courseDetailId: courseDetailId,
+                  ),
+                ),
+              );
+            },
             style: TextButton.styleFrom(
               backgroundColor: const Color(0xFFA48AFF),
               shape: RoundedRectangleBorder(

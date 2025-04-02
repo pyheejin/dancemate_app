@@ -16,3 +16,17 @@ final selectCourseDetailIdProvider = StateProvider.autoDispose<int>((ref) {
 final selectUserTicketProvider = StateProvider.autoDispose<int>((ref) {
   return 0;
 });
+
+final postCourseDetailReserveProvider =
+    FutureProvider.family<dynamic, List<int>>((ref, args) async {
+  final ApiServices api = ApiServices();
+
+  final courseDetailId = args[0];
+  final userTicketId = args[1];
+
+  final result = await api.postCourseDetailReserve(
+    courseDetailId,
+    userTicketId,
+  );
+  return result;
+});
