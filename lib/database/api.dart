@@ -48,9 +48,11 @@ class ApiServices {
 
     if (resultData['result_code'] == 200) {
       final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+      final userId = responseBody['user_id'];
       final accessToken = responseBody['access_token'];
 
       final payload = jsonEncode({
+        'userId': userId,
         'email': email,
         'access_token': accessToken,
       });
@@ -141,10 +143,10 @@ class ApiServices {
     return resultData;
   }
 
-  Future<dynamic> getUser() async {
+  Future<dynamic> getUserProfile() async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/user'),
+      Uri.parse('$baseUrl/user/profile'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },

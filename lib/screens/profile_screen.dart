@@ -10,7 +10,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userProfile = ref.watch(getUserProvider);
+    final userProfile = ref.watch(getUserProfileProvider);
 
     void onCourseTap(int courseId) {
       Navigator.of(context).push(

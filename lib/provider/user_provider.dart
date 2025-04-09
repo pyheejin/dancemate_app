@@ -27,10 +27,10 @@ final userTypeProvider = StateProvider.family<UserType, UserType>((ref, type) {
   return type;
 });
 
-final getUserProvider = FutureProvider<dynamic>((ref) async {
+final getUserProfileProvider = FutureProvider<dynamic>((ref) async {
   final ApiServices api = ApiServices();
 
-  final result = await api.getUser();
+  final result = await api.getUserProfile();
   return result;
 });
 
