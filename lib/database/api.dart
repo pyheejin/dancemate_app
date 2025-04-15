@@ -239,6 +239,21 @@ class ApiServices {
     return resultData;
   }
 
+  Future<dynamic> postCourseDetailCancel(int courseDetailId) async {
+    final accessToken = await getAccessToken();
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/course/$courseDetailId/cancel'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
+
   Future<dynamic> getCourseLike() async {
     final accessToken = await getAccessToken();
     final response = await http.get(
@@ -291,6 +306,20 @@ class ApiServices {
     final accessToken = await getAccessToken();
     final response = await http.get(
       Uri.parse('$baseUrl/dancer/$dancerId/ticket'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+
+    return resultData;
+  }
+
+  Future<dynamic> getDancerCourse() async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/dancer/course'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },

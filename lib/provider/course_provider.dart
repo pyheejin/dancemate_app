@@ -35,3 +35,11 @@ final postCourseLikeProvider =
   final result = await api.postCourseDetailLike(courseId);
   return result;
 });
+
+final postCourseDetailCancelProvider =
+    FutureProvider.family<dynamic, int>((ref, courseDetailId) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.postCourseDetailCancel(courseDetailId);
+  return result;
+});

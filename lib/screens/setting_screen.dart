@@ -1,3 +1,4 @@
+import 'package:dancemate_app/screens/dancer_course_screen.dart';
 import 'package:dancemate_app/screens/like_course_screen.dart';
 import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/screens/notification_screen.dart';
@@ -29,6 +30,21 @@ class SettingScreen extends ConsumerWidget {
             ),
             const SettingMenu(
               name: '티켓 구매 내역',
+              screen: TicketHistoryScreen(),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colors.grey.shade400),
+                ),
+              ),
+            ),
+            const SettingMenu(
+              name: '수업 관리',
+              screen: DancerCourseScreen(),
+            ),
+            const SettingMenu(
+              name: '티켓 관리',
               screen: TicketHistoryScreen(),
             ),
             Container(
