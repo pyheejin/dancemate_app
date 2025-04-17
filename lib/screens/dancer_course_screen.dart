@@ -1,5 +1,6 @@
 import 'package:dancemate_app/provider/course_provider.dart';
 import 'package:dancemate_app/provider/dancer_provider.dart';
+import 'package:dancemate_app/screens/dancer_course_detail_create_screen.dart';
 import 'package:dancemate_app/screens/dancer_course_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -94,6 +95,46 @@ class DancerCourseScreen extends ConsumerWidget {
               child: Text('search error: $error'),
             );
           },
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.white24,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: TextButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const DancerCourseDetailCreateScreen(),
+                ),
+              );
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: const Color(0xFFA48AFF),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 3,
+                horizontal: 15,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '추가하기',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

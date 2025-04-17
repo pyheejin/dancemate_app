@@ -15,3 +15,20 @@ final getDancerCourseProvider = FutureProvider<dynamic>((ref) async {
   final result = await api.getDancerCourse();
   return result;
 });
+
+class DancerCourseNotifier extends StateNotifier<dynamic> {
+  DancerCourseNotifier() : super([]);
+
+  void addCourseDetail(Map<String, dynamic> detail) {
+    state = [...state, detail];
+  }
+
+  void removeCourseDetail(Map<String, dynamic> removeDetail) {
+    state = state.where((detail) => detail != removeDetail).toList();
+  }
+}
+
+final dancerCourseProvider =
+    StateNotifierProvider<DancerCourseNotifier, dynamic>((ref) {
+  return DancerCourseNotifier();
+});

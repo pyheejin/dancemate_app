@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/course_provider.dart';
+import 'package:dancemate_app/provider/dancer_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,8 +16,14 @@ class DancerCourseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final courseDetailData = ref.watch(getCourseDetailProvider(courseId));
 
-    Widget onAddTap() {
-      return const Text('data');
+    final newDetailList = ref.watch(dancerCourseProvider);
+
+    void onAddTap() {
+      ref.read(dancerCourseProvider.notifier).addCourseDetail({});
+    }
+
+    void onRemoveTap(Map<String, dynamic> detail) {
+      ref.read(dancerCourseProvider.notifier).removeCourseDetail(detail);
     }
 
     void onSaveTap(int courseDetailId, int dancerId) {}
@@ -410,6 +417,253 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                               },
                             ),
                           ),
+                        ),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          itemCount: newDetailList.length,
+                          itemBuilder: (context, index) {
+                            final TextEditingController dateController =
+                                TextEditingController();
+                            final TextEditingController titleController =
+                                TextEditingController();
+                            final TextEditingController addressController =
+                                TextEditingController();
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xFFA48AFF),
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 15,
+                                                  ),
+                                                  child: Text(
+                                                    '수업 날짜',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Expanded(
+                                                child: SizedBox(
+                                                  height: 32,
+                                                  child: TextField(
+                                                    controller: dateController,
+                                                    decoration: InputDecoration(
+                                                      contentPadding:
+                                                          const EdgeInsets.only(
+                                                              left: 10),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color: Colors
+                                                              .grey.shade400,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color: Colors
+                                                              .grey.shade400,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      suffixIcon: const Icon(
+                                                        Icons.cancel_outlined,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xFFA48AFF),
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 15,
+                                                  ),
+                                                  child: Text(
+                                                    '수업 회차',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Expanded(
+                                                child: SizedBox(
+                                                  height: 32,
+                                                  child: TextField(
+                                                    controller: titleController,
+                                                    decoration: InputDecoration(
+                                                      contentPadding:
+                                                          const EdgeInsets.only(
+                                                              left: 10),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color: Colors
+                                                              .grey.shade400,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color: Colors
+                                                              .grey.shade400,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      suffixIcon: const Icon(
+                                                        Icons.cancel_outlined,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xFFA48AFF),
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 15,
+                                                  ),
+                                                  child: Text(
+                                                    '수업 장소',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Expanded(
+                                                child: SizedBox(
+                                                  height: 32,
+                                                  child: TextField(
+                                                    controller:
+                                                        addressController,
+                                                    decoration: InputDecoration(
+                                                      contentPadding:
+                                                          const EdgeInsets.only(
+                                                              left: 10),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color: Colors
+                                                              .grey.shade400,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color: Colors
+                                                              .grey.shade400,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      suffixIcon: const Icon(
+                                                        Icons.cancel_outlined,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      // onRemoveTap();
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.redAccent,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 20,
+                                          horizontal: 10,
+                                        ),
+                                        child: Text(
+                                          '삭제',
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                         GestureDetector(
                           onTap: onAddTap,
