@@ -32,3 +32,22 @@ final dancerCourseProvider =
     StateNotifierProvider<DancerCourseNotifier, dynamic>((ref) {
   return DancerCourseNotifier();
 });
+
+final getDancerTicketProvider = FutureProvider<dynamic>((ref) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.getTicketList();
+  return result;
+});
+
+final getDancerTicketDetailProvider =
+    FutureProvider.family<dynamic, int>((ref, ticketId) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.getTicketDetail(ticketId);
+  return result;
+});
+
+final ticketActiveProvider = StateProvider.autoDispose<bool>((ref) {
+  return true;
+});
