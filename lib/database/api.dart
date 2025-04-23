@@ -357,4 +357,74 @@ class ApiServices {
 
     return resultData;
   }
+
+  Future<dynamic> postTicket(Map<String, dynamic> ticketData) async {
+    final accessToken = await getAccessToken();
+
+    dynamic body = {
+      'status': ticketData['status'],
+      'count': ticketData['count'],
+      'cost': ticketData['cost'],
+      'discount_rate': ticketData['discount_rate'],
+    };
+    body = jsonEncode(body);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/ticket'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
+
+  Future<dynamic> putTicketDetail(
+      int ticketId, Map<String, dynamic> ticketData) async {
+    final accessToken = await getAccessToken();
+
+    dynamic body = {
+      'status': ticketData['status'],
+      'count': ticketData['count'],
+      'cost': ticketData['cost'],
+      'discount_rate': ticketData['discount_rate'],
+    };
+    body = jsonEncode(body);
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/ticket/$ticketId'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
+
+  Future<dynamic> postTicketExpire(int day) async {
+    final accessToken = await getAccessToken();
+
+    dynamic body = {
+      'day': day,
+    };
+    body = jsonEncode(body);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/ticket/expire'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
 }

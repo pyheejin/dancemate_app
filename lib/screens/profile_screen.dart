@@ -6,6 +6,7 @@ import 'package:dancemate_app/screens/setting_screen.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -13,6 +14,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userProfile = ref.watch(getUserProfileProvider);
+    NumberFormat format = NumberFormat('###,###,###,###');
 
     void onCourseTap(int courseId) {
       Navigator.of(context).push(
@@ -315,18 +317,18 @@ class ProfileScreen extends ConsumerWidget {
                         shrinkWrap: true,
                         itemCount: dataList['mate_ticket'].length,
                         itemBuilder: (context, index) {
-                          final ticketCount =
-                              dataList['mate_ticket'][index]['count'];
-                          final ticketRemainCount =
-                              dataList['mate_ticket'][index]['remain_count'];
-                          final expiredDate =
-                              dataList['mate_ticket'][index]['expired_date'];
+                          final userTicketData = dataList['mate_ticket'][index];
+                          final count = userTicketData['count'];
+                          final remainCount = userTicketData['remain_count'];
+                          final expiredDate = userTicketData['expired_date'];
 
-                          final ticketData =
-                              dataList['mate_ticket'][index]['ticket'];
+                          final ticketData = userTicketData['ticket'];
+                          final price = ticketData['price'];
 
                           final dancerData = ticketData['dancer'];
+                          final dancerEmail = dancerData['email'];
                           final dancerNickname = dancerData['nickname'];
+                          final dancerImageUrl = dancerData['image_url'];
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 5,
@@ -336,31 +338,147 @@ class ProfileScreen extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Container(
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xff6555FF),
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 5,
-                                      horizontal: 15,
+                                  decoration: const BoxDecoration(
+                                    color: Color.fromARGB(88, 163, 138, 255),
+                                    borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(15),
+                                      bottomRight: Radius.circular(15),
                                     ),
-                                    child: Text(
-                                      dancerNickname,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
+                                    border: Border(
+                                      right: BorderSide(
+                                        color: Colors.black38,
+                                        style: BorderStyle.solid,
                                       ),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  '$ticketRemainCount회권 / $ticketCount회권',
-                                  style: const TextStyle(
-                                    fontSize: 17,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 25,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: 70,
+                                              height: 70,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.grey.shade400,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(35),
+                                              ),
+                                              child: CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  dancerImageUrl,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xff6555FF),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 15),
+                                                    child: Text(
+                                                      dancerNickname,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '@$dancerEmail',
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              '$count회권',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 100),
+                                            Text(
+                                              '${format.format(price)}원',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                                Text(expiredDate),
+                                Container(
+                                  decoration: const BoxDecoration(
+                                    color: Color.fromARGB(81, 64, 195, 255),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15),
+                                      bottomLeft: Radius.circular(15),
+                                    ),
+                                    border: Border(
+                                      left: BorderSide(
+                                        color: Colors.black26,
+                                        style: BorderStyle.solid,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 30,
+                                      horizontal: 12,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          textAlign: TextAlign.center,
+                                          '남은 횟수:\n $remainCount회',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          textAlign: TextAlign.right,
+                                          '$expiredDate',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           );

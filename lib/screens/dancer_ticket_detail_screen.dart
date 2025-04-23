@@ -1,5 +1,7 @@
 import 'package:dancemate_app/provider/dancer_provider.dart';
+import 'package:dancemate_app/screens/dancer_ticket_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -14,9 +16,24 @@ class DancerTicketDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ticketDetailData = ref.watch(getDancerTicketDetailProvider(ticketId));
+
     NumberFormat format = NumberFormat('###,###,###,###');
 
-    void onSaveTap() {}
+    TextEditingController countController = TextEditingController();
+    TextEditingController costController = TextEditingController();
+    TextEditingController discountRateController = TextEditingController();
+    TextEditingController priceController = TextEditingController();
+
+    void onSaveTap(Map<String, dynamic> ticketData) async {
+      final result = await ref
+          .watch(putDancerTicketDetailProvider([ticketId, ticketData]).future);
+      if (result['result_code'] == 200) {
+        Navigator.of(context).pop();
+
+        ref.refresh(getDancerTicketProvider);
+        ref.refresh(getDancerTicketDetailProvider(ticketId));
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -41,14 +58,10 @@ class DancerTicketDetailScreen extends ConsumerWidget {
             final discountRate = ticketDetail['discount_rate'];
             final price = ticketDetail['price'];
 
-            final TextEditingController countController =
-                TextEditingController(text: '$count');
-            final TextEditingController costController =
-                TextEditingController(text: format.format(cost));
-            final TextEditingController discountRateController =
-                TextEditingController(text: '$discountRate');
-            final TextEditingController priceController =
-                TextEditingController(text: format.format(price));
+            countController.text = count.toString();
+            costController.text = cost.toString();
+            discountRateController.text = discountRate.toString();
+            priceController.text = format.format(price);
             return Column(
               children: [
                 Padding(
@@ -86,6 +99,10 @@ class DancerTicketDetailScreen extends ConsumerWidget {
                             child: SizedBox(
                               height: 45,
                               child: TextField(
+                                keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
                                 controller: countController,
                                 decoration: InputDecoration(
                                   contentPadding:
@@ -148,6 +165,25 @@ class DancerTicketDetailScreen extends ConsumerWidget {
                             child: SizedBox(
                               height: 45,
                               child: TextField(
+                                onChanged: (valueCost) {
+                                  if (valueCost == '') {
+                                    valueCost = '0';
+                                    discountRateController.text = '0';
+                                    priceController.text = '0';
+                                  }
+                                  final price = int.parse(valueCost) *
+                                      (1 -
+                                          (int.parse(
+                                                  discountRateController.text) /
+                                              100));
+
+                                  priceController.text =
+                                      format.format(price.toInt());
+                                },
+                                keyboardType: TextInputType.number,
+                                // inputFormatters: <TextInputFormatter>[
+                                //   FilteringTextInputFormatter.digitsOnly
+                                // ],
                                 controller: costController,
                                 decoration: InputDecoration(
                                   contentPadding:
@@ -210,6 +246,23 @@ class DancerTicketDetailScreen extends ConsumerWidget {
                             child: SizedBox(
                               height: 45,
                               child: TextField(
+                                onChanged: (valueDiscountRate) {
+                                  if (valueDiscountRate == '') {
+                                    valueDiscountRate = '0';
+                                    discountRateController.text =
+                                        valueDiscountRate;
+                                  }
+                                  final price = int.parse(costController.text) *
+                                      (1 -
+                                          (int.parse(valueDiscountRate) / 100));
+
+                                  priceController.text =
+                                      format.format(price.toInt());
+                                },
+                                keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
                                 controller: discountRateController,
                                 decoration: InputDecoration(
                                   contentPadding:
@@ -272,27 +325,22 @@ class DancerTicketDetailScreen extends ConsumerWidget {
                             child: SizedBox(
                               height: 45,
                               child: TextField(
+                                readOnly: true,
                                 controller: priceController,
-                                decoration: InputDecoration(
-                                  contentPadding:
-                                      const EdgeInsets.only(left: 10),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 10),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Colors.grey.shade400,
-                                      width: 1.0,
-                                    ),
+                                    borderSide: BorderSide.none,
                                   ),
                                   enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Colors.grey.shade400,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  suffixIcon: const Icon(
-                                    Icons.cancel_outlined,
-                                    color: Colors.black54,
+                                    borderSide: BorderSide.none,
                                   ),
                                 ),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                                textAlign: TextAlign.right,
                               ),
                             ),
                           ),
@@ -318,7 +366,15 @@ class DancerTicketDetailScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Map<String, dynamic> ticketData = {
+                'status': 1,
+                'count': int.parse(countController.text),
+                'cost': int.parse(costController.text),
+                'discount_rate': int.parse(discountRateController.text),
+              };
+              onSaveTap(ticketData);
+            },
             style: TextButton.styleFrom(
               backgroundColor: const Color(0xFFA48AFF),
               shape: RoundedRectangleBorder(

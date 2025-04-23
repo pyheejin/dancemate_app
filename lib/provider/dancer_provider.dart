@@ -48,6 +48,46 @@ final getDancerTicketDetailProvider =
   return result;
 });
 
-final ticketActiveProvider = StateProvider.autoDispose<bool>((ref) {
-  return true;
+final postDancerTicketDetailProvider =
+    FutureProvider.family<dynamic, Map<String, dynamic>>(
+        (ref, ticketData) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.postTicket(ticketData);
+  return result;
+});
+
+final putDancerTicketDetailProvider =
+    FutureProvider.family<dynamic, List<dynamic>>((ref, args) async {
+  final ApiServices api = ApiServices();
+
+  final ticketId = args[0];
+  final ticketData = args[1];
+
+  final result = await api.putTicketDetail(ticketId, ticketData);
+  return result;
+});
+
+final postDancerTicketExpireProvider =
+    FutureProvider.family<dynamic, int>((ref, day) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.postTicketExpire(day);
+  return result;
+});
+
+final ticketCountProvider = StateProvider.autoDispose<dynamic>((ref) {
+  return 0;
+});
+
+final ticketCostProvider = StateProvider.autoDispose<dynamic>((ref) {
+  return 0;
+});
+
+final ticketDiscountRateProvider = StateProvider.autoDispose<dynamic>((ref) {
+  return 0;
+});
+
+final ticketPriceProvider = StateProvider.autoDispose<dynamic>((ref) {
+  return 0;
 });
