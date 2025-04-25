@@ -91,3 +91,7 @@ final ticketDiscountRateProvider = StateProvider.autoDispose<dynamic>((ref) {
 final ticketPriceProvider = StateProvider.autoDispose<dynamic>((ref) {
   return 0;
 });
+
+final selectDateProvider = StateProvider.autoDispose<DateTime>((ref) {
+  return DateTime.now();
+});

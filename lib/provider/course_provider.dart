@@ -9,6 +9,14 @@ final getCourseProvider =
   return result;
 });
 
+final postCourseProvider = FutureProvider.family<dynamic, Map<String, dynamic>>(
+    (ref, courseData) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.postCourse(courseData);
+  return result;
+});
+
 final getCourseDetailProvider =
     FutureProvider.family<dynamic, int>((ref, courseDetailId) async {
   final ApiServices api = ApiServices();

@@ -186,6 +186,24 @@ class ApiServices {
     return reserveCourses;
   }
 
+  Future<dynamic> postCourse(Map<String, dynamic> courseData) async {
+    final accessToken = await getAccessToken();
+
+    final body = jsonEncode(courseData);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/course'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
+
   Future<dynamic> getCourseDetail(int courseDetailId) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
