@@ -156,12 +156,19 @@ class CalendarScreen extends ConsumerWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Image.network(
-                                width: 120,
-                                height: 120,
-                                fit: BoxFit.cover,
-                                courseImage,
-                              ),
+                              courseImage == null
+                                  ? Image.asset(
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      'assets/images/app_logo/2x.png',
+                                    )
+                                  : Image.network(
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      courseImage,
+                                    ),
                               const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -83,12 +83,17 @@ class CourseDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 40),
                   Stack(
                     children: [
-                      Image.network(
-                        width: 430,
-                        height: 270,
-                        fit: BoxFit.fitWidth,
-                        courseImageUrl,
-                      ),
+                      courseImageUrl == null
+                          ? Image.asset(
+                              height: 270,
+                              'assets/images/app_logo/detail_2x.png',
+                            )
+                          : Image.network(
+                              width: 430,
+                              height: 270,
+                              fit: BoxFit.fitWidth,
+                              courseImageUrl,
+                            ),
                       Positioned(
                         top: 5,
                         left: 5,

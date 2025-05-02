@@ -1,9 +1,7 @@
 import 'package:dancemate_app/provider/course_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
-import 'package:dancemate_app/screens/calendar_screen.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
-import 'package:dancemate_app/screens/main_tab_screen.dart';
-import 'package:dancemate_app/screens/search_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -178,12 +176,19 @@ class HomeScreen extends ConsumerWidget {
                                   children: [
                                     Stack(
                                       children: [
-                                        Image.network(
-                                          width: 170,
-                                          height: 200,
-                                          fit: BoxFit.cover,
-                                          todayCoursesData['image_url'],
-                                        ),
+                                        todayCoursesData['image_url'] == null
+                                            ? Image.asset(
+                                                width: 120,
+                                                height: 120,
+                                                fit: BoxFit.cover,
+                                                'assets/images/app_logo/2x.png',
+                                              )
+                                            : Image.network(
+                                                width: 170,
+                                                height: 200,
+                                                fit: BoxFit.cover,
+                                                todayCoursesData['image_url'],
+                                              ),
                                         Positioned(
                                           top: 5,
                                           left: 5,
@@ -422,12 +427,19 @@ class HomeScreen extends ConsumerWidget {
                                               print('like fail');
                                             }
                                           },
-                                          child: Image.network(
-                                            width: 120,
-                                            height: 120,
-                                            fit: BoxFit.cover,
-                                            courseImage,
-                                          ),
+                                          child: courseImage == null
+                                              ? Image.asset(
+                                                  width: 120,
+                                                  height: 120,
+                                                  fit: BoxFit.cover,
+                                                  'assets/images/app_logo/2x.png',
+                                                )
+                                              : Image.network(
+                                                  width: 120,
+                                                  height: 120,
+                                                  fit: BoxFit.cover,
+                                                  courseImage,
+                                                ),
                                         ),
                                         Positioned(
                                           top: 5,

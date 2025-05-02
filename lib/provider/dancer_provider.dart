@@ -23,8 +23,28 @@ class DancerCourseNotifier extends StateNotifier<dynamic> {
     state = [...state, detail];
   }
 
+  void updateCourseDetail(int index, Map<String, dynamic> newDetail) {
+    print('----- $index');
+    // int idx = 0;
+    // for (var detail in state) {
+    //   if (idx == index) {
+    //     detail = newDetail;
+    //   }
+    //   idx++;
+    // }
+
+    state[index] = newDetail;
+  }
+
   void removeCourseDetail(Map<String, dynamic> removeDetail) {
     state = state.where((detail) => detail != removeDetail).toList();
+  }
+
+  dynamic saveCourse(Map<String, dynamic> course) async {
+    final ApiServices api = ApiServices();
+
+    final result = await api.postCourse(course);
+    return result;
   }
 }
 
@@ -94,4 +114,16 @@ final ticketPriceProvider = StateProvider.autoDispose<dynamic>((ref) {
 
 final selectDateProvider = StateProvider.autoDispose<DateTime>((ref) {
   return DateTime.now();
+});
+
+final selectDetailDateProvider = StateProvider.autoDispose<DateTime>((ref) {
+  return DateTime.now();
+});
+
+final courseTitleProvider = StateProvider.autoDispose<String>((ref) {
+  return '';
+});
+
+final courseDescriptionProvider = StateProvider.autoDispose<String>((ref) {
+  return '';
 });
