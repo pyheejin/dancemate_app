@@ -310,12 +310,19 @@ class SearchResult extends StatelessWidget {
                                 children: [
                                   Stack(
                                     children: [
-                                      Image.network(
-                                        width: 120,
-                                        height: 120,
-                                        fit: BoxFit.cover,
-                                        courseImage,
-                                      ),
+                                      courseImage == null
+                                          ? Image.asset(
+                                              width: 120,
+                                              height: 120,
+                                              fit: BoxFit.cover,
+                                              'assets/images/app_logo/2x.png',
+                                            )
+                                          : Image.network(
+                                              width: 120,
+                                              height: 120,
+                                              fit: BoxFit.cover,
+                                              courseImage,
+                                            ),
                                       Positioned(
                                         top: 5,
                                         left: 5,

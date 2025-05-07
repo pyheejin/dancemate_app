@@ -24,16 +24,10 @@ class DancerCourseNotifier extends StateNotifier<dynamic> {
   }
 
   void updateCourseDetail(int index, Map<String, dynamic> newDetail) {
-    print('----- $index');
-    // int idx = 0;
-    // for (var detail in state) {
-    //   if (idx == index) {
-    //     detail = newDetail;
-    //   }
-    //   idx++;
-    // }
-
-    state[index] = newDetail;
+    state = [
+      for (var detail in state)
+        if (detail['idx'] == index) newDetail else detail
+    ];
   }
 
   void removeCourseDetail(Map<String, dynamic> removeDetail) {
