@@ -52,6 +52,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
     final TextEditingController countController = TextEditingController();
     final TextEditingController addressController = TextEditingController();
 
+    final TextEditingController detailTitleController = TextEditingController();
     final TextEditingController detailDateController = TextEditingController();
     final TextEditingController detailStartTimeController =
         TextEditingController();
@@ -138,14 +139,10 @@ class DancerCourseDetailScreen extends ConsumerWidget {
     }
 
     void onDetailDateModalBottomSheet(dynamic courseDetail) {
-      String date = courseDetail['course_date'].split(' ')[0];
-      String startTime = courseDetail['start_time'];
-      String endTime = courseDetail['end_time'];
-      String title = courseDetail['title'];
-      String address = courseDetail['address'];
-      String addressDetail = courseDetail['address_detail'];
-
       DateTime detailSelectDay = ref.watch(selectDetailDateProvider);
+      DateTime courseDate =
+          DateFormat('yyyy-MM-dd').parse('${courseDetail['course_date']}');
+      ref.read(selectDetailDateProvider.notifier).update((state) => courseDate);
 
       showModalBottomSheet(
         context: context,
@@ -200,8 +197,6 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                     .read(selectDetailDateProvider.notifier)
                     .update((state) => detailSelectDay);
 
-                print(detailSelectDay);
-
                 detailDateController.text =
                     DateFormat('yyyy-MM-dd').format(detailSelectDay);
 
@@ -225,8 +220,450 @@ class DancerCourseDetailScreen extends ConsumerWidget {
       );
     }
 
-    void onCourseDetailTap(int index, dynamic courseDetail) {
-      print(index);
+    void onCourseDetailTap(int idx, int index, dynamic courseDetail) {
+      String date = courseDetail['course_date'];
+      String startTime = courseDetail['start_time'];
+      String endTime = courseDetail['end_time'];
+      String title = courseDetail['title'];
+      String address = courseDetail['address'];
+      // String addressDetail = courseDetail['address_detail'];
+
+      detailDateController.text = date;
+      detailStartTimeController.text = startTime;
+      detailEndTimeController.text = endTime;
+      detailCountController.text = title;
+      detailAddressController.text = address;
+
+      TimeOfDay afterStartTime = TimeOfDay(
+        hour: int.parse(startTime.split(':')[0]),
+        minute: int.parse(startTime.split(':')[1]),
+      );
+      TimeOfDay afterEndTime = TimeOfDay(
+        hour: int.parse(endTime.split(':')[0]),
+        minute: int.parse(endTime.split(':')[1]),
+      );
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              height: 420,
+              decoration: const BoxDecoration(
+                color: Colors.white, // 모달 배경색
+                borderRadius: BorderRadius.all(
+                  Radius.circular(15), // 모달 전체 라운딩 처리
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 15,
+                  horizontal: 20,
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      '회차 수정하기',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFA48AFF),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 15,
+                            ),
+                            child: Text(
+                              '수업 날짜',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: SizedBox(
+                            height: 40,
+                            child: TextField(
+                              onTap: () {
+                                onDetailDateModalBottomSheet(courseDetail);
+                              },
+                              controller: detailDateController,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 10),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFA48AFF),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 15,
+                            ),
+                            child: Text(
+                              '시작 시간',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: SizedBox(
+                            height: 40,
+                            child: TextField(
+                              onTap: () async {
+                                final TimeOfDay? timeOfDay =
+                                    await showTimePicker(
+                                  context: context,
+                                  initialTime: afterStartTime,
+                                  initialEntryMode:
+                                      TimePickerEntryMode.inputOnly,
+                                );
+                                if (timeOfDay != null) {
+                                  String hour =
+                                      timeOfDay.hour.toString().padLeft(2, '0');
+                                  String minute = timeOfDay.minute
+                                      .toString()
+                                      .padLeft(2, '0');
+                                  detailStartTimeController.text =
+                                      '$hour:$minute';
+
+                                  String endHour = (timeOfDay.hour + 2)
+                                      .toString()
+                                      .padLeft(2, '0');
+                                  String endMinute = timeOfDay.minute
+                                      .toString()
+                                      .padLeft(2, '0');
+                                  detailEndTimeController.text =
+                                      '$endHour:$endMinute';
+                                }
+                              },
+                              controller: detailStartTimeController,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 10),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFA48AFF),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 15,
+                            ),
+                            child: Text(
+                              '종료 시간',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: SizedBox(
+                            height: 40,
+                            child: TextField(
+                              onTap: () async {
+                                final TimeOfDay? timeOfDay =
+                                    await showTimePicker(
+                                  context: context,
+                                  initialTime: afterEndTime,
+                                  initialEntryMode:
+                                      TimePickerEntryMode.inputOnly,
+                                );
+                                if (timeOfDay != null) {
+                                  String hour =
+                                      timeOfDay.hour.toString().padLeft(2, '0');
+                                  String minute = timeOfDay.minute
+                                      .toString()
+                                      .padLeft(2, '0');
+                                  detailEndTimeController.text =
+                                      '$hour:$minute';
+                                }
+                              },
+                              controller: detailEndTimeController,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 10),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFA48AFF),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 15,
+                            ),
+                            child: Text(
+                              '수업 회차',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: SizedBox(
+                            height: 40,
+                            child: TextField(
+                              controller: detailCountController,
+                              decoration: InputDecoration(
+                                hintText: 'N회차',
+                                contentPadding: const EdgeInsets.only(left: 10),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                suffixIcon: const Icon(
+                                  Icons.cancel_outlined,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFA48AFF),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 15,
+                            ),
+                            child: Text(
+                              '수업 장소',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: SizedBox(
+                            height: 40,
+                            child: TextField(
+                              controller: detailAddressController,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 10),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                suffixIcon: const Icon(
+                                  Icons.cancel_outlined,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 50),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.redAccent,
+                              ),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 15,
+                              ),
+                              child: Text(
+                                '취소',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.redAccent,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            courseDetailData.value['course_detail'][idx]
+                                ['title'] = detailCountController.text;
+                            courseDetailData.value['course_detail'][idx]
+                                ['course_date'] = detailDateController.text;
+                            courseDetailData.value['course_detail'][idx]
+                                ['start_time'] = detailStartTimeController.text;
+                            courseDetailData.value['course_detail'][idx]
+                                ['end_time'] = detailEndTimeController.text;
+                            courseDetailData.value['course_detail'][idx]
+                                ['address'] = detailAddressController.text;
+
+                            ref
+                                .read(courseTitleProvider.notifier)
+                                .update((state) => titleController.text);
+
+                            ref
+                                .read(courseDescriptionProvider.notifier)
+                                .update((state) => descriptionController.text);
+
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color(0xFFA48AFF),
+                              ),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 15,
+                              ),
+                              child: Text(
+                                '저장',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFA48AFF),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    void onNewCourseDetailTap(int index, dynamic courseDetail) {
       String date = courseDetail['course_date'].split(' ')[0];
       String startTime = courseDetail['start_time'];
       String endTime = courseDetail['end_time'];
@@ -1243,7 +1680,11 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                               if (detailList['course_detail'].length > 0) {
                                 return GestureDetector(
                                   onTap: () {
-                                    // onCourseDetailTap(index, detailList[index]);
+                                    onCourseDetailTap(
+                                      index,
+                                      detailList['course_detail'][index]['id'],
+                                      detailList['course_detail'][index],
+                                    );
                                   },
                                   child: Row(
                                     children: [
@@ -1510,7 +1951,8 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                           if (newDetailList.length > 0) {
                             return GestureDetector(
                               onTap: () {
-                                onCourseDetailTap(index, newDetailList[index]);
+                                onNewCourseDetailTap(
+                                    index, newDetailList[index]);
                               },
                               child: Row(
                                 children: [

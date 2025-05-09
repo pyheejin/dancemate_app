@@ -327,7 +327,7 @@ class CourseDetailScreen extends ConsumerWidget {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
+                        horizontal: 10,
                       ),
                       child: DropdownButton(
                         value: selectCourseDetailId,
