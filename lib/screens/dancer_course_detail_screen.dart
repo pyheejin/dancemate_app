@@ -24,6 +24,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
     final TextEditingController descriptionController = TextEditingController();
 
     dynamic newDetailList = ref.watch(dancerCourseProvider);
+    dynamic detailList = ref.watch(oldDancerCourseProvider);
 
     DateTime now = DateTime.now();
     TimeOfDay initialStartTime = TimeOfDay.now();
@@ -1471,7 +1472,6 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            print('newDetailList: ${newDetailList.length}');
                             final detail = {
                               'idx': newDetailList.length,
                               'course_date': '${dateController.text} 00:00:00',
@@ -1530,25 +1530,44 @@ class DancerCourseDetailScreen extends ConsumerWidget {
     }
 
     void onRemoveTap(Map<String, dynamic> detail) {
+      ref.read(oldDancerCourseProvider.notifier).removeCourseDetail(detail);
+    }
+
+    void onNewRemoveTap(Map<String, dynamic> detail) {
       ref.read(dancerCourseProvider.notifier).removeCourseDetail(detail);
     }
 
     void onSaveTap() async {
+      List<dynamic> bodyList = [];
+      for (var detail in detailList) {
+        bodyList.add({
+          'course_date': '${detail['course_date']} 00:00:00',
+          'start_time': detail['start_time'],
+          'end_time': detail['end_time'],
+          'title': detail['title'],
+          'address': detail['address'],
+          'address_detail': detail['address_detail'],
+        });
+      }
+      bodyList.addAll(newDetailList);
       final detail = {
         'status': 1,
         'title': titleController.text,
         'description': descriptionController.text,
-        'detail_list': newDetailList,
+        'detail_list': bodyList,
       };
 
-      final result =
-          await ref.read(dancerCourseProvider.notifier).saveCourse(detail);
+      final result = await ref
+          .read(dancerCourseProvider.notifier)
+          .updateCourse(courseId, detail);
 
       if (result != null) {
         if (result['result_code'] == 200) {
-          Navigator.pop(context);
           ref.refresh(getDancerCourseProvider);
           ref.refresh(dancerCourseProvider);
+          ref.refresh(oldDancerCourseProvider);
+
+          Navigator.pop(context);
         }
       }
     }
@@ -1564,8 +1583,11 @@ class DancerCourseDetailScreen extends ConsumerWidget {
               size: 30,
             ),
             onPressed: () {
-              Navigator.pop(context);
               ref.refresh(dancerCourseProvider);
+              ref.refresh(getCourseDetailProvider(courseId));
+              ref.refresh(oldDancerCourseProvider);
+
+              Navigator.pop(context);
             },
           ),
         ),
@@ -1670,31 +1692,104 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      courseDetailData.when(
-                        data: (detailList) {
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            itemCount: detailList['course_detail'].length,
-                            itemBuilder: (context, index) {
-                              if (detailList['course_detail'].length > 0) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    onCourseDetailTap(
-                                      index,
-                                      detailList['course_detail'][index]['id'],
-                                      detailList['course_detail'][index],
-                                    );
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 5,
-                                            horizontal: 5,
+                      ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        itemCount: detailList.length,
+                        itemBuilder: (context, index) {
+                          if (detailList.length > 0) {
+                            return GestureDetector(
+                              onTap: () {
+                                onCourseDetailTap(
+                                  index,
+                                  detailList[index]['id'],
+                                  detailList[index],
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 5,
+                                        horizontal: 5,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xFFA48AFF),
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 15,
+                                                  ),
+                                                  child: Text(
+                                                    '수업 회차',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 15),
+                                              Text(
+                                                '${detailList[index]['title']}',
+                                                style: const TextStyle(
+                                                  fontSize: 17,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          child: Column(
+                                          const SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xFFA48AFF),
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 15,
+                                                  ),
+                                                  child: Text(
+                                                    '수업 날짜',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 15),
+                                              Text(
+                                                detailList[index]['course_date']
+                                                    .split(' ')[0],
+                                                style: const TextStyle(
+                                                  fontSize: 17,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Row(
                                                 children: [
@@ -1713,7 +1808,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                                                         horizontal: 15,
                                                       ),
                                                       child: Text(
-                                                        '수업 회차',
+                                                        '시작 시간',
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           fontWeight:
@@ -1725,14 +1820,15 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                                                   ),
                                                   const SizedBox(width: 15),
                                                   Text(
-                                                    '${detailList['course_detail'][index]['title']}',
+                                                    detailList[index]
+                                                        ['start_time'],
                                                     style: const TextStyle(
                                                       fontSize: 17,
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(height: 5),
+                                              const SizedBox(width: 15),
                                               Row(
                                                 children: [
                                                   Container(
@@ -1741,7 +1837,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                                                           0xFFA48AFF),
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              15),
+                                                              20),
                                                     ),
                                                     child: const Padding(
                                                       padding:
@@ -1750,7 +1846,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                                                         horizontal: 15,
                                                       ),
                                                       child: Text(
-                                                        '수업 날짜',
+                                                        '종료 시간',
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           fontWeight:
@@ -1762,140 +1858,8 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                                                   ),
                                                   const SizedBox(width: 15),
                                                   Text(
-                                                    detailList['course_detail']
-                                                                [index]
-                                                            ['course_date']
-                                                        .split(' ')[0],
-                                                    style: const TextStyle(
-                                                      fontSize: 17,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 5),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: const Color(
-                                                              0xFFA48AFF),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(15),
-                                                        ),
-                                                        child: const Padding(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                            vertical: 5,
-                                                            horizontal: 15,
-                                                          ),
-                                                          child: Text(
-                                                            '시작 시간',
-                                                            style: TextStyle(
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 15),
-                                                      Text(
-                                                        detailList[
-                                                                'course_detail']
-                                                            [
-                                                            index]['start_time'],
-                                                        style: const TextStyle(
-                                                          fontSize: 17,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(width: 15),
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: const Color(
-                                                              0xFFA48AFF),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(20),
-                                                        ),
-                                                        child: const Padding(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                            vertical: 5,
-                                                            horizontal: 15,
-                                                          ),
-                                                          child: Text(
-                                                            '종료 시간',
-                                                            style: TextStyle(
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 15),
-                                                      Text(
-                                                        detailList[
-                                                                'course_detail']
-                                                            [index]['end_time'],
-                                                        style: const TextStyle(
-                                                          fontSize: 17,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 5),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(
-                                                          0xFFA48AFF),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15),
-                                                    ),
-                                                    child: const Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                        vertical: 5,
-                                                        horizontal: 15,
-                                                      ),
-                                                      child: Text(
-                                                        '수업 장소',
-                                                        style: TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 15),
-                                                  Text(
-                                                    detailList['course_detail']
-                                                        [index]['address'],
+                                                    detailList[index]
+                                                        ['end_time'],
                                                     style: const TextStyle(
                                                       fontSize: 17,
                                                     ),
@@ -1904,42 +1868,67 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                                               ),
                                             ],
                                           ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 15),
-                                      GestureDetector(
-                                        onTap: () {
-                                          onRemoveTap(
-                                              detailList['course_detail']
-                                                  [index]);
-                                        },
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.redAccent,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
+                                          const SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xFFA48AFF),
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 15,
+                                                  ),
+                                                  child: Text(
+                                                    '수업 장소',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 15),
+                                              Text(
+                                                detailList[index]['address'],
+                                                style: const TextStyle(
+                                                  fontSize: 17,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          child: const Icon(
-                                            Icons.remove_circle_outline,
-                                            color: Colors.white,
-                                            size: 40,
-                                          ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                );
-                              }
-                              return null;
-                            },
-                          );
-                        },
-                        loading: () => const CircularProgressIndicator(),
-                        error: (error, stack) {
-                          return SizedBox(
-                            width: 300,
-                            child: Text('search error: $error'),
-                          );
+                                  const SizedBox(width: 15),
+                                  GestureDetector(
+                                    onTap: () {
+                                      onRemoveTap(detailList[index]);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.redAccent,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: const Icon(
+                                        Icons.remove_circle_outline,
+                                        color: Colors.white,
+                                        size: 40,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          return null;
                         },
                       ),
                       const SizedBox(height: 10),
@@ -2159,7 +2148,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                                   const SizedBox(width: 15),
                                   GestureDetector(
                                     onTap: () {
-                                      onRemoveTap(newDetailList[index]);
+                                      onNewRemoveTap(newDetailList[index]);
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(

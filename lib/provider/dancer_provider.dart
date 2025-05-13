@@ -40,11 +40,38 @@ class DancerCourseNotifier extends StateNotifier<dynamic> {
     final result = await api.postCourse(course);
     return result;
   }
+
+  dynamic updateCourse(int courseId, Map<String, dynamic> course) async {
+    final ApiServices api = ApiServices();
+
+    final result = await api.putCourseDetail(courseId, course);
+    return result;
+  }
 }
 
 final dancerCourseProvider =
     StateNotifierProvider<DancerCourseNotifier, dynamic>((ref) {
   return DancerCourseNotifier();
+});
+
+class OldDancerCourseNotifier extends StateNotifier<dynamic> {
+  OldDancerCourseNotifier() : super([]);
+
+  void addCourseDetailList(int courseId) async {
+    final ApiServices api = ApiServices();
+
+    final result = await api.getCourseDetail(courseId);
+    state = result['course_detail'];
+  }
+
+  void removeCourseDetail(Map<String, dynamic> removeDetail) {
+    state = state.where((detail) => detail != removeDetail).toList();
+  }
+}
+
+final oldDancerCourseProvider =
+    StateNotifierProvider<OldDancerCourseNotifier, dynamic>((ref) {
+  return OldDancerCourseNotifier();
 });
 
 final getDancerTicketProvider = FutureProvider<dynamic>((ref) async {

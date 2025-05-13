@@ -1,4 +1,3 @@
-import 'package:dancemate_app/provider/course_provider.dart';
 import 'package:dancemate_app/provider/dancer_provider.dart';
 import 'package:dancemate_app/screens/dancer_course_detail_create_screen.dart';
 import 'package:dancemate_app/screens/dancer_course_detail_screen.dart';
@@ -18,6 +17,7 @@ class DancerCourseScreen extends ConsumerWidget {
           builder: (context) => DancerCourseDetailScreen(courseId: courseId),
         ),
       );
+      ref.read(oldDancerCourseProvider.notifier).addCourseDetailList(courseId);
     }
 
     return Scaffold(
