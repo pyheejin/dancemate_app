@@ -10,7 +10,6 @@ class SearchScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final TextEditingController textController = TextEditingController();
 
-    int resultCount = ref.watch(searchResultCountProvider);
     String keyword = ref.watch(searchKeywordProvider);
     dynamic courses = ref.watch(getSearchProvider(keyword));
     dynamic searchPre = ref.watch(getSearchPreProvider);
@@ -21,12 +20,7 @@ class SearchScreen extends ConsumerWidget {
       courses = ref.watch(getSearchProvider(searchKeyword));
       searchPre = ref.watch(getSearchPreProvider);
 
-      if (courses.value != null) {
-        ref
-            .read(searchResultCountProvider.notifier)
-            .update((state) => courses.value['result_count']);
-      }
-      print(resultCount);
+      ref.refresh(getSearchPreProvider);
     }
 
     return Scaffold(
@@ -72,7 +66,6 @@ class SearchScreen extends ConsumerWidget {
               courses: courses,
               searchPre: searchPre,
               text: keyword,
-              resultCount: resultCount,
             ),
           ],
         ),
@@ -88,24 +81,18 @@ class SearchResult extends StatelessWidget {
     required this.searchPre,
     required this.courses,
     required this.text,
-    required this.resultCount,
   });
 
   final WidgetRef ref;
   final AsyncValue searchPre, courses;
   final String text;
-  final int resultCount;
 
   @override
   Widget build(BuildContext context) {
-    void onTap(String searchKeyword) {
+    void onKeywordTap(String searchKeyword) {
       ref.read(searchKeywordProvider.notifier).update((state) => searchKeyword);
 
-      if (courses.value != null) {
-        ref
-            .read(searchResultCountProvider.notifier)
-            .update((state) => courses.value['result_count']);
-      }
+      ref.refresh(getSearchPreProvider);
     }
 
     void onCourseTap(int courseId) {
@@ -156,7 +143,7 @@ class SearchResult extends StatelessWidget {
                                       dataList['latest_keyword'][index];
                                   return GestureDetector(
                                     onTap: () {
-                                      onTap(keywordData['keyword']);
+                                      onKeywordTap(keywordData['keyword']);
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.only(right: 10),
@@ -224,7 +211,7 @@ class SearchResult extends StatelessWidget {
                                       dataList['recommend_keyword'][index];
                                   return GestureDetector(
                                     onTap: () {
-                                      onTap(keywordData['keyword']);
+                                      onKeywordTap(keywordData['keyword']);
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.only(right: 10),
@@ -297,6 +284,9 @@ class SearchResult extends StatelessWidget {
                               courseData['course_detail'][0];
                           final courseDate = courseDetailData['course_date'];
                           final courseTitle = courseDetailData['title'];
+                          final courseStartTime =
+                              courseDetailData['start_time'];
+                          final courseEndTime = courseDetailData['end_time'];
                           return GestureDetector(
                             onTap: () {
                               onCourseTap(courseData['id']);
@@ -394,13 +384,19 @@ class SearchResult extends StatelessWidget {
                                         title,
                                         style: const TextStyle(
                                           color: Color(0xff3F51B5),
-                                          fontSize: 18,
+                                          fontSize: 17,
                                         ),
                                       ),
                                       Text(
                                         '$courseDate $courseTitle',
                                         style: const TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      Text(
+                                        '$courseStartTime - $courseEndTime',
+                                        style: const TextStyle(
+                                          fontSize: 15,
                                         ),
                                       ),
                                     ],
@@ -420,20 +416,20 @@ class SearchResult extends StatelessWidget {
         ),
       );
     } else {
-      return Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text('검색결과 총 $resultCount개'),
-            ],
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 600,
-            child: courses.when(
-              data: (courseList) {
-                return ListView.builder(
+      return SizedBox(
+        height: 600,
+        child: courses.when(
+          data: (courseList) {
+            return Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('검색결과 총 ${courseList['courses'].length}개'),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                ListView.builder(
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,
                   scrollDirection: Axis.vertical,
@@ -445,6 +441,13 @@ class SearchResult extends StatelessWidget {
                     final courseData = courseList['courses'][index];
                     final courseTitle = courseData['title'];
                     final courseImage = courseData['image_url'];
+
+                    final courseDetailData = courseData['course_detail'][0];
+                    final courseDetailDate = courseDetailData['course_date'];
+                    final courseDetailTitle = courseDetailData['title'];
+                    final courseDetailStartTime =
+                        courseDetailData['start_time'];
+                    final courseDetailEndTime = courseDetailData['end_time'];
 
                     final dancerData = courseData['dancer'];
                     final dancerNickname = dancerData['nickname'];
@@ -464,12 +467,19 @@ class SearchResult extends StatelessWidget {
                           children: [
                             Stack(
                               children: [
-                                Image.network(
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                  courseImage,
-                                ),
+                                courseImage == null
+                                    ? Image.asset(
+                                        width: 120,
+                                        height: 120,
+                                        fit: BoxFit.cover,
+                                        'assets/images/app_logo/2x.png',
+                                      )
+                                    : Image.network(
+                                        width: 120,
+                                        height: 120,
+                                        fit: BoxFit.cover,
+                                        courseImage,
+                                      ),
                                 Positioned(
                                   top: 5,
                                   left: 5,
@@ -537,7 +547,19 @@ class SearchResult extends StatelessWidget {
                                   courseTitle,
                                   style: const TextStyle(
                                     color: Color(0xff3F51B5),
-                                    fontSize: 20,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                Text(
+                                  '$courseDetailDate $courseDetailTitle',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                Text(
+                                  '$courseDetailStartTime - $courseDetailEndTime',
+                                  style: const TextStyle(
+                                    fontSize: 15,
                                   ),
                                 ),
                               ],
@@ -547,18 +569,18 @@ class SearchResult extends StatelessWidget {
                       ),
                     );
                   },
-                );
-              },
-              loading: () => const CircularProgressIndicator(),
-              error: (error, stack) {
-                return SizedBox(
-                  width: 300,
-                  child: Text('search error: $error'),
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ],
+            );
+          },
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stack) {
+            return SizedBox(
+              width: 300,
+              child: Text('search error: $error'),
+            );
+          },
+        ),
       );
     }
   }

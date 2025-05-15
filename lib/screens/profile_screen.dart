@@ -160,6 +160,10 @@ class ProfileScreen extends ConsumerWidget {
                             final courseDetailTitle = courseDetailData['title'];
                             final courseDetailDate =
                                 courseDetailData['course_date'];
+                            final courseDetailStartTime =
+                                courseDetailData['start_time'];
+                            final courseDetailEndTime =
+                                courseDetailData['end_time'];
 
                             final courseData = courseDetailData['course'];
                             final courseTitle = courseData['title'];
@@ -251,13 +255,19 @@ class ProfileScreen extends ConsumerWidget {
                                               courseTitle,
                                               style: const TextStyle(
                                                 color: Color(0xff3F51B5),
-                                                fontSize: 18,
+                                                fontSize: 17,
                                               ),
                                             ),
                                             Text(
                                               '$courseDetailDate $courseDetailTitle',
                                               style: const TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                            Text(
+                                              '$courseDetailStartTime - $courseDetailEndTime',
+                                              style: const TextStyle(
+                                                fontSize: 15,
                                               ),
                                             ),
                                           ],

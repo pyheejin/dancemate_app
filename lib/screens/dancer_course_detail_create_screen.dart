@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/dancer_provider.dart';
+import 'package:dancemate_app/widgets/error.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1108,6 +1109,8 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
           Navigator.pop(context);
           ref.refresh(getDancerCourseProvider);
           ref.refresh(dancerCourseProvider);
+        } else {
+          errorAlert(context, result['result_msg']);
         }
       }
     }

@@ -135,6 +135,7 @@ class HomeScreen extends ConsumerWidget {
                         height: 320,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
+                          padding: EdgeInsets.zero,
                           itemCount: homeData['today_courses'].length,
                           itemBuilder: (context, index) {
                             final todayCoursesData =
@@ -142,12 +143,14 @@ class HomeScreen extends ConsumerWidget {
 
                             final dancerData = todayCoursesData['dancer'];
                             final dancerNickname = dancerData['nickname'];
-                            final dancerEmail = dancerData['email'];
                             final dancerImageUrl = dancerData['image_url'];
 
                             final courseDetailData =
                                 todayCoursesData['course_detail'][0];
                             final courseDate = courseDetailData['course_date'];
+                            final courseStartTime =
+                                courseDetailData['start_time'];
+                            final courseEndTime = courseDetailData['end_time'];
                             final courseTitle = courseDetailData['title'];
                             bool isCourseLike = todayCoursesData['is_like'];
                             return GestureDetector(
@@ -172,15 +175,15 @@ class HomeScreen extends ConsumerWidget {
                                   horizontal: 7,
                                 ),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Stack(
                                       children: [
                                         todayCoursesData['image_url'] == null
                                             ? Image.asset(
-                                                width: 120,
-                                                height: 120,
-                                                fit: BoxFit.cover,
+                                                width: 170,
+                                                height: 200,
+                                                fit: BoxFit.fill,
                                                 'assets/images/app_logo/2x.png',
                                               )
                                             : Image.network(
@@ -232,36 +235,23 @@ class HomeScreen extends ConsumerWidget {
                                           ),
                                         ),
                                         const SizedBox(width: 5),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xff6555FF),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 15),
-                                                child: Text(
-                                                  dancerNickname,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Text(
-                                              dancerEmail,
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xff6555FF),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            child: Text(
+                                              dancerNickname,
                                               style: const TextStyle(
+                                                color: Colors.white,
                                                 fontSize: 16,
                                               ),
                                             ),
-                                          ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -273,7 +263,7 @@ class HomeScreen extends ConsumerWidget {
                                       ),
                                     ),
                                     Text(
-                                      '$courseDate $courseTitle',
+                                      '$courseTitle, $courseStartTime - $courseEndTime',
                                       style: const TextStyle(
                                         fontSize: 16,
                                       ),
@@ -332,48 +322,6 @@ class HomeScreen extends ConsumerWidget {
                                 color: Colors.black54,
                               ),
                             ),
-                            SizedBox(height: 10),
-                            // GestureDetector(
-                            //   onTap: () {
-                            //     Navigator.of(context).push(
-                            //       MaterialPageRoute(
-                            //         builder: (context) => const SearchScreen(),
-                            //       ),
-                            //     );
-                            //   },
-                            //   child: Container(
-                            //     width: 150,
-                            //     decoration: BoxDecoration(
-                            //       border: Border.all(
-                            //         color: const Color(0xff9475FF),
-                            //       ),
-                            //       borderRadius: BorderRadius.circular(10),
-                            //     ),
-                            //     child: const Padding(
-                            //       padding: EdgeInsets.symmetric(
-                            //         vertical: 10,
-                            //         horizontal: 20,
-                            //       ),
-                            //       child: Row(
-                            //         mainAxisAlignment:
-                            //             MainAxisAlignment.spaceBetween,
-                            //         children: [
-                            //           Text(
-                            //             '달력 보러가기',
-                            //             style: TextStyle(
-                            //               fontSize: 15,
-                            //               color: Color(0xff9475FF),
-                            //             ),
-                            //           ),
-                            //           Icon(
-                            //             Icons.chevron_right,
-                            //             color: Color(0xff9475FF),
-                            //           ),
-                            //         ],
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
                           ],
                         );
                       }
@@ -395,6 +343,9 @@ class HomeScreen extends ConsumerWidget {
                             final courseDetailData = reserveCourseData;
                             final courseDetailDate =
                                 courseDetailData['course_date'];
+                            final courseStartTime =
+                                courseDetailData['start_time'];
+                            final courseEndTime = courseDetailData['end_time'];
                             final courseDetailTitle = courseDetailData['title'];
 
                             final courseData = reserveCourseData['course'];
@@ -529,13 +480,19 @@ class HomeScreen extends ConsumerWidget {
                                           courseTitle,
                                           style: const TextStyle(
                                             color: Color(0xff3F51B5),
-                                            fontSize: 18,
+                                            fontSize: 17,
                                           ),
                                         ),
                                         Text(
                                           '$courseDetailDate $courseDetailTitle',
                                           style: const TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                        Text(
+                                          '$courseStartTime - $courseEndTime',
+                                          style: const TextStyle(
+                                            fontSize: 15,
                                           ),
                                         ),
                                       ],

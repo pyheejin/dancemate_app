@@ -67,17 +67,16 @@ class CalendarScreen extends ConsumerWidget {
                 formatButtonVisible: false,
               ),
               calendarStyle: CalendarStyle(
-                selectedDecoration: BoxDecoration(
-                  color: const Color(0xFFA48AFF),
-                  borderRadius: BorderRadius.circular(20),
+                selectedDecoration: const BoxDecoration(
+                  color: Color(0xFFA48AFF),
+                  shape: BoxShape.circle,
                 ),
-                defaultDecoration: BoxDecoration(
-                  // color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
+                defaultDecoration: const BoxDecoration(
+                  shape: BoxShape.circle,
                 ),
                 todayDecoration: BoxDecoration(
                   color: Colors.blueAccent.shade100,
-                  borderRadius: BorderRadius.circular(20),
+                  shape: BoxShape.circle,
                 ),
               ),
               selectedDayPredicate: (day) {
@@ -139,6 +138,9 @@ class CalendarScreen extends ConsumerWidget {
                       final courseDetailData = reserveCourseList[index];
                       final courseDetailDate = courseDetailData['course_date'];
                       final courseDetailTitle = courseDetailData['title'];
+                      final courseDetailStartTime =
+                          courseDetailData['start_time'];
+                      final courseDetailEndTime = courseDetailData['end_time'];
 
                       final courseData = reserveCourseList[index]['course'];
                       final courseImage = courseData['image_url'];
@@ -219,13 +221,19 @@ class CalendarScreen extends ConsumerWidget {
                                     courseTitle,
                                     style: const TextStyle(
                                       color: Color(0xff3F51B5),
-                                      fontSize: 18,
+                                      fontSize: 17,
                                     ),
                                   ),
                                   Text(
                                     '$courseDetailDate $courseDetailTitle',
                                     style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  Text(
+                                    '$courseDetailStartTime - $courseDetailEndTime',
+                                    style: const TextStyle(
+                                      fontSize: 15,
                                     ),
                                   ),
                                 ],

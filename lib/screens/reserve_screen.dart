@@ -1,5 +1,6 @@
 import 'package:dancemate_app/provider/reserve_provider.dart';
 import 'package:dancemate_app/screens/reserve_complete_screen.dart';
+import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -69,12 +70,19 @@ class ReserveScreen extends ConsumerWidget {
                       children: [
                         Stack(
                           children: [
-                            Image.network(
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                              courseImage,
-                            ),
+                            courseImage == null
+                                ? Image.asset(
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                    'assets/images/app_logo/2x.png',
+                                  )
+                                : Image.network(
+                                    width: 170,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                    courseImage,
+                                  )
                           ],
                         ),
                         const SizedBox(width: 10),
@@ -232,14 +240,18 @@ class ReserveScreen extends ConsumerWidget {
               ];
               final result =
                   await ref.watch(postCourseDetailReserveProvider(args).future);
-              if (result['result_code'] == 200) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => ReserveCompleteScreen(
-                      reserveData: reserveData.value,
+              if (result != null) {
+                if (result['result_code'] == 200) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ReserveCompleteScreen(
+                        reserveData: reserveData.value,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  errorAlert(context, result['result_msg']);
+                }
               }
             },
             style: TextButton.styleFrom(

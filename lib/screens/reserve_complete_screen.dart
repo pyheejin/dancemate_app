@@ -1,4 +1,4 @@
-import 'package:dancemate_app/screens/home_screen.dart';
+import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,12 +44,19 @@ class ReserveCompleteScreen extends ConsumerWidget {
                     children: [
                       Stack(
                         children: [
-                          Image.network(
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.cover,
-                            courseImage,
-                          ),
+                          courseImage == null
+                              ? Image.asset(
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                  'assets/images/app_logo/2x.png',
+                                )
+                              : Image.network(
+                                  width: 430,
+                                  height: 270,
+                                  fit: BoxFit.fitWidth,
+                                  courseImage,
+                                ),
                         ],
                       ),
                       const SizedBox(width: 10),
@@ -160,6 +167,7 @@ class ReserveCompleteScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: TextButton(
             onPressed: () {
+              ref.refresh(getHomeProvider.future);
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const MainNavigationScreen(),
