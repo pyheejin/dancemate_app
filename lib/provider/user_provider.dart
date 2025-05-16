@@ -41,3 +41,10 @@ final getUserTicketProvider =
   final result = await api.getUserTicket(dancerId);
   return result;
 });
+
+final getUserCourseProvider = FutureProvider<dynamic>((ref) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.getUserCourse();
+  return result;
+});

@@ -18,10 +18,10 @@ final postCourseProvider = FutureProvider.family<dynamic, Map<String, dynamic>>(
 });
 
 final getCourseDetailProvider =
-    FutureProvider.family<dynamic, int>((ref, courseDetailId) async {
+    FutureProvider.family<dynamic, int>((ref, courseId) async {
   final ApiServices api = ApiServices();
 
-  final result = await api.getCourseDetail(courseDetailId);
+  final result = await api.getCourseDetail(courseId);
   return result;
 });
 
@@ -49,5 +49,13 @@ final postCourseDetailCancelProvider =
   final ApiServices api = ApiServices();
 
   final result = await api.postCourseDetailCancel(courseDetailId);
+  return result;
+});
+
+final postCourseDetailExistsProvider =
+    FutureProvider.family<dynamic, int>((ref, courseDetailId) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.postCourseDetailExists(courseDetailId);
   return result;
 });

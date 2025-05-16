@@ -1,3 +1,4 @@
+import 'package:dancemate_app/screens/course_history_screen.dart';
 import 'package:dancemate_app/screens/dancer_course_screen.dart';
 import 'package:dancemate_app/screens/dancer_ticket_screen.dart';
 import 'package:dancemate_app/screens/like_course_screen.dart';
@@ -28,6 +29,10 @@ class SettingScreen extends ConsumerWidget {
             const SettingMenu(
               name: '찜한 수업',
               screen: LikeCourseScreen(),
+            ),
+            const SettingMenu(
+              name: '수업 수강 내역',
+              screen: CourseHistoryScreen(),
             ),
             const SettingMenu(
               name: '티켓 구매 내역',

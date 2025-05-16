@@ -1,14 +1,10 @@
-import 'dart:convert';
-
 import 'package:dancemate_app/provider/course_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/order_screen.dart';
 import 'package:dancemate_app/screens/reserve_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
-import 'package:dancemate_app/widgets/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class CourseDetailScreen extends ConsumerWidget {
   final int courseId;
@@ -21,6 +17,7 @@ class CourseDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final courseDetailData = ref.watch(getCourseDetailProvider(courseId));
+
     dynamic selectCourseDetailId = ref.watch(selectCourseDetailIdProvider);
 
     if (courseDetailData.value != null) {
@@ -30,11 +27,12 @@ class CourseDetailScreen extends ConsumerWidget {
     }
 
     void onReserveTap(int courseDetailId, int dancerId) async {
-      const storage = FlutterSecureStorage();
-      String? data = await storage.read(key: 'login');
-      if (data != null) {
-        if (json.decode(data)['userId'] == dancerId) {
-          errorAlert(context, '내 수업은 예약할 수 없습니다.');
+      dynamic isCourseReserveExists =
+          ref.watch(postCourseDetailExistsProvider(selectCourseDetailId));
+
+      if (isCourseReserveExists.value != null) {
+        if (isCourseReserveExists.value['result_code'] > 200) {
+          errorAlert(context, isCourseReserveExists.value['result_msg']);
         } else {
           final ticketData = ref.watch(getUserTicketProvider(dancerId));
 

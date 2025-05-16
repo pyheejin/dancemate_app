@@ -171,6 +171,20 @@ class ApiServices {
     return resultData;
   }
 
+  Future<dynamic> getUserCourse() async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/user/course'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+
+    return resultData;
+  }
+
   Future<dynamic> getCourses(String date) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
@@ -225,10 +239,10 @@ class ApiServices {
     return resultData;
   }
 
-  Future<dynamic> getCourseDetail(int courseDetailId) async {
+  Future<dynamic> getCourseDetail(int courseId) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/course/$courseDetailId'),
+      Uri.parse('$baseUrl/course/$courseId'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
@@ -236,6 +250,21 @@ class ApiServices {
     final resultData =
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
     final reserveCourses = resultData['course'];
+
+    return reserveCourses;
+  }
+
+  Future<dynamic> getCourseDetailDetail(int courseDetailId) async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/course-detail/$courseDetailId'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+    final reserveCourses = resultData['course_detail'];
 
     return reserveCourses;
   }
@@ -283,6 +312,21 @@ class ApiServices {
 
     final response = await http.post(
       Uri.parse('$baseUrl/course/$courseDetailId/cancel'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
+
+  Future<dynamic> postCourseDetailExists(int courseDetailId) async {
+    final accessToken = await getAccessToken();
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/course/$courseDetailId/exists'),
       headers: {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',

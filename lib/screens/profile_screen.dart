@@ -173,6 +173,7 @@ class ProfileScreen extends ConsumerWidget {
                             final dancerNickname = dancerData['nickname'];
                             final dancerEmail = dancerData['email'];
                             final dancerImageUrl = dancerData['image_url'];
+
                             return GestureDetector(
                               onTap: () {
                                 onCourseTap(courseData['id']);
@@ -311,7 +312,7 @@ class ProfileScreen extends ConsumerWidget {
                               ),
                             );
                           }
-                          return null;
+                          return Container();
                         },
                       );
                     }
