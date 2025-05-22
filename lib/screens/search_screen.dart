@@ -280,8 +280,7 @@ class SearchResult extends StatelessWidget {
                           final dancerEmail = dancerData['email'];
                           final dancerImageUrl = dancerData['image_url'];
 
-                          final courseDetailData =
-                              courseData['course_detail'][0];
+                          final courseDetailData = courseData['course'][0];
                           final courseDate = courseDetailData['course_date'];
                           final courseTitle = courseDetailData['title'];
                           final courseStartTime =

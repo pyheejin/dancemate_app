@@ -35,16 +35,16 @@ class CourseHistoryScreen extends ConsumerWidget {
               padding: EdgeInsets.zero,
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
-              itemCount: courseList['courses'].length,
+              itemCount: courseList['lessons'].length,
               itemBuilder: (context, index) {
-                if (courseList['courses'].isEmpty) {
+                if (courseList['lessons'].isEmpty) {
                   return null;
                 }
-                final courseData = courseList['courses'][index];
+                final courseData = courseList['lessons'][index];
                 final courseTitle = courseData['title'];
                 final courseImage = courseData['image_url'];
 
-                final courseDetailData = courseData['course_detail'][0];
+                final courseDetailData = courseData['course'][0];
                 final courseDetailDate = courseDetailData['course_date'];
                 final courseStartTime = courseDetailData['start_time'];
                 final courseEndTime = courseDetailData['end_time'];

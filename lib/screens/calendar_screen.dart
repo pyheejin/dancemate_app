@@ -124,126 +124,132 @@ class CalendarScreen extends ConsumerWidget {
                   );
                 },
                 data: (reserveCourseList) {
-                  return ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: reserveCourseList.length,
-                    itemBuilder: (context, index) {
-                      final dancerData =
-                          reserveCourseList[index]['course']['dancer'];
-                      final dancerNickname = dancerData['nickname'];
-                      final dancerEmail = dancerData['email'];
-                      final dancerImageUrl = dancerData['image_url'];
+                  if (reserveCourseList != null) {
+                    return ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: reserveCourseList.length,
+                      itemBuilder: (context, index) {
+                        final courseDetailData = reserveCourseList[index];
+                        final courseDetailDate =
+                            courseDetailData['course_date'];
+                        final courseDetailTitle = courseDetailData['title'];
+                        final courseDetailStartTime =
+                            courseDetailData['start_time'];
+                        final courseDetailEndTime =
+                            courseDetailData['end_time'];
+                        final isCourseLike = courseDetailData['is_like'];
 
-                      final courseDetailData = reserveCourseList[index];
-                      final courseDetailDate = courseDetailData['course_date'];
-                      final courseDetailTitle = courseDetailData['title'];
-                      final courseDetailStartTime =
-                          courseDetailData['start_time'];
-                      final courseDetailEndTime = courseDetailData['end_time'];
+                        final courseData = courseDetailData['lesson'];
+                        final courseImage = courseData['image_url'];
+                        final courseTitle = courseData['title'];
 
-                      final courseData = reserveCourseList[index]['course'];
-                      final courseImage = courseData['image_url'];
-                      final courseTitle = courseData['title'];
-                      final isCourseLike = courseData['is_like'];
-                      return GestureDetector(
-                        onTap: () {
-                          onCourseTap(courseData['id']);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 5,
-                            horizontal: 5,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              courseImage == null
-                                  ? Image.asset(
-                                      width: 120,
-                                      height: 120,
-                                      fit: BoxFit.cover,
-                                      'assets/images/app_logo/2x.png',
-                                    )
-                                  : Image.network(
-                                      width: 120,
-                                      height: 120,
-                                      fit: BoxFit.cover,
-                                      courseImage,
-                                    ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                          dancerImageUrl,
-                                        ),
+                        final dancerData = courseData['dancer'];
+                        final dancerNickname = dancerData['nickname'];
+                        final dancerEmail = dancerData['email'];
+                        final dancerImageUrl = dancerData['image_url'];
+
+                        return GestureDetector(
+                          onTap: () {
+                            onCourseTap(courseData['id']);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 5,
+                              horizontal: 5,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                courseImage == null
+                                    ? Image.asset(
+                                        width: 120,
+                                        height: 120,
+                                        fit: BoxFit.cover,
+                                        'assets/images/app_logo/2x.png',
+                                      )
+                                    : Image.network(
+                                        width: 120,
+                                        height: 120,
+                                        fit: BoxFit.cover,
+                                        courseImage,
                                       ),
-                                      const SizedBox(width: 5),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xff6555FF),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 15),
-                                              child: Text(
-                                                dancerNickname,
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            dancerImageUrl,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xff6555FF),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 15),
+                                                child: Text(
+                                                  dancerNickname,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          Text(
-                                            dancerEmail,
-                                            style: const TextStyle(
-                                              fontSize: 16,
+                                            Text(
+                                              dancerEmail,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      courseTitle,
+                                      style: const TextStyle(
+                                        color: Color(0xff3F51B5),
+                                        fontSize: 17,
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    courseTitle,
-                                    style: const TextStyle(
-                                      color: Color(0xff3F51B5),
-                                      fontSize: 17,
                                     ),
-                                  ),
-                                  Text(
-                                    '$courseDetailDate $courseDetailTitle',
-                                    style: const TextStyle(
-                                      fontSize: 15,
+                                    Text(
+                                      '$courseDetailDate $courseDetailTitle',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    '$courseDetailStartTime - $courseDetailEndTime',
-                                    style: const TextStyle(
-                                      fontSize: 15,
+                                    Text(
+                                      '$courseDetailStartTime - $courseDetailEndTime',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  );
+                        );
+                      },
+                    );
+                  } else {
+                    return Container();
+                  }
                 },
               ),
             ),

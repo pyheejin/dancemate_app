@@ -22,7 +22,7 @@ class CourseDetailScreen extends ConsumerWidget {
 
     if (courseDetailData.value != null) {
       if (selectCourseDetailId == 0) {
-        selectCourseDetailId = courseDetailData.value['course_detail'][0]['id'];
+        selectCourseDetailId = courseDetailData.value['course'][0]['id'];
       }
     }
 
@@ -80,66 +80,27 @@ class CourseDetailScreen extends ConsumerWidget {
             final courseTitle = courseDetail['title'];
             final courseImageUrl = courseDetail['image_url'];
             final courseDescription = courseDetail['description'];
-            final isCourseLike = courseDetail['is_like'];
 
             final dancerData = courseDetail['dancer'];
             final dancerEmail = dancerData['email'];
             final dancerNickname = dancerData['nickname'];
             final dancerImageUrl = dancerData['image_url'];
 
-            final courseDetailList = courseDetail['course_detail'];
+            final courseDetailList = courseDetail['course'];
             return Column(
               children: [
                 const SizedBox(height: 10),
-                Stack(
-                  children: [
-                    courseImageUrl == null
-                        ? Image.asset(
-                            height: 270,
-                            'assets/images/app_logo/detail_2x.png',
-                          )
-                        : Image.network(
-                            width: 430,
-                            height: 270,
-                            fit: BoxFit.fitWidth,
-                            courseImageUrl,
-                          ),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: GestureDetector(
-                        onTap: () async {
-                          final result = await ref.watch(
-                              postCourseLikeProvider(courseDetail['id'])
-                                  .future);
-                          print(result['result_code']);
-                          if (result['result_code'] == 200) {
-                            print('200이래');
-                            ref.refresh(getCourseDetailProvider(courseId));
-                            print(isCourseLike);
-                          } else {
-                            print('like fail');
-                          }
-                        },
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(35),
-                            color: const Color(0xff9475FF),
-                          ),
-                          child: Icon(
-                            isCourseLike
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                        ),
+                courseImageUrl == null
+                    ? Image.asset(
+                        height: 270,
+                        'assets/images/app_logo/detail_2x.png',
+                      )
+                    : Image.network(
+                        width: 430,
+                        height: 270,
+                        fit: BoxFit.fitWidth,
+                        courseImageUrl,
                       ),
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -216,7 +177,7 @@ class CourseDetailScreen extends ConsumerWidget {
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 5,
-                                    horizontal: 10,
+                                    horizontal: 5,
                                   ),
                                   child: Row(
                                     mainAxisAlignment:
@@ -327,7 +288,7 @@ class CourseDetailScreen extends ConsumerWidget {
                   );
                 },
                 data: (courseDetail) {
-                  final courseDetailList = courseDetail['course_detail'];
+                  final courseDetailList = courseDetail['course'];
 
                   return DecoratedBox(
                     decoration: BoxDecoration(
@@ -370,8 +331,8 @@ class CourseDetailScreen extends ConsumerWidget {
               TextButton(
                 onPressed: () {
                   if (courseDetailData.value != null) {
-                    final dancerId = courseDetailData.value['course_detail'][0]
-                        ['course']['dancer']['id'];
+                    final dancerId = courseDetailData.value['course'][0]
+                        ['lesson']['dancer']['id'];
                     onReserveTap(selectCourseDetailId, dancerId);
                   }
                 },

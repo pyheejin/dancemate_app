@@ -152,8 +152,8 @@ class ProfileScreen extends ConsumerWidget {
                         shrinkWrap: true,
                         itemCount: dataList['reserve_course'].length,
                         itemBuilder: (context, index) {
-                          final courseDetailData = dataList['reserve_course']
-                              [index]['course_detail'];
+                          final courseDetailData =
+                              dataList['reserve_course'][index]['course'];
 
                           if (courseDetailData != null) {
                             final courseDetailId = courseDetailData['id'];
@@ -165,7 +165,7 @@ class ProfileScreen extends ConsumerWidget {
                             final courseDetailEndTime =
                                 courseDetailData['end_time'];
 
-                            final courseData = courseDetailData['course'];
+                            final courseData = courseDetailData['lesson'];
                             final courseTitle = courseData['title'];
                             final courseImage = courseData['image_url'];
 

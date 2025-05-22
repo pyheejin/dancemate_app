@@ -35,12 +35,12 @@ class DancerCourseScreen extends ConsumerWidget {
               padding: EdgeInsets.zero,
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
-              itemCount: courseList['courses'].length,
+              itemCount: courseList['lessons'].length,
               itemBuilder: (context, index) {
-                if (courseList['courses'].isEmpty) {
-                  return null;
+                if (courseList['lessons'].isEmpty) {
+                  return Container();
                 }
-                final courseData = courseList['courses'][index];
+                final courseData = courseList['lessons'][index];
                 final courseTitle = courseData['title'];
                 final courseImage = courseData['image_url'];
                 return GestureDetector(

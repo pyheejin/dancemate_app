@@ -50,9 +50,15 @@ class LikeCourseScreen extends ConsumerWidget {
               itemCount: courseList['courses'].length,
               itemBuilder: (context, index) {
                 if (courseList['courses'].isEmpty) {
-                  return null;
+                  return Container();
                 }
-                final courseData = courseList['courses'][index];
+                final courseDetailData = courseList['courses'][index];
+                final courseDetailTitle = courseDetailData['title'];
+                final courseDetailDate = courseDetailData['course_date'];
+                final courseDetailStartTime = courseDetailData['start_time'];
+                final courseDetailEndTime = courseDetailData['end_time'];
+
+                final courseData = courseDetailData['lesson'];
                 final courseTitle = courseData['title'];
                 final courseImage = courseData['image_url'];
 
@@ -137,12 +143,24 @@ class LikeCourseScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 5),
                             Text(
                               courseTitle,
                               style: const TextStyle(
                                 color: Color(0xff3F51B5),
-                                fontSize: 20,
+                                fontSize: 17,
+                              ),
+                            ),
+                            Text(
+                              '$courseDetailDate $courseDetailTitle',
+                              style: const TextStyle(
+                                fontSize: 15,
+                              ),
+                            ),
+                            Text(
+                              '$courseDetailStartTime - $courseDetailEndTime',
+                              style: const TextStyle(
+                                fontSize: 15,
                               ),
                             ),
                           ],

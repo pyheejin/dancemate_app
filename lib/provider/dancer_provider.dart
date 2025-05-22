@@ -61,7 +61,7 @@ class OldDancerCourseNotifier extends StateNotifier<dynamic> {
     final ApiServices api = ApiServices();
 
     final result = await api.getCourseDetail(courseId);
-    state = result['course_detail'];
+    state = result['course'];
   }
 
   void removeCourseDetail(Map<String, dynamic> removeDetail) {

@@ -13,13 +13,15 @@ class ReserveCompleteScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final courseData = reserveData['course'];
+    final courseData = reserveData['lesson'];
     final courseImage = courseData['image_url'];
     final courseTitle = courseData['title'];
 
-    final courseDetailData = courseData['course_detail'][0];
+    final courseDetailData = courseData['course'][0];
     final courseDetailTitle = courseDetailData['title'];
     final courseDetailDate = courseDetailData['course_date'];
+    final courseDetailStartTime = courseDetailData['start_time'];
+    final courseDetailEndTime = courseDetailData['end_time'];
 
     final dancerData = courseData['dancer'];
     final dancerEmail = dancerData['email'];
@@ -42,23 +44,19 @@ class ReserveCompleteScreen extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Stack(
-                        children: [
-                          courseImage == null
-                              ? Image.asset(
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                  'assets/images/app_logo/2x.png',
-                                )
-                              : Image.network(
-                                  width: 430,
-                                  height: 270,
-                                  fit: BoxFit.fitWidth,
-                                  courseImage,
-                                ),
-                        ],
-                      ),
+                      courseImage == null
+                          ? Image.asset(
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              'assets/images/app_logo/2x.png',
+                            )
+                          : Image.network(
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              courseImage,
+                            ),
                       const SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,13 +104,19 @@ class ReserveCompleteScreen extends ConsumerWidget {
                             courseTitle,
                             style: const TextStyle(
                               color: Color(0xff3F51B5),
-                              fontSize: 18,
+                              fontSize: 17,
                             ),
                           ),
                           Text(
                             '$courseDetailDate $courseDetailTitle',
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 15,
+                            ),
+                          ),
+                          Text(
+                            '$courseDetailStartTime - $courseDetailEndTime',
+                            style: const TextStyle(
+                              fontSize: 15,
                             ),
                           ),
                         ],

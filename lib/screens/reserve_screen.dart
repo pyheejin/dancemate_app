@@ -44,7 +44,7 @@ class ReserveScreen extends ConsumerWidget {
               );
             },
             data: (reserveDataList) {
-              final courseData = reserveDataList['course'];
+              final courseData = reserveDataList['lesson'];
               final courseTitle = courseData['title'];
               final courseImage = courseData['image_url'];
 
@@ -53,7 +53,7 @@ class ReserveScreen extends ConsumerWidget {
               final dancerNickname = dancerData['nickname'];
               final dancerImageUrl = dancerData['image_url'];
 
-              final courseDetailData = courseData['course_detail'][0];
+              final courseDetailData = courseData['course'][0];
               final courseDetailTitle = courseDetailData['title'];
               final courseDetailDate = courseDetailData['course_date'];
 

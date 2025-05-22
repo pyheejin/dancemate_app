@@ -34,148 +34,119 @@ class TicketHistoryScreen extends ConsumerWidget {
           vertical: 10,
           horizontal: 20,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ticketData.when(
-              loading: () => const CircularProgressIndicator(),
-              error: (error, stack) {
-                print(error);
-                return SizedBox(
-                  width: 300,
-                  child: Text('error: $error'),
-                );
-              },
-              data: (dataList) => ListView.builder(
-                shrinkWrap: true,
-                itemCount: dataList['tickets'].length,
-                itemBuilder: (context, index) {
-                  final date = dataList['tickets'][index]['date'];
-                  final ticketList = dataList['tickets'][index]['ticket_list'];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 5,
-                      horizontal: 5,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(date),
-                        const SizedBox(height: 5),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: ticketList.length,
-                          itemBuilder: (context, index) {
-                            final dancerData = ticketList[index]['dancer'];
-                            final dancerEmail = dancerData['email'];
-                            final dancerNickname = dancerData['nickname'];
-                            final dancerImageUrl = dancerData['image_url'];
+        child: ticketData.when(
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stack) {
+            print(error);
+            return SizedBox(
+              width: 300,
+              child: Text('error: $error'),
+            );
+          },
+          data: (dataList) => ListView.builder(
+            shrinkWrap: true,
+            itemCount: dataList['tickets'].length,
+            itemBuilder: (context, index) {
+              final date = dataList['tickets'][index]['date'];
+              final ticketList = dataList['tickets'][index]['ticket_list'];
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 5,
+                  horizontal: 5,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(date),
+                    const SizedBox(height: 5),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: ticketList.length,
+                      itemBuilder: (context, index) {
+                        final dancerData = ticketList[index]['dancer'];
+                        final dancerEmail = dancerData['email'];
+                        final dancerNickname = dancerData['nickname'];
+                        final dancerImageUrl = dancerData['image_url'];
 
-                            final count = ticketList[index]['count'];
-                            final remainCount =
-                                ticketList[index]['remain_count'];
-                            final price = ticketList[index]['price'];
-                            final expiredDate =
-                                ticketList[index]['expired_date'];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 2,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color.fromARGB(88, 163, 138, 255),
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(15),
-                                        bottomRight: Radius.circular(15),
-                                      ),
-                                      border: Border(
-                                        right: BorderSide(
-                                          color: Colors.black38,
-                                          style: BorderStyle.solid,
-                                        ),
-                                      ),
+                        final count = ticketList[index]['count'];
+                        final remainCount = ticketList[index]['remain_count'];
+                        final price = ticketList[index]['price'];
+                        final expiredDate = ticketList[index]['expired_date'];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 2,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                decoration: const BoxDecoration(
+                                  color: Color.fromARGB(88, 163, 138, 255),
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(15),
+                                    bottomRight: Radius.circular(15),
+                                  ),
+                                  border: Border(
+                                    right: BorderSide(
+                                      color: Colors.black38,
+                                      style: BorderStyle.solid,
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                        horizontal: 20,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
                                         children: [
-                                          Row(
+                                          Container(
+                                            width: 70,
+                                            height: 70,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.grey.shade400,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(35),
+                                            ),
+                                            child: CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                dancerImageUrl,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Container(
-                                                width: 70,
-                                                height: 70,
                                                 decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: Colors.grey.shade400,
-                                                  ),
+                                                  color:
+                                                      const Color(0xff6555FF),
                                                   borderRadius:
-                                                      BorderRadius.circular(35),
+                                                      BorderRadius.circular(10),
                                                 ),
-                                                child: CircleAvatar(
-                                                  backgroundImage: NetworkImage(
-                                                    dancerImageUrl,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 5),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(
-                                                          0xff6555FF),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                    ),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 15),
-                                                      child: Text(
-                                                        dancerNickname,
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '@$dancerEmail',
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 15),
+                                                  child: Text(
+                                                    dancerNickname,
                                                     style: const TextStyle(
+                                                      color: Colors.white,
                                                       fontSize: 16,
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 20),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                '$count',
-                                                style: const TextStyle(
-                                                  fontSize: 16,
                                                 ),
                                               ),
-                                              const SizedBox(width: 100),
                                               Text(
-                                                '$price원',
+                                                '@$dancerEmail',
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ),
@@ -184,64 +155,83 @@ class TicketHistoryScreen extends ConsumerWidget {
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: remainCount > 0
-                                          ? const Color.fromARGB(
-                                              81, 64, 195, 255)
-                                          : Colors.black12,
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(15),
-                                        bottomLeft: Radius.circular(15),
-                                      ),
-                                      border: const Border(
-                                        left: BorderSide(
-                                          color: Colors.black26,
-                                          style: BorderStyle.solid,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 30,
-                                        horizontal: 12,
-                                      ),
-                                      child: Column(
+                                      const SizedBox(height: 20),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            textAlign: TextAlign.center,
-                                            '남은 횟수:\n $remainCount회',
+                                            '$count',
                                             style: const TextStyle(
                                               fontSize: 16,
                                             ),
                                           ),
-                                          const SizedBox(height: 5),
+                                          const SizedBox(width: 100),
                                           Text(
-                                            textAlign: TextAlign.right,
-                                            '$expiredDate',
+                                            '$price원',
                                             style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.red,
+                                              fontSize: 16,
                                             ),
                                           ),
                                         ],
                                       ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: remainCount > 0
+                                      ? const Color.fromARGB(81, 64, 195, 255)
+                                      : Colors.black12,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    bottomLeft: Radius.circular(15),
+                                  ),
+                                  border: const Border(
+                                    left: BorderSide(
+                                      color: Colors.black26,
+                                      style: BorderStyle.solid,
                                     ),
                                   ),
-                                ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 30,
+                                    horizontal: 12,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        textAlign: TextAlign.center,
+                                        '남은 횟수:\n $remainCount회',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        textAlign: TextAlign.right,
+                                        '$expiredDate',
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            );
-                          },
-                        ),
-                      ],
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
-          ],
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

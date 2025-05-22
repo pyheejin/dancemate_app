@@ -1,6 +1,8 @@
 import 'package:dancemate_app/provider/course_detail_provider.dart';
+import 'package:dancemate_app/provider/review_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ReviewScreen extends ConsumerWidget {
   final int courseDetailId;
@@ -14,6 +16,7 @@ class ReviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final courseDetailData = ref.watch(getCourseDetailProvider(courseDetailId));
     final TextEditingController descriptionController = TextEditingController();
+    double courseRate = ref.watch(courseReviewRateProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -36,6 +39,7 @@ class ReviewScreen extends ConsumerWidget {
           final dancerImageUrl = dancerData['image_url'];
           return Padding(
             padding: const EdgeInsets.symmetric(
+              vertical: 10,
               horizontal: 15,
             ),
             child: Column(
@@ -130,21 +134,63 @@ class ReviewScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 25),
+                RatingBar.builder(
+                  initialRating: 1,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  unratedColor: Colors.black26,
+                  itemSize: 50,
+                  itemCount: 5,
+                  itemBuilder: (context, _) {
+                    return const Icon(
+                      Icons.star,
+                      color: Color(0xFFA48AFF),
+                    );
+                  },
+                  onRatingUpdate: (rating) {
+                    // save 동작 필요함
+                    print(rating);
+                    courseRate = rating;
+                  },
+                ),
+                const SizedBox(height: 25),
                 Container(
                   decoration: BoxDecoration(
-                      border: Border.all(
-                    color: Colors.grey.shade400,
-                  )),
-                  child: const Row(
-                    children: [
-                      Text('사진추가'),
-                      Text('최대 5장'),
-                    ],
+                    border: Border.all(
+                      color: const Color(0xFFA48AFF),
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 25,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '사진추가',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color(0xff3F51B5),
+                          ),
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          '최대 5장',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                SizedBox(
-                  height: 100,
+                const SizedBox(height: 30),
+                Expanded(
                   child: TextField(
                     controller: descriptionController,
                     expands: true,
@@ -156,10 +202,12 @@ class ReviewScreen extends ConsumerWidget {
                           color: Colors.grey.shade400,
                           width: 1.0,
                         ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                   ),
                 ),
+                const SizedBox(height: 30),
               ],
             ),
           );

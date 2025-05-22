@@ -197,6 +197,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                 ref
                     .read(selectDetailDateProvider.notifier)
                     .update((state) => detailSelectDay);
+                print(detailSelectDay);
 
                 detailDateController.text =
                     DateFormat('yyyy-MM-dd').format(detailSelectDay);
@@ -609,16 +610,16 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            courseDetailData.value['course_detail'][idx]
-                                ['title'] = detailCountController.text;
-                            courseDetailData.value['course_detail'][idx]
+                            courseDetailData.value['course'][idx]['title'] =
+                                detailCountController.text;
+                            courseDetailData.value['course'][idx]
                                 ['course_date'] = detailDateController.text;
-                            courseDetailData.value['course_detail'][idx]
+                            courseDetailData.value['course'][idx]
                                 ['start_time'] = detailStartTimeController.text;
-                            courseDetailData.value['course_detail'][idx]
-                                ['end_time'] = detailEndTimeController.text;
-                            courseDetailData.value['course_detail'][idx]
-                                ['address'] = detailAddressController.text;
+                            courseDetailData.value['course'][idx]['end_time'] =
+                                detailEndTimeController.text;
+                            courseDetailData.value['course'][idx]['address'] =
+                                detailAddressController.text;
 
                             ref
                                 .read(courseTitleProvider.notifier)
@@ -1928,7 +1929,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                               ),
                             );
                           }
-                          return null;
+                          return Container();
                         },
                       ),
                       const SizedBox(height: 10),
@@ -1937,6 +1938,8 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                         padding: EdgeInsets.zero,
                         itemCount: newDetailList.length,
                         itemBuilder: (context, index) {
+                          print('=========');
+                          print(newDetailList);
                           if (newDetailList.length > 0) {
                             return GestureDetector(
                               onTap: () {
@@ -2166,7 +2169,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                               ),
                             );
                           }
-                          return null;
+                          return Container();
                         },
                       ),
                       GestureDetector(

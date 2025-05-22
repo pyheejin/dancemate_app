@@ -188,14 +188,14 @@ class ApiServices {
   Future<dynamic> getCourses(String date) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/course?date=$date'),
+      Uri.parse('$baseUrl/lesson?date=$date'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
     );
     final resultData =
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
-    final reserveCourses = resultData['courses'];
+    final reserveCourses = resultData['lessons'];
 
     return reserveCourses;
   }
@@ -206,7 +206,7 @@ class ApiServices {
     final body = jsonEncode(courseData);
 
     final response = await http.post(
-      Uri.parse('$baseUrl/course'),
+      Uri.parse('$baseUrl/lesson'),
       headers: {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
@@ -227,7 +227,7 @@ class ApiServices {
     final body = jsonEncode(courseData);
 
     final response = await http.put(
-      Uri.parse('$baseUrl/course/$courseId'),
+      Uri.parse('$baseUrl/lesson/$courseId'),
       headers: {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
@@ -242,14 +242,14 @@ class ApiServices {
   Future<dynamic> getCourseDetail(int courseId) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/course/$courseId'),
+      Uri.parse('$baseUrl/lesson/$courseId'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
     );
     final resultData =
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
-    final reserveCourses = resultData['course'];
+    final reserveCourses = resultData['lesson'];
 
     return reserveCourses;
   }
@@ -402,7 +402,7 @@ class ApiServices {
   Future<dynamic> getDancerCourse() async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/dancer/course'),
+      Uri.parse('$baseUrl/dancer/lesson'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },

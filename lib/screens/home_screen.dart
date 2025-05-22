@@ -136,23 +136,23 @@ class HomeScreen extends ConsumerWidget {
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: EdgeInsets.zero,
-                          itemCount: homeData['today_courses'].length,
+                          itemCount: homeData['today_lessons'].length,
                           itemBuilder: (context, index) {
                             final todayCoursesData =
-                                homeData['today_courses'][index];
+                                homeData['today_lessons'][index];
 
                             final dancerData = todayCoursesData['dancer'];
                             final dancerNickname = dancerData['nickname'];
                             final dancerImageUrl = dancerData['image_url'];
 
                             final courseDetailData =
-                                todayCoursesData['course_detail'][0];
+                                todayCoursesData['course'][0];
                             final courseDate = courseDetailData['course_date'];
                             final courseStartTime =
                                 courseDetailData['start_time'];
                             final courseEndTime = courseDetailData['end_time'];
                             final courseTitle = courseDetailData['title'];
-                            bool isCourseLike = todayCoursesData['is_like'];
+                            bool isCourseLike = courseDetailData['is_like'];
                             return GestureDetector(
                               onTap: () {
                                 onCourseTap(todayCoursesData['id']);
@@ -304,7 +304,7 @@ class HomeScreen extends ConsumerWidget {
                     data: (homeData) {
                       if (homeData == null) {
                         return Container();
-                      } else if (homeData['reserve_courses'].length == 0) {
+                      } else if (homeData['reserve_lessons'].length == 0) {
                         return const Column(
                           children: [
                             SizedBox(height: 10),
@@ -329,13 +329,13 @@ class HomeScreen extends ConsumerWidget {
                         height: 400,
                         child: ListView.builder(
                           scrollDirection: Axis.vertical,
-                          itemCount: homeData['reserve_courses'].length,
+                          itemCount: homeData['reserve_lessons'].length,
                           itemBuilder: (context, index) {
                             final reserveCourseData =
-                                homeData['reserve_courses'][index];
+                                homeData['reserve_lessons'][index];
 
                             final dancerData =
-                                reserveCourseData['course']['dancer'];
+                                reserveCourseData['lesson']['dancer'];
                             final dancerNickname = dancerData['nickname'];
                             final dancerEmail = dancerData['email'];
                             final dancerImageUrl = dancerData['image_url'];
@@ -347,11 +347,12 @@ class HomeScreen extends ConsumerWidget {
                                 courseDetailData['start_time'];
                             final courseEndTime = courseDetailData['end_time'];
                             final courseDetailTitle = courseDetailData['title'];
+                            bool isCourseLike = courseDetailData['is_like'];
 
-                            final courseData = reserveCourseData['course'];
+                            final courseData = reserveCourseData['lesson'];
                             final courseImage = courseData['image_url'];
                             final courseTitle = courseData['title'];
-                            bool isCourseLike = courseData['is_like'];
+
                             return GestureDetector(
                               onTap: () {
                                 onCourseTap(courseData['id']);
