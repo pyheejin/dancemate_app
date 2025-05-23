@@ -1,27 +1,27 @@
 import 'package:dancemate_app/database/api.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final getCourseProvider =
+final getLessonProvider =
     FutureProvider.family<dynamic, dynamic>((ref, date) async {
   final ApiServices api = ApiServices();
 
-  final result = await api.getCourses(date);
+  final result = await api.getLessons(date);
   return result;
 });
 
-final postCourseProvider = FutureProvider.family<dynamic, Map<String, dynamic>>(
-    (ref, courseData) async {
+final postLessonProvider = FutureProvider.family<dynamic, Map<String, dynamic>>(
+    (ref, lessonData) async {
   final ApiServices api = ApiServices();
 
-  final result = await api.postCourse(courseData);
+  final result = await api.postLesson(lessonData);
   return result;
 });
 
-final getCourseDetailProvider =
-    FutureProvider.family<dynamic, int>((ref, courseId) async {
+final getLessonDetailProvider =
+    FutureProvider.family<dynamic, int>((ref, lessonId) async {
   final ApiServices api = ApiServices();
 
-  final result = await api.getCourseDetail(courseId);
+  final result = await api.getLessonDetail(lessonId);
   return result;
 });
 

@@ -1,5 +1,6 @@
-import 'package:dancemate_app/provider/course_provider.dart';
+import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/dancer_provider.dart';
+import 'package:dancemate_app/widgets/error.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +16,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final courseDetailData = ref.watch(getCourseDetailProvider(courseId));
+    final courseDetailData = ref.watch(getLessonDetailProvider(courseId));
 
     String title = ref.watch(courseTitleProvider);
     String description = ref.watch(courseDescriptionProvider);
@@ -197,10 +198,10 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                 ref
                     .read(selectDetailDateProvider.notifier)
                     .update((state) => detailSelectDay);
-                print(detailSelectDay);
 
                 detailDateController.text =
                     DateFormat('yyyy-MM-dd').format(detailSelectDay);
+                print('----- ${detailDateController.text}');
 
                 Navigator.pop(context);
               },
@@ -610,15 +611,15 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            courseDetailData.value['course'][idx]['title'] =
+                            detailList[idx]['title'] =
                                 detailCountController.text;
-                            courseDetailData.value['course'][idx]
-                                ['course_date'] = detailDateController.text;
-                            courseDetailData.value['course'][idx]
-                                ['start_time'] = detailStartTimeController.text;
-                            courseDetailData.value['course'][idx]['end_time'] =
+                            detailList[idx]['course_date'] =
+                                detailDateController.text;
+                            detailList[idx]['start_time'] =
+                                detailStartTimeController.text;
+                            detailList[idx]['end_time'] =
                                 detailEndTimeController.text;
-                            courseDetailData.value['course'][idx]['address'] =
+                            detailList[idx]['address'] =
                                 detailAddressController.text;
 
                             ref
@@ -1551,6 +1552,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
         });
       }
       bodyList.addAll(newDetailList);
+
       final detail = {
         'status': 1,
         'title': titleController.text,
@@ -1569,6 +1571,8 @@ class DancerCourseDetailScreen extends ConsumerWidget {
           ref.refresh(oldDancerCourseProvider);
 
           Navigator.pop(context);
+        } else {
+          errorAlert(context, result['result_msg']);
         }
       }
     }
@@ -1585,7 +1589,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
             ),
             onPressed: () {
               ref.refresh(dancerCourseProvider);
-              ref.refresh(getCourseDetailProvider(courseId));
+              ref.refresh(getLessonDetailProvider(courseId));
               ref.refresh(oldDancerCourseProvider);
 
               Navigator.pop(context);

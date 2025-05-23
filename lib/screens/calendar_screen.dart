@@ -1,5 +1,5 @@
 import 'package:dancemate_app/provider/calendar_provider.dart';
-import 'package:dancemate_app/provider/course_provider.dart';
+import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,7 +24,7 @@ class CalendarScreen extends ConsumerWidget {
     DateTime now = DateTime.now();
     CalendarFormat calendarFormat = CalendarFormat.month;
     DateTime selectDay = ref.watch(selectDateProvider);
-    var courses = ref.watch(getCourseProvider(dateFormat.format(selectDay)));
+    var courses = ref.watch(getLessonProvider(dateFormat.format(selectDay)));
     List<String> days = ['_', '월', '화', '수', '목', '금', '토', '일'];
 
     Map<DateTime, List<Event>> events = {
@@ -90,7 +90,7 @@ class CalendarScreen extends ConsumerWidget {
                 ref
                     .read(selectDateProvider.notifier)
                     .update((state) => selectDay);
-                courses = ref.watch(getCourseProvider(selectDay));
+                courses = ref.watch(getLessonProvider(selectDay));
               },
               onPageChanged: (focusedDay) {
                 now = focusedDay;
@@ -130,21 +130,18 @@ class CalendarScreen extends ConsumerWidget {
                       shrinkWrap: true,
                       itemCount: reserveCourseList.length,
                       itemBuilder: (context, index) {
-                        final courseDetailData = reserveCourseList[index];
-                        final courseDetailDate =
-                            courseDetailData['course_date'];
-                        final courseDetailTitle = courseDetailData['title'];
-                        final courseDetailStartTime =
-                            courseDetailData['start_time'];
-                        final courseDetailEndTime =
-                            courseDetailData['end_time'];
-                        final isCourseLike = courseDetailData['is_like'];
-
-                        final courseData = courseDetailData['lesson'];
-                        final courseImage = courseData['image_url'];
+                        final courseData = reserveCourseList[index];
+                        final courseDate = courseData['course_date'];
                         final courseTitle = courseData['title'];
+                        final courseStartTime = courseData['start_time'];
+                        final courseEndTime = courseData['end_time'];
+                        final isCourseLike = courseData['is_like'];
 
-                        final dancerData = courseData['dancer'];
+                        final lessonData = courseData['lesson'];
+                        final lessonImage = lessonData['image_url'];
+                        final lessonTitle = lessonData['title'];
+
+                        final dancerData = lessonData['dancer'];
                         final dancerNickname = dancerData['nickname'];
                         final dancerEmail = dancerData['email'];
                         final dancerImageUrl = dancerData['image_url'];
@@ -161,7 +158,7 @@ class CalendarScreen extends ConsumerWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                courseImage == null
+                                lessonImage == null
                                     ? Image.asset(
                                         width: 120,
                                         height: 120,
@@ -172,7 +169,7 @@ class CalendarScreen extends ConsumerWidget {
                                         width: 120,
                                         height: 120,
                                         fit: BoxFit.cover,
-                                        courseImage,
+                                        lessonImage,
                                       ),
                                 const SizedBox(width: 10),
                                 Column(
@@ -221,20 +218,20 @@ class CalendarScreen extends ConsumerWidget {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      courseTitle,
+                                      lessonTitle,
                                       style: const TextStyle(
                                         color: Color(0xff3F51B5),
                                         fontSize: 17,
                                       ),
                                     ),
                                     Text(
-                                      '$courseDetailDate $courseDetailTitle',
+                                      '$courseDate, $courseTitle',
                                       style: const TextStyle(
                                         fontSize: 15,
                                       ),
                                     ),
                                     Text(
-                                      '$courseDetailStartTime - $courseDetailEndTime',
+                                      '$courseStartTime - $courseEndTime',
                                       style: const TextStyle(
                                         fontSize: 15,
                                       ),

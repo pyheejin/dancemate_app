@@ -1,4 +1,4 @@
-import 'package:dancemate_app/provider/course_provider.dart';
+import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';

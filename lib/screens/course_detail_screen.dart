@@ -1,4 +1,4 @@
-import 'package:dancemate_app/provider/course_provider.dart';
+import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/order_screen.dart';
 import 'package:dancemate_app/screens/reserve_screen.dart';
@@ -16,7 +16,7 @@ class CourseDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final courseDetailData = ref.watch(getCourseDetailProvider(courseId));
+    final courseDetailData = ref.watch(getLessonDetailProvider(courseId));
 
     dynamic selectCourseDetailId = ref.watch(selectCourseDetailIdProvider);
 
@@ -77,9 +77,9 @@ class CourseDetailScreen extends ConsumerWidget {
             );
           },
           data: (courseDetail) {
-            final courseTitle = courseDetail['title'];
-            final courseImageUrl = courseDetail['image_url'];
-            final courseDescription = courseDetail['description'];
+            final lessonTitle = courseDetail['title'];
+            final lessonImageUrl = courseDetail['image_url'];
+            final lessonDescription = courseDetail['description'];
 
             final dancerData = courseDetail['dancer'];
             final dancerEmail = dancerData['email'];
@@ -90,7 +90,7 @@ class CourseDetailScreen extends ConsumerWidget {
             return Column(
               children: [
                 const SizedBox(height: 10),
-                courseImageUrl == null
+                lessonImageUrl == null
                     ? Image.asset(
                         height: 270,
                         'assets/images/app_logo/detail_2x.png',
@@ -99,7 +99,7 @@ class CourseDetailScreen extends ConsumerWidget {
                         width: 430,
                         height: 270,
                         fit: BoxFit.fitWidth,
-                        courseImageUrl,
+                        lessonImageUrl,
                       ),
                 const SizedBox(height: 10),
                 Padding(
@@ -150,7 +150,7 @@ class CourseDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        courseTitle,
+                        lessonTitle,
                         style: const TextStyle(
                           color: Color(0xff3F51B5),
                           fontSize: 18,
@@ -263,7 +263,7 @@ class CourseDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Text(courseDescription),
+                      Text(lessonDescription),
                     ],
                   ),
                 ),

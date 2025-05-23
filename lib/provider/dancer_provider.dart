@@ -34,17 +34,17 @@ class DancerCourseNotifier extends StateNotifier<dynamic> {
     state = state.where((detail) => detail != removeDetail).toList();
   }
 
-  dynamic saveCourse(Map<String, dynamic> course) async {
+  dynamic saveCourse(Map<String, dynamic> lesson) async {
     final ApiServices api = ApiServices();
 
-    final result = await api.postCourse(course);
+    final result = await api.postLesson(lesson);
     return result;
   }
 
-  dynamic updateCourse(int courseId, Map<String, dynamic> course) async {
+  dynamic updateCourse(int lessonId, Map<String, dynamic> course) async {
     final ApiServices api = ApiServices();
 
-    final result = await api.putCourseDetail(courseId, course);
+    final result = await api.putLessonDetail(lessonId, course);
     return result;
   }
 }
@@ -60,7 +60,7 @@ class OldDancerCourseNotifier extends StateNotifier<dynamic> {
   void addCourseDetailList(int courseId) async {
     final ApiServices api = ApiServices();
 
-    final result = await api.getCourseDetail(courseId);
+    final result = await api.getLessonDetail(courseId);
     state = result['course'];
   }
 

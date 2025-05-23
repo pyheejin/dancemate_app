@@ -1,22 +1,52 @@
 import 'package:dancemate_app/provider/course_detail_provider.dart';
 import 'package:dancemate_app/provider/review_provider.dart';
+import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ReviewScreen extends ConsumerWidget {
-  final int courseDetailId;
+  final int courseId, userCourseId;
 
   const ReviewScreen({
     super.key,
-    required this.courseDetailId,
+    required this.courseId,
+    required this.userCourseId,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final courseDetailData = ref.watch(getCourseDetailProvider(courseDetailId));
+    final courseDetailData = ref.watch(getCourseDetailProvider(courseId));
     final TextEditingController descriptionController = TextEditingController();
-    double courseRate = ref.watch(courseReviewRateProvider);
+    double lessonRate = ref.watch(lessonReviewRateProvider);
+    int lessonId = 0;
+
+    if (courseDetailData.value != null) {
+      lessonId = courseDetailData.value['lesson']['id'];
+    }
+
+    void onSaveTap() async {
+      final bodyData = {
+        'course_id': lessonId,
+        'user_course_id': userCourseId,
+        'rate': lessonRate,
+        'description': descriptionController.text,
+      };
+
+      final result = await ref
+          .read(lessonDetailReviewProvider.notifier)
+          .saveReview(lessonId, bodyData);
+
+      if (result != null) {
+        if (result['result_code'] == 200) {
+          ref.refresh(getUserCourseProvider);
+          Navigator.pop(context);
+        } else {
+          errorAlert(context, result['result_msg']);
+        }
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -24,16 +54,16 @@ class ReviewScreen extends ConsumerWidget {
       ),
       body: courseDetailData.when(
         data: (courseDetail) {
-          final courseData = courseDetail['course'];
-          final courseTitle = courseData['title'];
-          final courseImage = courseData['image_url'];
+          final lessonData = courseDetail['lesson'];
+          final lessonTitle = lessonData['title'];
+          final lessonImage = lessonData['image_url'];
 
-          final courseDetailDate = courseDetail['course_date'];
+          final courseDate = courseDetail['course_date'];
           final courseStartTime = courseDetail['start_time'];
           final courseEndTime = courseDetail['end_time'];
-          final courseDetailTitle = courseDetail['title'];
+          final courseTitle = courseDetail['title'];
 
-          final dancerData = courseData['dancer'];
+          final dancerData = lessonData['dancer'];
           final dancerNickname = dancerData['nickname'];
           final dancerEmail = dancerData['email'];
           final dancerImageUrl = dancerData['image_url'];
@@ -47,7 +77,7 @@ class ReviewScreen extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    courseImage == null
+                    lessonImage == null
                         ? Image.asset(
                             width: 120,
                             height: 120,
@@ -58,7 +88,7 @@ class ReviewScreen extends ConsumerWidget {
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
-                            courseImage,
+                            lessonImage,
                           ),
                     const SizedBox(width: 10),
                     Column(
@@ -104,14 +134,14 @@ class ReviewScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          courseTitle,
+                          lessonTitle,
                           style: const TextStyle(
                             color: Color(0xff3F51B5),
                             fontSize: 17,
                           ),
                         ),
                         Text(
-                          '$courseDetailDate $courseDetailTitle',
+                          '$courseDate $courseTitle',
                           style: const TextStyle(
                             fontSize: 15,
                           ),
@@ -151,8 +181,8 @@ class ReviewScreen extends ConsumerWidget {
                   },
                   onRatingUpdate: (rating) {
                     // save 동작 필요함
-                    print(rating);
-                    courseRate = rating;
+                    lessonRate = rating;
+                    print(lessonRate);
                   },
                 ),
                 const SizedBox(height: 25),
@@ -224,7 +254,7 @@ class ReviewScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: TextButton(
-            onPressed: () {},
+            onPressed: onSaveTap,
             style: TextButton.styleFrom(
               backgroundColor: const Color(0xFFA48AFF),
               shape: RoundedRectangleBorder(
