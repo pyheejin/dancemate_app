@@ -15,15 +15,23 @@ class LessonDetailReviewNotifier extends StateNotifier<dynamic> {
     return result;
   }
 
-  // dynamic updateReview(int lessonId, Map<String, dynamic> course) async {
-  //   final ApiServices api = ApiServices();
+  dynamic updateReview(int reviewId, Map<String, dynamic> request) async {
+    final ApiServices api = ApiServices();
 
-  //   final result = await api.putLessonDetailReview(lessonId, course);
-  //   return result;
-  // }
+    final result = await api.putReviewDetail(reviewId, request);
+    return result;
+  }
 }
 
 final lessonDetailReviewProvider =
     StateNotifierProvider<LessonDetailReviewNotifier, dynamic>((ref) {
   return LessonDetailReviewNotifier();
+});
+
+final getReviewDetailProvider =
+    FutureProvider.family<dynamic, dynamic>((ref, reviewId) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.getReviewDetail(reviewId);
+  return result;
 });

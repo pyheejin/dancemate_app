@@ -1,6 +1,7 @@
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/review_detail_screen.dart';
 import 'package:dancemate_app/screens/review_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -197,9 +198,8 @@ class CourseHistoryScreen extends ConsumerWidget {
                                 onTap: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (context) => ReviewScreen(
-                                        courseId: courseData['id'],
-                                        userCourseId: userCourseId,
+                                      builder: (context) => ReviewDetailScreen(
+                                        reviewId: reviewData[0]['id'],
                                       ),
                                     ),
                                   );

@@ -273,6 +273,27 @@ class ApiServices {
     return resultData;
   }
 
+  Future<dynamic> putReviewDetail(
+    int reviewId,
+    Map<String, dynamic> request,
+  ) async {
+    final accessToken = await getAccessToken();
+
+    final body = jsonEncode(request);
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/review/$reviewId'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
+
   Future<dynamic> getCourseDetail(int courseId) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
@@ -528,5 +549,20 @@ class ApiServices {
     final resultData = jsonDecode(utf8.decode(response.bodyBytes));
 
     return resultData;
+  }
+
+  Future<dynamic> getReviewDetail(int reviewId) async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/review/$reviewId'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+    final result = resultData['review'];
+
+    return result;
   }
 }
