@@ -565,4 +565,42 @@ class ApiServices {
 
     return result;
   }
+
+  Future<dynamic> getNotification() async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/notification'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+    final result = resultData['notification'];
+
+    return result;
+  }
+
+  Future<dynamic> postNotification(Map<String, dynamic> requestData) async {
+    final accessToken = await getAccessToken();
+
+    dynamic body = {
+      'lesson': requestData['lesson'],
+      'ticket': requestData['ticket'],
+      'community': requestData['community'],
+    };
+    body = jsonEncode(body);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/notification'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return resultData;
+  }
 }
