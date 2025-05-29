@@ -43,7 +43,7 @@ class NotificationScreen extends ConsumerWidget {
                       ),
                       CupertinoSwitch(
                         value: lessonNotice,
-                        activeColor: CupertinoColors.activeBlue,
+                        activeColor: const Color(0xFFA48AFF),
                         onChanged: (bool? value) async {
                           final result = await ref
                               .read(notificationProvider.notifier)
@@ -76,7 +76,7 @@ class NotificationScreen extends ConsumerWidget {
                       ),
                       CupertinoSwitch(
                         value: ticketNotice,
-                        activeColor: CupertinoColors.activeBlue,
+                        activeColor: const Color(0xFFA48AFF),
                         onChanged: (bool? value) async {
                           final result = await ref
                               .read(notificationProvider.notifier)
@@ -109,7 +109,7 @@ class NotificationScreen extends ConsumerWidget {
                       ),
                       CupertinoSwitch(
                         value: communityNotice,
-                        activeColor: CupertinoColors.activeBlue,
+                        activeColor: const Color(0xFFA48AFF),
                         onChanged: (bool? value) async {
                           final result = await ref
                               .read(notificationProvider.notifier)
