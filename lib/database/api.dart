@@ -625,8 +625,7 @@ class ApiServices {
         'Authorization': 'Bearer $accessToken',
       },
     );
-    final result = jsonDecode(utf8.decode(response.bodyBytes))['result_data']
-        ['chat_room']['chat'];
+    final result = jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
 
     return result;
   }
@@ -647,8 +646,7 @@ class ApiServices {
       },
       body: body,
     );
-    final result = jsonDecode(utf8.decode(response.bodyBytes))['result_data']
-        ['chat_room']['chat'];
+    final result = jsonDecode(utf8.decode(response.bodyBytes));
 
     return result;
   }

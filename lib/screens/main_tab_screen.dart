@@ -76,10 +76,10 @@ class MainNavigationScreen extends ConsumerWidget {
               selectedIndex: selectedIndex,
             ),
             NavTab(
-              text: '커뮤니티',
+              text: '수업톡',
               isSelected: selectedIndex == 3,
-              icon: Icons.forum_outlined,
-              selectedIcon: Icons.forum,
+              icon: Icons.chat_outlined,
+              selectedIcon: Icons.chat,
               onTap: () => onTap(3),
               selectedIndex: selectedIndex,
             ),

@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/chat_provider.dart';
+import 'package:dancemate_app/screens/chat_room_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,14 +13,19 @@ class ChatRoomScreen extends ConsumerWidget {
     final scrollController = ScrollController();
     final chatRoomData = ref.watch(getChatRoomProvider);
 
+    void onChatRoomTap(int chatRoomId) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ChatRoomDetailScreen(chatRoomId: chatRoomId),
+        ),
+      );
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(30),
-        child: AppBar(
-          automaticallyImplyLeading: true,
-          title: const Text('채팅방'),
-        ),
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        title: const Text('수업톡'),
       ),
       body: Column(
         children: [
@@ -55,7 +61,9 @@ class ChatRoomScreen extends ConsumerWidget {
                         final dancerNickname = dancerData['nickname'];
                         final dancerImage = dancerData['image_url'];
                         return GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            onChatRoomTap(roomData['id']);
+                          },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 5,
@@ -74,7 +82,7 @@ class ChatRoomScreen extends ConsumerWidget {
                                               width: 100,
                                               height: 100,
                                               fit: BoxFit.cover,
-                                              'assets/images/app_logo/2x.png',
+                                              'assets/images/app_logo/chat.png',
                                             )
                                           : Image.network(
                                               width: 100,
@@ -87,6 +95,8 @@ class ChatRoomScreen extends ConsumerWidget {
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           lessonTitle,
