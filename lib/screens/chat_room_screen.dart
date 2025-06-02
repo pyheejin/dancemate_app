@@ -52,6 +52,10 @@ class ChatRoomScreen extends ConsumerWidget {
                         final lastChat = roomData['last_chat'];
                         final lastChatTime = roomData['last_chat_time'];
 
+                        final roomNotificationData =
+                            roomData['room_notification'][0];
+                        final isCheck = roomNotificationData['status'];
+
                         final lessonData = roomData['lesson'];
                         final lessonImage = lessonData['image_url'];
                         final lessonTitle = lessonData['title'];
@@ -75,21 +79,41 @@ class ChatRoomScreen extends ConsumerWidget {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(50),
-                                      child: lessonImage == null
-                                          ? Image.asset(
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              'assets/images/app_logo/chat.png',
-                                            )
-                                          : Image.network(
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              lessonImage,
-                                            ),
+                                    Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          child: lessonImage == null
+                                              ? Image.asset(
+                                                  width: 100,
+                                                  height: 100,
+                                                  fit: BoxFit.cover,
+                                                  'assets/images/app_logo/chat.png',
+                                                )
+                                              : Image.network(
+                                                  width: 100,
+                                                  height: 100,
+                                                  fit: BoxFit.cover,
+                                                  lessonImage,
+                                                ),
+                                        ),
+                                        isCheck == 0
+                                            ? Positioned(
+                                                left: 5,
+                                                child: Container(
+                                                  width: 20,
+                                                  height: 20,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.redAccent,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                ),
+                                              )
+                                            : Container(),
+                                      ],
                                     ),
                                     const SizedBox(width: 10),
                                     Column(

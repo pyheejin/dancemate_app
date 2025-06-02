@@ -32,6 +32,16 @@ class ChatRoomDetailScreen extends ConsumerWidget {
             );
           },
         ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.chevron_left,
+            size: 30,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            ref.refresh(getChatRoomProvider);
+          },
+        ),
       ),
       body: Column(
         children: [
@@ -77,6 +87,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                       }
 
                                       final chatData = chatList[index];
+                                      final chatType = chatData['type'];
                                       final chatMessage = chatData['message'];
                                       final chatTime =
                                           chatData['created_at'].split(' ')[1];
@@ -93,130 +104,183 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 5,
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              userId == loginUserId
-                                                  ? MainAxisAlignment.end
-                                                  : MainAxisAlignment.start,
-                                          children: [
-                                            userId == loginUserId
-                                                ? Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    children: [
-                                                      Text(
-                                                        chatTime,
-                                                        style: const TextStyle(
-                                                          fontSize: 13,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          border: Border.all(
-                                                            color: const Color(
-                                                                0xFFA48AFF),
-                                                          ),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5),
-                                                        ),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                            vertical: 5,
-                                                            horizontal: 10,
-                                                          ),
-                                                          child: Text(
-                                                            chatMessage,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 16,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                : Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        width: 50,
-                                                        height: 50,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          border: Border.all(
-                                                            color: Colors
-                                                                .grey.shade400,
-                                                          ),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(35),
-                                                        ),
-                                                        child: CircleAvatar(
-                                                          backgroundImage:
-                                                              NetworkImage(
-                                                            userImage,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(userNickname),
-                                                          const SizedBox(
-                                                              height: 2),
-                                                          Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              border:
-                                                                  Border.all(
-                                                                color: const Color(
-                                                                    0xFF74D0FF),
+                                        child: chatType == 1
+                                            ? Row(
+                                                mainAxisAlignment: userId ==
+                                                        loginUserId
+                                                    ? MainAxisAlignment.end
+                                                    : MainAxisAlignment.start,
+                                                children: [
+                                                  userId == loginUserId
+                                                      ? Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Text(
+                                                              chatTime,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 13,
                                                               ),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          5),
                                                             ),
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                vertical: 5,
-                                                                horizontal: 10,
+                                                            const SizedBox(
+                                                                width: 5),
+                                                            Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border:
+                                                                    Border.all(
+                                                                  color: const Color(
+                                                                      0xFFA48AFF),
+                                                                ),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5),
                                                               ),
-                                                              child: Text(
-                                                                chatMessage,
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontSize: 16,
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .symmetric(
+                                                                  vertical: 5,
+                                                                  horizontal:
+                                                                      10,
+                                                                ),
+                                                                child: Text(
+                                                                  chatMessage,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                          ],
+                                                        )
+                                                      : Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .end,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Container(
+                                                              width: 50,
+                                                              height: 50,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border:
+                                                                    Border.all(
+                                                                  color: Colors
+                                                                      .grey
+                                                                      .shade400,
+                                                                ),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            35),
+                                                              ),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                  userImage,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 5),
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                    userNickname),
+                                                                const SizedBox(
+                                                                    height: 2),
+                                                                Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: const Color(
+                                                                          0xFF74D0FF),
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(5),
+                                                                  ),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .symmetric(
+                                                                      vertical:
+                                                                          5,
+                                                                      horizontal:
+                                                                          10,
+                                                                    ),
+                                                                    child: Text(
+                                                                      chatMessage,
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 5),
+                                                            Text(
+                                                              chatTime,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 13,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                ],
+                                              )
+                                            : Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        color: Colors.black26,
                                                       ),
-                                                      const SizedBox(width: 5),
-                                                      Text(
-                                                        chatTime,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        vertical: 5,
+                                                        horizontal: 20,
+                                                      ),
+                                                      child: Text(
+                                                        chatMessage,
                                                         style: const TextStyle(
-                                                          fontSize: 13,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                         ),
                                                       ),
-                                                    ],
+                                                    ),
                                                   ),
-                                          ],
-                                        ),
+                                                ],
+                                              ),
                                       );
                                     },
                                   ),
