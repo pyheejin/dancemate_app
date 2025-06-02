@@ -61,6 +61,7 @@ class TicketHistoryScreen extends ConsumerWidget {
                     const SizedBox(height: 5),
                     ListView.builder(
                       shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: ticketList.length,
                       itemBuilder: (context, index) {
                         final dancerData = ticketList[index]['dancer'];

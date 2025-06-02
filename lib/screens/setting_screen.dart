@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:dancemate_app/provider/setting_provider.dart';
 import 'package:dancemate_app/screens/course_history_screen.dart';
 import 'package:dancemate_app/screens/dancer_course_screen.dart';
 import 'package:dancemate_app/screens/dancer_ticket_screen.dart';
@@ -14,6 +17,23 @@ class SettingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    bool isDancer = ref.watch(isDancerProvider);
+
+    Future<void> isloginData() async {
+      const storage = FlutterSecureStorage();
+
+      String? data = await storage.read(key: 'login');
+      if (data != null) {
+        int type = json.decode(data)['userType'];
+
+        if (type == 50) {
+          ref.read(isDancerProvider.notifier).update((state) => true);
+        }
+      }
+    }
+
+    isloginData();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('설정'),
@@ -38,21 +58,27 @@ class SettingScreen extends ConsumerWidget {
               name: '티켓 구매 내역',
               screen: TicketHistoryScreen(),
             ),
-            Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Colors.grey.shade400),
-                ),
-              ),
-            ),
-            const SettingMenu(
-              name: '수업 관리',
-              screen: DancerCourseScreen(),
-            ),
-            const SettingMenu(
-              name: '티켓 관리',
-              screen: DancerTicketScreen(),
-            ),
+            isDancer
+                ? Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: Colors.grey.shade400),
+                      ),
+                    ),
+                  )
+                : Container(),
+            isDancer
+                ? const SettingMenu(
+                    name: '수업 관리',
+                    screen: DancerCourseScreen(),
+                  )
+                : Container(),
+            isDancer
+                ? const SettingMenu(
+                    name: '티켓 관리',
+                    screen: DancerTicketScreen(),
+                  )
+                : Container(),
             Container(
               decoration: BoxDecoration(
                 border: Border(

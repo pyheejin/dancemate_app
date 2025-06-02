@@ -1699,6 +1699,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 10),
                       ListView.builder(
                         shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         padding: EdgeInsets.zero,
                         itemCount: detailList.length,
                         itemBuilder: (context, index) {

@@ -49,10 +49,12 @@ class ApiServices {
     if (resultData['result_code'] == 200) {
       final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
       final userId = responseBody['user_id'];
+      final userType = responseBody['type'];
       final accessToken = responseBody['access_token'];
 
       final payload = jsonEncode({
         'userId': userId,
+        'userType': userType,
         'email': email,
         'access_token': accessToken,
       });
