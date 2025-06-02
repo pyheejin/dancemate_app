@@ -329,6 +329,8 @@ class HomeScreen extends ConsumerWidget {
                         height: 400,
                         child: ListView.builder(
                           scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: homeData['reserve_lessons'].length,
                           itemBuilder: (context, index) {
                             final reserveCourseData =
