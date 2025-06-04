@@ -415,171 +415,167 @@ class SearchResult extends StatelessWidget {
         ),
       );
     } else {
-      return SizedBox(
-        height: 600,
-        child: courses.when(
-          data: (courseList) {
-            return Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text('검색결과 총 ${courseList['courses'].length}개'),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                ListView.builder(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  itemCount: courseList['courses'].length,
-                  itemBuilder: (context, index) {
-                    if (courseList['courses'].isEmpty) {
-                      return null;
-                    }
-                    final courseData = courseList['courses'][index];
-                    final courseTitle = courseData['title'];
-                    final courseImage = courseData['image_url'];
+      return courses.when(
+        data: (courseList) {
+          return Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text('검색결과 총 ${courseList['courses'].length}개'),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                itemCount: courseList['courses'].length,
+                itemBuilder: (context, index) {
+                  if (courseList['courses'].isEmpty) {
+                    return null;
+                  }
+                  final courseData = courseList['courses'][index];
+                  final courseTitle = courseData['title'];
+                  final courseImage = courseData['image_url'];
 
-                    final courseDetailData = courseData['course_detail'][0];
-                    final courseDetailDate = courseDetailData['course_date'];
-                    final courseDetailTitle = courseDetailData['title'];
-                    final courseDetailStartTime =
-                        courseDetailData['start_time'];
-                    final courseDetailEndTime = courseDetailData['end_time'];
+                  final courseDetailData = courseData['course'][0];
+                  final courseDetailDate = courseDetailData['course_date'];
+                  final courseDetailTitle = courseDetailData['title'];
+                  final courseDetailStartTime = courseDetailData['start_time'];
+                  final courseDetailEndTime = courseDetailData['end_time'];
 
-                    final dancerData = courseData['dancer'];
-                    final dancerNickname = dancerData['nickname'];
-                    final dancerEmail = dancerData['email'];
-                    final dancerImageUrl = dancerData['image_url'];
-                    return GestureDetector(
-                      onTap: () {
-                        onCourseTap(courseData['id']);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 5,
-                          horizontal: 5,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Stack(
-                              children: [
-                                courseImage == null
-                                    ? Image.asset(
-                                        width: 120,
-                                        height: 120,
-                                        fit: BoxFit.cover,
-                                        'assets/images/app_logo/2x.png',
-                                      )
-                                    : Image.network(
-                                        width: 120,
-                                        height: 120,
-                                        fit: BoxFit.cover,
-                                        courseImage,
-                                      ),
-                                Positioned(
-                                  top: 5,
-                                  left: 5,
-                                  child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: const Color(0xff9475FF),
+                  final dancerData = courseData['dancer'];
+                  final dancerNickname = dancerData['nickname'];
+                  final dancerEmail = dancerData['email'];
+                  final dancerImageUrl = dancerData['image_url'];
+                  return GestureDetector(
+                    onTap: () {
+                      onCourseTap(courseData['id']);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 5,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Stack(
+                            children: [
+                              courseImage == null
+                                  ? Image.asset(
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      'assets/images/app_logo/2x.png',
+                                    )
+                                  : Image.network(
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      courseImage,
                                     ),
-                                    child: const Icon(
-                                      Icons.favorite_border,
-                                      color: Colors.white,
-                                    ),
+                              Positioned(
+                                top: 5,
+                                left: 5,
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: const Color(0xff9475FF),
+                                  ),
+                                  child: const Icon(
+                                    Icons.favorite_border,
+                                    color: Colors.white,
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                        dancerImageUrl,
-                                      ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                      dancerImageUrl,
                                     ),
-                                    const SizedBox(width: 5),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xff6555FF),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: Text(
-                                              dancerNickname,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                              ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xff6555FF),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15),
+                                          child: Text(
+                                            dancerNickname,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
                                             ),
                                           ),
                                         ),
-                                        Text(
-                                          dancerEmail,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                          ),
+                                      ),
+                                      Text(
+                                        dancerEmail,
+                                        style: const TextStyle(
+                                          fontSize: 16,
                                         ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  courseTitle,
-                                  style: const TextStyle(
-                                    color: Color(0xff3F51B5),
-                                    fontSize: 17,
+                                      ),
+                                    ],
                                   ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                courseTitle,
+                                style: const TextStyle(
+                                  color: Color(0xff3F51B5),
+                                  fontSize: 17,
                                 ),
-                                Text(
-                                  '$courseDetailDate $courseDetailTitle',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                  ),
+                              ),
+                              Text(
+                                '$courseDetailDate $courseDetailTitle',
+                                style: const TextStyle(
+                                  fontSize: 15,
                                 ),
-                                Text(
-                                  '$courseDetailStartTime - $courseDetailEndTime',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                  ),
+                              ),
+                              Text(
+                                '$courseDetailStartTime - $courseDetailEndTime',
+                                style: const TextStyle(
+                                  fontSize: 15,
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
-              ],
-            );
-          },
-          loading: () => const CircularProgressIndicator(),
-          error: (error, stack) {
-            return SizedBox(
-              width: 300,
-              child: Text('search error: $error'),
-            );
-          },
-        ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          );
+        },
+        loading: () => const CircularProgressIndicator(),
+        error: (error, stack) {
+          return SizedBox(
+            width: 300,
+            child: Text('search error: $error'),
+          );
+        },
       );
     }
   }

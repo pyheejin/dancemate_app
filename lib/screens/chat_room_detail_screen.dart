@@ -60,6 +60,10 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                     Expanded(
                       child: chatRoomData.when(
                         data: (room) {
+                          final roomData = room['chat_room'];
+                          final lessonData = roomData['lesson'];
+                          final dancerData = lessonData['dancer'];
+                          final dancerId = dancerData['id'];
                           return Align(
                             alignment: Alignment.topCenter,
                             child: ListView.builder(
@@ -67,11 +71,11 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                               reverse: true,
                               shrinkWrap: true,
                               controller: scrollController,
-                              itemCount: room['chat_room'].length,
+                              itemCount: room['chats'].length,
                               itemBuilder: (context, index) {
-                                final date = room['chat_room'][index]['date'];
-                                final chatList =
-                                    room['chat_room'][index]['chat_list'];
+                                final chatData = room['chats'][index];
+                                final date = chatData['date'];
+                                final chatList = chatData['chat_list'];
                                 return Column(
                                   children: [
                                     Text(date),
@@ -111,7 +115,8 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                           padding: const EdgeInsets.symmetric(
                                             vertical: 5,
                                           ),
-                                          child: chatType == 1
+                                          child: chatType ==
+                                                  1 // 채팅 메시지이면 1, 공지나 날짜이면 99(가운데 정렬)
                                               ? Row(
                                                   mainAxisAlignment: userId ==
                                                           loginUserId
@@ -181,9 +186,17 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                                                     BoxDecoration(
                                                                   border: Border
                                                                       .all(
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade400,
+                                                                    width: userId ==
+                                                                            dancerId
+                                                                        ? 2
+                                                                        : 1,
+                                                                    color: userId ==
+                                                                            dancerId
+                                                                        ? const Color(
+                                                                            0xFFA48AFF)
+                                                                        : Colors
+                                                                            .grey
+                                                                            .shade400,
                                                                   ),
                                                                   borderRadius:
                                                                       BorderRadius
@@ -206,7 +219,23 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                      userNickname),
+                                                                    userNickname,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: userId ==
+                                                                              dancerId
+                                                                          ? const Color(
+                                                                              0xFFA48AFF)
+                                                                          : Colors
+                                                                              .black,
+                                                                      fontWeight: userId ==
+                                                                              dancerId
+                                                                          ? FontWeight
+                                                                              .bold
+                                                                          : FontWeight
+                                                                              .normal,
+                                                                    ),
+                                                                  ),
                                                                   const SizedBox(
                                                                       height:
                                                                           2),

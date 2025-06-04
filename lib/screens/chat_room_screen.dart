@@ -14,6 +14,8 @@ class ChatRoomScreen extends ConsumerWidget {
     final chatRoomData = ref.watch(getChatRoomProvider);
 
     void onChatRoomTap(int chatRoomId) {
+      ref.refresh(getChatRoomDetailProvider(chatRoomId));
+
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => ChatRoomDetailScreen(chatRoomId: chatRoomId),

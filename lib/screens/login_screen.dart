@@ -1,3 +1,4 @@
+import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/signup_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +23,8 @@ class LoginScreen extends ConsumerWidget {
       final result = await ref.watch(postUserLoginProvider(args).future);
 
       if (result['result_code'] == 200) {
+        ref.read(mainTapProvider.notifier).update((state) => 0);
+
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => const MainNavigationScreen(),

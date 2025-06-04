@@ -25,17 +25,21 @@ class CalendarScreen extends ConsumerWidget {
     CalendarFormat calendarFormat = CalendarFormat.month;
     DateTime selectDay = ref.watch(selectDateProvider);
     var courses = ref.watch(getLessonProvider(dateFormat.format(selectDay)));
+
     List<String> days = ['_', '월', '화', '수', '목', '금', '토', '일'];
 
-    Map<DateTime, List<Event>> events = {
-      DateTime.utc(2025, 2, 13): [Event('title'), Event('title2')],
-      DateTime.utc(2025, 2, 14): [Event('title3')],
-    };
-    // final events = LinkedHashMap(
-    //   equals: isSameDay,
-    // )..addAll(eventSource);
+    int selectMonth = ref.watch(selectMonthProvider);
+    dynamic monthCourses = ref.watch(getCalendarLessonProvider(selectMonth));
 
-    List<Event> getEventsForDay(DateTime day) {
+    Map<dynamic, List<dynamic>> events = {};
+    if (monthCourses.value != null) {
+      for (var course in monthCourses.value) {
+        var date = dateFormat.parse(course['date']);
+        events[date] = course['course_list'];
+      }
+    }
+
+    List<dynamic> getEventsForDay(DateTime day) {
       return events[day] ?? [];
     }
 
@@ -78,6 +82,10 @@ class CalendarScreen extends ConsumerWidget {
                   color: Colors.blueAccent.shade100,
                   shape: BoxShape.circle,
                 ),
+                markerDecoration: const BoxDecoration(
+                  color: Color(0xFFA48AFF),
+                  shape: BoxShape.circle,
+                ),
               ),
               selectedDayPredicate: (day) {
                 return isSameDay(selectDay, day);
@@ -94,6 +102,9 @@ class CalendarScreen extends ConsumerWidget {
               },
               onPageChanged: (focusedDay) {
                 now = focusedDay;
+                // ref
+                //     .read(selectMonthProvider.notifier)
+                //     .update((state) => focusedDay.month);
               },
               calendarBuilders: CalendarBuilders(
                 dowBuilder: (context, day) {
@@ -101,17 +112,13 @@ class CalendarScreen extends ConsumerWidget {
                     child: Text(days[day.weekday]),
                   );
                 },
-                // markerBuilder: (context, date, events) {
-                //   DateTime date2 = DateTime(date.year, date.month, date.day);
-                //   return null;
-                // },
               ),
-
-              // eventLoader: (day) {
-              //   final dateFormat = DateFormat('yyyy-MM-dd');
-              //   final newDay = dateFormat.format(day);
-              //   return getEventsForDay(day);
-              // },
+              // 마커 표시
+              eventLoader: (day) {
+                final dateFormat = DateFormat('yyyy-MM-dd');
+                final newDay = dateFormat.format(day);
+                return getEventsForDay(dateFormat.parse(newDay));
+              },
             ),
             Expanded(
               child: courses.when(
@@ -148,7 +155,7 @@ class CalendarScreen extends ConsumerWidget {
 
                         return GestureDetector(
                           onTap: () {
-                            onCourseTap(courseData['id']);
+                            onCourseTap(lessonData['id']);
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(

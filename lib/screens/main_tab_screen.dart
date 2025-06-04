@@ -1,4 +1,9 @@
+import 'package:dancemate_app/provider/calendar_provider.dart';
+import 'package:dancemate_app/provider/chat_provider.dart';
+import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/main_tap_provider.dart';
+import 'package:dancemate_app/provider/search_provider.dart';
+import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/calendar_screen.dart';
 import 'package:dancemate_app/screens/chat_room_screen.dart';
 import 'package:dancemate_app/screens/home_screen.dart';
@@ -56,7 +61,10 @@ class MainNavigationScreen extends ConsumerWidget {
               isSelected: selectedIndex == 0,
               icon: Icons.home_outlined,
               selectedIcon: Icons.home_outlined,
-              onTap: () => onTap(0),
+              onTap: () {
+                ref.refresh(getHomeProvider);
+                return onTap(0);
+              },
               selectedIndex: selectedIndex,
             ),
             NavTab(
@@ -64,7 +72,10 @@ class MainNavigationScreen extends ConsumerWidget {
               isSelected: selectedIndex == 1,
               icon: Icons.search_outlined,
               selectedIcon: Icons.search,
-              onTap: () => onTap(1),
+              onTap: () {
+                ref.refresh(searchKeywordProvider);
+                return onTap(1);
+              },
               selectedIndex: selectedIndex,
             ),
             NavTab(
@@ -72,7 +83,10 @@ class MainNavigationScreen extends ConsumerWidget {
               isSelected: selectedIndex == 2,
               icon: Icons.calendar_month_outlined,
               selectedIcon: Icons.calendar_month,
-              onTap: () => onTap(2),
+              onTap: () {
+                ref.refresh(selectDateProvider);
+                return onTap(2);
+              },
               selectedIndex: selectedIndex,
             ),
             NavTab(
@@ -80,7 +94,10 @@ class MainNavigationScreen extends ConsumerWidget {
               isSelected: selectedIndex == 3,
               icon: Icons.chat_outlined,
               selectedIcon: Icons.chat,
-              onTap: () => onTap(3),
+              onTap: () {
+                ref.refresh(getChatRoomProvider);
+                return onTap(3);
+              },
               selectedIndex: selectedIndex,
             ),
             NavTab(
@@ -88,7 +105,10 @@ class MainNavigationScreen extends ConsumerWidget {
               isSelected: selectedIndex == 4,
               icon: Icons.person_outline,
               selectedIcon: Icons.person,
-              onTap: () => onTap(4),
+              onTap: () {
+                ref.refresh(getUserProfileProvider);
+                return onTap(4);
+              },
               selectedIndex: selectedIndex,
             ),
           ],

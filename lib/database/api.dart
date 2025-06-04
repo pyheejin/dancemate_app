@@ -652,4 +652,19 @@ class ApiServices {
 
     return result;
   }
+
+  Future<dynamic> getCalendarLessons(int month) async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/calendar?month=$month'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+    final courses = resultData['courses'];
+
+    return courses;
+  }
 }

@@ -7,6 +7,7 @@ import 'package:dancemate_app/screens/dancer_ticket_screen.dart';
 import 'package:dancemate_app/screens/like_course_screen.dart';
 import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/screens/notification_screen.dart';
+import 'package:dancemate_app/screens/qna_screen.dart';
 import 'package:dancemate_app/screens/ticket_history_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,7 +93,7 @@ class SettingScreen extends ConsumerWidget {
             ),
             const SettingMenu(
               name: '문의하기',
-              screen: SettingScreen(),
+              screen: QnaScreen(),
             ),
             const Padding(
               padding: EdgeInsets.symmetric(
