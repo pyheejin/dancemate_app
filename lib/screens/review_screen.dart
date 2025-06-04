@@ -180,9 +180,7 @@ class ReviewScreen extends ConsumerWidget {
                     );
                   },
                   onRatingUpdate: (rating) {
-                    // save 동작 필요함
                     lessonRate = rating;
-                    print(lessonRate);
                   },
                 ),
                 const SizedBox(height: 25),
