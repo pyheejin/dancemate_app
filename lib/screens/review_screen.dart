@@ -166,7 +166,7 @@ class ReviewScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 25),
                 RatingBar.builder(
-                  initialRating: 1,
+                  initialRating: 5,
                   minRating: 1,
                   direction: Axis.horizontal,
                   allowHalfRating: true,
