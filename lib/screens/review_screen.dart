@@ -28,7 +28,6 @@ class ReviewScreen extends ConsumerWidget {
 
     void onSaveTap() async {
       final bodyData = {
-        'course_id': lessonId,
         'user_course_id': userCourseId,
         'rate': lessonRate,
         'description': descriptionController.text,

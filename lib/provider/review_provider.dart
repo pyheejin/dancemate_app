@@ -2,7 +2,7 @@ import 'package:dancemate_app/database/api.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final lessonReviewRateProvider = StateProvider.autoDispose<double>((ref) {
-  return 1;
+  return 5;
 });
 
 class LessonDetailReviewNotifier extends StateNotifier<dynamic> {
