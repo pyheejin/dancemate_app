@@ -55,8 +55,12 @@ class ChatRoomScreen extends ConsumerWidget {
                         final lastChatTime = roomData['last_chat_time'];
 
                         final roomNotificationData =
-                            roomData['room_notification'][0];
-                        final isCheck = roomNotificationData['status'];
+                            roomData['room_notification'];
+
+                        int isCheck = 0;
+                        if (roomNotificationData.isNotEmpty) {
+                          isCheck = roomNotificationData[0]['status'];
+                        }
 
                         final lessonData = roomData['lesson'];
                         final lessonImage = lessonData['image_url'];
