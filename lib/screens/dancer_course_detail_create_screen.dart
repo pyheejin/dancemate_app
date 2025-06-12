@@ -613,8 +613,7 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
                           onTap: () {
                             final detail = {
                               'idx': index,
-                              'course_date':
-                                  '${detailDateController.text} 00:00:00',
+                              'course_date': detailDateController.text,
                               'start_time': detailStartTimeController.text,
                               'end_time': detailEndTimeController.text,
                               'title': detailCountController.text,
@@ -1031,16 +1030,16 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            print('newDetailList: ${newDetailList.length}');
                             final detail = {
                               'idx': newDetailList.length,
-                              'course_date': '${dateController.text} 00:00:00',
+                              'course_date': dateController.text,
                               'start_time': startTimeController.text,
                               'end_time': endTimeController.text,
                               'title': countController.text,
                               'address': addressController.text,
                               'address_detail': addressController.text,
                             };
+
                             ref
                                 .read(dancerCourseProvider.notifier)
                                 .addCourseDetail(detail);

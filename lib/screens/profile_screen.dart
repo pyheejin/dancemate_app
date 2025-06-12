@@ -15,6 +15,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userProfile = ref.watch(getUserProfileProvider);
     NumberFormat format = NumberFormat('###,###,###,###');
+    DateTime today = DateTime.now();
 
     void onCourseTap(int courseId) {
       Navigator.of(context).push(
@@ -106,9 +107,51 @@ class ProfileScreen extends ConsumerWidget {
                                           fontSize: 18,
                                         ),
                                       ),
-                                      const Icon(
-                                        Icons.mode_edit_outline_outlined,
-                                        size: 17,
+                                      GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return Dialog(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 20,
+                                                    horizontal: 10,
+                                                  ),
+                                                  child: Container(
+                                                    width: 400,
+                                                    height: 200,
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(
+                                                            15), // 모달 전체 라운딩 처리
+                                                      ),
+                                                    ),
+                                                    child: const Column(
+                                                      children: [
+                                                        Text(
+                                                          '프로필 변경',
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: const Icon(
+                                          Icons.mode_edit_outline_outlined,
+                                          size: 17,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -164,6 +207,9 @@ class ProfileScreen extends ConsumerWidget {
                                 courseDetailData['start_time'];
                             final courseDetailEndTime =
                                 courseDetailData['end_time'];
+
+                            DateTime specificDay = DateFormat("yyyy-MM-dd")
+                                .parse(courseDetailDate);
 
                             final courseData = courseDetailData['lesson'];
                             final courseTitle = courseData['title'];
@@ -275,38 +321,160 @@ class ProfileScreen extends ConsumerWidget {
                                         ),
                                       ],
                                     ),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        final result = await ref.watch(
-                                            postCourseDetailCancelProvider(
-                                                    courseDetailId)
-                                                .future);
-                                        print(result['result_code']);
-                                        if (result['result_code'] == 200) {
-                                          ref.refresh(getUserProfileProvider);
-                                          ref.refresh(getHomeProvider);
-                                        } else {
-                                          print('reserve course cancel fail');
-                                        }
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.redAccent,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: const Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: Text(
-                                            '예약취소',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
+                                    // 당일엔 취소 못하도록 버튼 없애기
+                                    specificDay.isBefore(today)
+                                        ? Container()
+                                        : GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return Dialog(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        vertical: 20,
+                                                        horizontal: 30,
+                                                      ),
+                                                      child: Container(
+                                                        height: 160,
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                            Radius.circular(
+                                                                15), // 모달 전체 라운딩 처리
+                                                          ),
+                                                        ),
+                                                        child: Column(
+                                                          children: [
+                                                            const SizedBox(
+                                                                height: 15),
+                                                            const Text(
+                                                              '예약 취소 후 초대된 톡방도 나갈까요?',
+                                                              style: TextStyle(
+                                                                fontSize: 19,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 40),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    border: Border.all(
+                                                                        color: Colors
+                                                                            .redAccent),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child:
+                                                                      const Padding(
+                                                                    padding:
+                                                                        EdgeInsets.all(
+                                                                            10),
+                                                                    child: Text(
+                                                                      '톡방 나가기',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            17,
+                                                                        color: Colors
+                                                                            .redAccent,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                GestureDetector(
+                                                                  onTap:
+                                                                      () async {
+                                                                    final result =
+                                                                        await ref
+                                                                            .watch(postCourseDetailCancelProvider(courseDetailId).future);
+                                                                    if (result[
+                                                                            'result_code'] ==
+                                                                        200) {
+                                                                      ref.refresh(
+                                                                          getUserProfileProvider);
+                                                                      ref.refresh(
+                                                                          getHomeProvider);
+                                                                    } else {
+                                                                      print(
+                                                                          '[${result['result_code']}] ${result['result_msg']}');
+                                                                    }
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      border: Border.all(
+                                                                          color:
+                                                                              const Color(0xFFA48AFF)),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              10),
+                                                                    ),
+                                                                    child:
+                                                                        const Padding(
+                                                                      padding:
+                                                                          EdgeInsets.all(
+                                                                              10),
+                                                                      child:
+                                                                          Text(
+                                                                        '예약 취소만 하기',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              17,
+                                                                          color: Color.fromARGB(
+                                                                              255,
+                                                                              110,
+                                                                              87,
+                                                                              192),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.redAccent,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(10),
+                                                child: Text(
+                                                  '예약취소',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
                                   ],
                                 ),
                               ),

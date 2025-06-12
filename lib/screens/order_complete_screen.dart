@@ -21,6 +21,7 @@ class OrderCompleteScreen extends ConsumerWidget {
     final userTicketData = paymentDetail['user_ticket'];
     final ticketData = userTicketData['ticket'];
     final dancerData = ticketData['dancer'];
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(
