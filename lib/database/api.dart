@@ -681,4 +681,50 @@ class ApiServices {
 
     return resultData;
   }
+
+  Future<dynamic> postQna(dynamic qna) async {
+    final accessToken = await getAccessToken();
+
+    dynamic body = {
+      'email': qna['email'],
+      'title': qna['title'],
+      'question': qna['question'],
+    };
+    body = jsonEncode(body);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/qna'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final result = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return result;
+  }
+
+  Future<dynamic> putQnaDetail(int qnaId, dynamic qna) async {
+    final accessToken = await getAccessToken();
+
+    dynamic body = {
+      'email': qna['email'],
+      'title': qna['title'],
+      'question': qna['question'],
+    };
+    body = jsonEncode(body);
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/qna/$qnaId'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final result = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return result;
+  }
 }
