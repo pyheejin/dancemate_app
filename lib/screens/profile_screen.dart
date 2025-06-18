@@ -3,6 +3,7 @@ import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/screens/setting_screen.dart';
+import 'package:dancemate_app/widgets/error.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +23,175 @@ class ProfileScreen extends ConsumerWidget {
         MaterialPageRoute(
           builder: (context) => CourseDetailScreen(courseId: courseId),
         ),
+      );
+    }
+
+    void profileEditTap() {
+      final TextEditingController nicknameController = TextEditingController();
+      final TextEditingController descriptionController =
+          TextEditingController();
+
+      void onSaveTap() async {
+        // final qnaDetail = {
+        //   'email': emailController.text,
+        //   'title': titleController.text,
+        //   'question': questionController.text,
+        // };
+        // final result = await ref
+        //     .read(qnaProvider.notifier)
+        //     .updateQna(qna['id'], qnaDetail);
+        // if (result['result_code'] == 200) {
+        //   ref.refresh(getQnaProvider);
+        //   Navigator.pop(context);
+        // } else {
+        //   errorAlert(context, result['result_msg']);
+        // }
+      }
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 20,
+                horizontal: 10,
+              ),
+              child: Container(
+                width: 400,
+                height: 400,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(15), // 모달 전체 라운딩 처리
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      '프로필 변경',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Colors.black26,
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.camera_alt_outlined,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextField(
+                            controller: nicknameController,
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: TextField(
+                        textAlignVertical: TextAlignVertical.top,
+                        controller: descriptionController,
+                        expands: true,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          hintText: '자기소개',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.black38,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            '취소',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: const Color(0xFFA48AFF),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          onPressed: onSaveTap,
+                          child: const Text(
+                            '저장',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       );
     }
 
@@ -72,10 +242,14 @@ class ProfileScreen extends ConsumerWidget {
                             if (dataList == null) {
                               return Container();
                             } else {
+                              final imageUrl = dataList['image_url'];
                               return CircleAvatar(
                                 radius: 50,
-                                foregroundImage:
-                                    NetworkImage(dataList['image_url']),
+                                // foregroundImage:
+                                //     NetworkImage(dataList['image_url']),
+                                backgroundImage: AssetImage(
+                                  imageUrl,
+                                ),
                                 child: Text(dataList['nickname']),
                               );
                             }
@@ -108,46 +282,7 @@ class ProfileScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       GestureDetector(
-                                        onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Dialog(
-                                                child: Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    vertical: 20,
-                                                    horizontal: 10,
-                                                  ),
-                                                  child: Container(
-                                                    width: 400,
-                                                    height: 200,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(
-                                                            15), // 모달 전체 라운딩 처리
-                                                      ),
-                                                    ),
-                                                    child: const Column(
-                                                      children: [
-                                                        Text(
-                                                          '프로필 변경',
-                                                          style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
+                                        onTap: profileEditTap,
                                         child: const Icon(
                                           Icons.mode_edit_outline_outlined,
                                           size: 17,
