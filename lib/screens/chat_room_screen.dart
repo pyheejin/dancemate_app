@@ -26,7 +26,7 @@ class ChatRoomScreen extends ConsumerWidget {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        automaticallyImplyLeading: true,
+        automaticallyImplyLeading: false,
         title: const Text('수업톡'),
       ),
       body: Column(

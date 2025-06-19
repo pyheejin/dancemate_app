@@ -61,6 +61,10 @@ class SignUpScreen extends ConsumerWidget {
       }
     }
 
+    void onClearTap(TextEditingController controller) {
+      controller.clear();
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -144,7 +148,21 @@ class SignUpScreen extends ConsumerWidget {
                         width: 1.0,
                       ),
                     ),
-                    suffixIcon: const Icon(Icons.cancel_outlined),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade400,
+                        width: 1.0,
+                      ),
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        onClearTap(emailController);
+                      },
+                      child: const Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.black54,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -181,7 +199,21 @@ class SignUpScreen extends ConsumerWidget {
                         width: 1.0,
                       ),
                     ),
-                    suffixIcon: const Icon(Icons.cancel_outlined),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade400,
+                        width: 1.0,
+                      ),
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        onClearTap(passwordController);
+                      },
+                      child: const Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.black54,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -216,7 +248,21 @@ class SignUpScreen extends ConsumerWidget {
                         width: 1.0,
                       ),
                     ),
-                    suffixIcon: const Icon(Icons.cancel_outlined),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade400,
+                        width: 1.0,
+                      ),
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        onClearTap(nicknameController);
+                      },
+                      child: const Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.black54,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -252,7 +298,21 @@ class SignUpScreen extends ConsumerWidget {
                         width: 1.0,
                       ),
                     ),
-                    suffixIcon: const Icon(Icons.cancel_outlined),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade400,
+                        width: 1.0,
+                      ),
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        onClearTap(nameController);
+                      },
+                      child: const Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.black54,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -288,7 +348,21 @@ class SignUpScreen extends ConsumerWidget {
                         width: 1.0,
                       ),
                     ),
-                    suffixIcon: const Icon(Icons.cancel_outlined),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade400,
+                        width: 1.0,
+                      ),
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        onClearTap(phoneController);
+                      },
+                      child: const Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.black54,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -308,7 +382,16 @@ class SignUpScreen extends ConsumerWidget {
                             width: 1.0,
                           ),
                         ),
-                        suffixIcon: const Icon(Icons.cancel_outlined),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 1.0,
+                          ),
+                        ),
+                        suffixIcon: const Icon(
+                          Icons.cancel_outlined,
+                          color: Colors.black54,
+                        ),
                       ),
                     ),
                   ),
@@ -360,6 +443,12 @@ class SignUpScreen extends ConsumerWidget {
                   maxLines: null,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade400,
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: Colors.grey.shade400,
                         width: 1.0,

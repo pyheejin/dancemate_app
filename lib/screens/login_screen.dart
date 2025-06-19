@@ -15,6 +15,10 @@ class LoginScreen extends ConsumerWidget {
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
+    void onClearTap(TextEditingController controller) {
+      controller.clear();
+    }
+
     void onLoginTap() async {
       List<dynamic> args = [
         emailController.text,
@@ -43,14 +47,13 @@ class LoginScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 130),
-            Container(
+            SizedBox(
               width: 200,
               height: 120,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: const Center(
-                child: Text('DanceMate'),
+              child: Center(
+                child: Image.asset(
+                  'assets/images/app_logo/detail_2x.png',
+                ),
               ),
             ),
             const SizedBox(height: 80),
@@ -70,7 +73,21 @@ class LoginScreen extends ConsumerWidget {
                     width: 1.0,
                   ),
                 ),
-                suffixIcon: const Icon(Icons.cancel_outlined),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1.0,
+                  ),
+                ),
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    onClearTap(emailController);
+                  },
+                  child: const Icon(
+                    Icons.cancel_outlined,
+                    color: Colors.black54,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 30),
@@ -91,7 +108,21 @@ class LoginScreen extends ConsumerWidget {
                     width: 1.0,
                   ),
                 ),
-                suffixIcon: const Icon(Icons.cancel_outlined),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1.0,
+                  ),
+                ),
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    onClearTap(passwordController);
+                  },
+                  child: const Icon(
+                    Icons.cancel_outlined,
+                    color: Colors.black54,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 40),
@@ -115,6 +146,7 @@ class LoginScreen extends ConsumerWidget {
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -124,7 +156,12 @@ class LoginScreen extends ConsumerWidget {
             const SizedBox(height: 10),
             const Row(
               children: [
-                Text('비밀번호를 잊으셨나요?'),
+                Text(
+                  '비밀번호를 잊으셨나요?',
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 30),
@@ -144,6 +181,7 @@ class LoginScreen extends ConsumerWidget {
                     '회원가입',
                     style: TextStyle(
                       color: Color(0xFFA48AFF),
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -155,7 +193,10 @@ class LoginScreen extends ConsumerWidget {
               children: [
                 Text(
                   '소셜 로그인',
-                  style: TextStyle(color: Colors.grey.shade500),
+                  style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),

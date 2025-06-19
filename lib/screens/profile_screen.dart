@@ -200,106 +200,124 @@ class ProfileScreen extends ConsumerWidget {
         length: 2,
         child: Padding(
           padding: const EdgeInsets.symmetric(
+            vertical: 10,
             horizontal: 10,
           ),
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
-                SliverAppBar(
-                  actions: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const SettingScreen(),
-                          ),
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.settings,
-                        size: 20,
-                      ),
-                    )
-                  ],
-                ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(
                       bottom: 20,
                     ),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        userProfile.when(
-                          loading: () => const CircularProgressIndicator(),
-                          error: (error, stack) {
-                            print(error);
-                            return SizedBox(
-                              width: 300,
-                              child: Text('error: $error'),
-                            );
-                          },
-                          data: (dataList) {
-                            if (dataList == null) {
-                              return Container();
-                            } else {
-                              final imageUrl = dataList['image_url'];
-                              return CircleAvatar(
-                                radius: 50,
-                                // foregroundImage:
-                                //     NetworkImage(dataList['image_url']),
-                                backgroundImage: AssetImage(
-                                  imageUrl,
-                                ),
-                                child: Text(dataList['nickname']),
-                              );
-                            }
-                          },
-                        ),
-                        const SizedBox(width: 10),
-                        userProfile.when(
-                          loading: () => const CircularProgressIndicator(),
-                          error: (error, stack) {
-                            print(error);
-                            return SizedBox(
-                              width: 300,
-                              child: Text('error: $error'),
-                            );
-                          },
-                          data: (dataList) {
-                            if (dataList == null) {
-                              return Container();
-                            } else {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                        Row(
+                          children: [
+                            userProfile.when(
+                              loading: () => const CircularProgressIndicator(),
+                              error: (error, stack) {
+                                print(error);
+                                return SizedBox(
+                                  width: 300,
+                                  child: Text('error: $error'),
+                                );
+                              },
+                              data: (dataList) {
+                                if (dataList == null) {
+                                  return Container();
+                                } else {
+                                  final imageUrl = dataList['image_url'];
+
+                                  if (imageUrl.split(':')[0] == 'https') {
+                                    return CircleAvatar(
+                                      radius: 50,
+                                      foregroundImage: NetworkImage(imageUrl),
+                                      child: Text(dataList['nickname']),
+                                    );
+                                  } else {
+                                    return CircleAvatar(
+                                      radius: 50,
+                                      foregroundImage: AssetImage(imageUrl),
+                                      child: Text(dataList['nickname']),
+                                    );
+                                  }
+                                }
+                              },
+                            ),
+                            const SizedBox(width: 10),
+                            userProfile.when(
+                              loading: () => const CircularProgressIndicator(),
+                              error: (error, stack) {
+                                print(error);
+                                return SizedBox(
+                                  width: 300,
+                                  child: Text('error: $error'),
+                                );
+                              },
+                              data: (dataList) {
+                                if (dataList == null) {
+                                  return Container();
+                                } else {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        '@${dataList['email']}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 18,
-                                        ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '@${dataList['email']}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: profileEditTap,
+                                            child: const Icon(
+                                              Icons.mode_edit_outline_outlined,
+                                              size: 17,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      GestureDetector(
-                                        onTap: profileEditTap,
-                                        child: const Icon(
-                                          Icons.mode_edit_outline_outlined,
-                                          size: 17,
+                                      Text(
+                                        dataList['introduction'],
+                                        style: const TextStyle(
+                                          fontSize: 15,
                                         ),
                                       ),
                                     ],
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              visualDensity: const VisualDensity(
+                                vertical: -4,
+                                horizontal: -4,
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => const SettingScreen(),
                                   ),
-                                  Text(
-                                    dataList['introduction'],
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                          },
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.settings,
+                                size: 25,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
