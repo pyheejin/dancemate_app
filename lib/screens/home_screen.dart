@@ -1,6 +1,11 @@
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
+import 'package:dancemate_app/provider/main_tap_provider.dart';
+import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/main_tab_screen.dart';
+import 'package:dancemate_app/screens/profile_screen.dart';
+import 'package:dancemate_app/screens/user_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +15,30 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeData = ref.watch(getHomeProvider);
+
+    void onDancerTap(int userId) {
+      final userData = ref.watch(getUserDetailProvider(userId));
+
+      if (userData.value != null) {
+        final isMine = userData.value['is_mine'];
+
+        if (isMine == false) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => UserDetailScreen(userId: userId),
+            ),
+          );
+        } else {
+          ref.read(mainTapProvider.notifier).update((state) => 4);
+
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const MainNavigationScreen(),
+            ),
+          );
+        }
+      }
+    }
 
     void onCourseTap(int courseId) {
       Navigator.of(context).push(
@@ -23,11 +52,11 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: const [
-          Icon(
-            Icons.send_outlined,
-            size: 27,
-          ),
-          SizedBox(width: 5),
+          // Icon(
+          //   Icons.send_outlined,
+          //   size: 27,
+          // ),
+          // SizedBox(width: 5),
           Icon(
             Icons.notifications_outlined,
             size: 27,
@@ -37,7 +66,7 @@ class HomeScreen extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 20,
+          horizontal: 10,
         ),
         child: CustomScrollView(
           slivers: [
@@ -65,33 +94,41 @@ class HomeScreen extends ConsumerWidget {
                               final userData =
                                   homeData['recommend_users'][index];
 
+                              final userId = userData['id'];
                               final imageUrl = userData['image_url'];
                               final nickname = userData['nickname'];
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      width: 70,
-                                      height: 70,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey.shade400,
+                              return GestureDetector(
+                                onTap: () {
+                                  onDancerTap(userId);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 5,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 70,
+                                        height: 70,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.grey.shade400,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(35),
                                         ),
-                                        borderRadius: BorderRadius.circular(35),
-                                      ),
-                                      child: CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                          imageUrl,
+                                        child: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            imageUrl,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 5),
-                                    Text(nickname),
-                                  ],
+                                      const SizedBox(height: 5),
+                                      Text(nickname),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
