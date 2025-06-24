@@ -222,6 +222,7 @@ class ReviewDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 30),
                 Expanded(
                   child: TextField(
+                    textAlignVertical: TextAlignVertical.top,
                     controller: descriptionController,
                     expands: true,
                     maxLines: null,
