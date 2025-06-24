@@ -107,7 +107,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
 
                                         final userData = chatData['user'];
                                         final userId = userData['id'];
-                                        final userImage = userData['image_url'];
+                                        final imageUrl = userData['image_url'];
                                         final userNickname =
                                             userData['nickname'];
 
@@ -203,13 +203,25 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                                                           .circular(
                                                                               35),
                                                                 ),
-                                                                child:
-                                                                    CircleAvatar(
-                                                                  backgroundImage:
-                                                                      NetworkImage(
-                                                                    userImage,
-                                                                  ),
-                                                                ),
+                                                                child: imageUrl.split(
+                                                                            ':')[0] ==
+                                                                        'https'
+                                                                    ? CircleAvatar(
+                                                                        radius:
+                                                                            50,
+                                                                        foregroundImage:
+                                                                            NetworkImage(imageUrl),
+                                                                        child: Text(
+                                                                            userNickname),
+                                                                      )
+                                                                    : CircleAvatar(
+                                                                        radius:
+                                                                            50,
+                                                                        foregroundImage:
+                                                                            AssetImage(imageUrl),
+                                                                        child: Text(
+                                                                            userNickname),
+                                                                      ),
                                                               ),
                                                               const SizedBox(
                                                                   width: 5),

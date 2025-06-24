@@ -4,7 +4,6 @@ import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
-import 'package:dancemate_app/screens/profile_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,69 +72,68 @@ class HomeScreen extends ConsumerWidget {
             SliverToBoxAdapter(
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      homeData.when(
-                        loading: () => const CircularProgressIndicator(),
-                        error: (error, stack) {
-                          ref.refresh(getHomeProvider.future);
-                          return SizedBox(
-                            width: 300,
-                            child: Text('error: $error'),
+                  homeData.when(
+                    loading: () => const CircularProgressIndicator(),
+                    error: (error, stack) {
+                      ref.refresh(getHomeProvider.future);
+                      return SizedBox(
+                        width: 300,
+                        child: Text('error: $error'),
+                      );
+                    },
+                    data: (homeData) => SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: homeData['recommend_users'].length,
+                        itemBuilder: (context, index) {
+                          final userData = homeData['recommend_users'][index];
+
+                          final userId = userData['id'];
+                          final imageUrl = userData['image_url'];
+                          final nickname = userData['nickname'];
+                          return GestureDetector(
+                            onTap: () {
+                              onDancerTap(userId);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.grey.shade400,
+                                      ),
+                                      borderRadius: BorderRadius.circular(35),
+                                    ),
+                                    child: imageUrl.split(':')[0] == 'https'
+                                        ? CircleAvatar(
+                                            radius: 50,
+                                            foregroundImage:
+                                                NetworkImage(imageUrl),
+                                            child: Text(nickname),
+                                          )
+                                        : CircleAvatar(
+                                            backgroundImage: AssetImage(
+                                              imageUrl,
+                                            ),
+                                          ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(nickname),
+                                ],
+                              ),
+                            ),
                           );
                         },
-                        data: (homeData) => SizedBox(
-                          width: 390,
-                          height: 100,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: homeData['recommend_users'].length,
-                            itemBuilder: (context, index) {
-                              final userData =
-                                  homeData['recommend_users'][index];
-
-                              final userId = userData['id'];
-                              final imageUrl = userData['image_url'];
-                              final nickname = userData['nickname'];
-                              return GestureDetector(
-                                onTap: () {
-                                  onDancerTap(userId);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 5,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 70,
-                                        height: 70,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: Colors.grey.shade400,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(35),
-                                        ),
-                                        child: CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                            imageUrl,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Text(nickname),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
                       ),
-                    ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -265,11 +263,15 @@ class HomeScreen extends ConsumerWidget {
                                     const SizedBox(height: 10),
                                     Row(
                                       children: [
-                                        CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                            dancerImageUrl,
-                                          ),
-                                        ),
+                                        dancerImageUrl.split(':')[0] == 'https'
+                                            ? CircleAvatar(
+                                                foregroundImage: NetworkImage(
+                                                    dancerImageUrl),
+                                              )
+                                            : CircleAvatar(
+                                                foregroundImage:
+                                                    AssetImage(dancerImageUrl),
+                                              ),
                                         const SizedBox(width: 5),
                                         Container(
                                           decoration: BoxDecoration(
@@ -473,11 +475,17 @@ class HomeScreen extends ConsumerWidget {
                                       children: [
                                         Row(
                                           children: [
-                                            CircleAvatar(
-                                              backgroundImage: NetworkImage(
-                                                dancerImageUrl,
-                                              ),
-                                            ),
+                                            dancerImageUrl.split(':')[0] ==
+                                                    'https'
+                                                ? CircleAvatar(
+                                                    foregroundImage:
+                                                        NetworkImage(
+                                                            dancerImageUrl),
+                                                  )
+                                                : CircleAvatar(
+                                                    foregroundImage: AssetImage(
+                                                        dancerImageUrl),
+                                                  ),
                                             const SizedBox(width: 5),
                                             Column(
                                               crossAxisAlignment:

@@ -10,7 +10,6 @@ class ChatRoomScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = ScrollController();
     final chatRoomData = ref.watch(getChatRoomProvider);
 
     void onChatRoomTap(int chatRoomId) {

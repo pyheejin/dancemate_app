@@ -120,6 +120,7 @@ class CalendarScreen extends ConsumerWidget {
                 return getEventsForDay(dateFormat.parse(newDay));
               },
             ),
+            const SizedBox(height: 10),
             Expanded(
               child: courses.when(
                 loading: () => const CircularProgressIndicator(),
@@ -184,11 +185,15 @@ class CalendarScreen extends ConsumerWidget {
                                   children: [
                                     Row(
                                       children: [
-                                        CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                            dancerImageUrl,
-                                          ),
-                                        ),
+                                        dancerImageUrl.split(':')[0] == 'https'
+                                            ? CircleAvatar(
+                                                foregroundImage: NetworkImage(
+                                                    dancerImageUrl),
+                                              )
+                                            : CircleAvatar(
+                                                foregroundImage:
+                                                    AssetImage(dancerImageUrl),
+                                              ),
                                         const SizedBox(width: 5),
                                         Column(
                                           crossAxisAlignment:

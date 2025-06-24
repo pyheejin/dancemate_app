@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dancemate_app/contants/api_urls.dart';
 import 'package:dancemate_app/database/model.dart';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -157,6 +158,25 @@ class ApiServices {
         jsonDecode(utf8.decode(response.bodyBytes))['result_data']['user'];
 
     return resultData;
+  }
+
+  Future<dynamic> postUserProfile(FormData bodyData) async {
+    final accessToken = await getAccessToken();
+
+    Dio dio = Dio();
+
+    final response = await dio.post(
+      '$baseUrl/user/profile',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+        responseType: ResponseType.json,
+      ),
+      data: bodyData,
+    );
+
+    return response;
   }
 
   Future<dynamic> getUserDetail(int userId) async {

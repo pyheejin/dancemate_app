@@ -112,11 +112,13 @@ class CourseDetailScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              dancerImageUrl,
-                            ),
-                          ),
+                          dancerImageUrl.split(':')[0] == 'https'
+                              ? CircleAvatar(
+                                  foregroundImage: NetworkImage(dancerImageUrl),
+                                )
+                              : CircleAvatar(
+                                  foregroundImage: AssetImage(dancerImageUrl),
+                                ),
                           const SizedBox(width: 5),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,21 +305,21 @@ class CourseDetailScreen extends ConsumerWidget {
                       ),
                       child: DropdownButton(
                         value: selectCourseDetailId,
-                        items: courseDetailList
-                            .map<DropdownMenuItem<Object>>(
-                              (dynamic e) => DropdownMenuItem<Object>(
-                                value: e['id'],
-                                child: Text(
-                                  '${e['course_date']} ${e['title']}',
-                                  style: const TextStyle(
-                                    color: Color(0xFFA48AFF),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                        items: courseDetailList.map<DropdownMenuItem<Object>>(
+                          (dynamic e) {
+                            return DropdownMenuItem<Object>(
+                              value: e['id'],
+                              child: Text(
+                                '${e['course_date']} ${e['title']}',
+                                style: const TextStyle(
+                                  color: Color(0xFFA48AFF),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            )
-                            .toList(),
+                            );
+                          },
+                        ).toList(),
                         onChanged: (value) {
                           ref
                               .read(selectCourseDetailIdProvider.notifier)

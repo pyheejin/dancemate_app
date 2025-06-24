@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:dancemate_app/database/api.dart';
 import 'package:dancemate_app/database/model.dart';
 import 'package:dancemate_app/screens/signup_screen.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 final postUserLoginProvider =
     FutureProvider.family<Map<String, dynamic>, List<dynamic>>(
@@ -27,10 +31,22 @@ final userTypeProvider = StateProvider.family<UserType, UserType>((ref, type) {
   return type;
 });
 
+final profileImagePathProvider = StateProvider.autoDispose<String>((ref) {
+  return '';
+});
+
 final getUserProfileProvider = FutureProvider<dynamic>((ref) async {
   final ApiServices api = ApiServices();
 
   final result = await api.getUserProfile();
+  return result;
+});
+
+final postUserProfileProvider =
+    FutureProvider.family<dynamic, FormData>((ref, bodyData) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.postUserProfile(bodyData);
   return result;
 });
 

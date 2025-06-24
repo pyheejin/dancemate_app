@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
@@ -5,8 +7,10 @@ import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/screens/setting_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -15,6 +19,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userProfile = ref.watch(getUserProfileProvider);
+    String imagePath = ref.watch(profileImagePathProvider);
     NumberFormat format = NumberFormat('###,###,###,###');
     DateTime today = DateTime.now();
 
@@ -28,24 +33,37 @@ class ProfileScreen extends ConsumerWidget {
 
     void profileEditTap() {
       final TextEditingController nicknameController = TextEditingController();
-      final TextEditingController descriptionController =
+      final TextEditingController introductionController =
           TextEditingController();
 
+      Future<void> pickImage() async {
+        ImagePicker().pickImage(source: ImageSource.gallery).then((image) {
+          if (image != null) {
+            // imagePath = image.path;
+            ref
+                .read(profileImagePathProvider.notifier)
+                .update((state) => image.path);
+            print('imagePath 2: $imagePath');
+          }
+        });
+      }
+
       void onSaveTap() async {
-        // final qnaDetail = {
-        //   'email': emailController.text,
-        //   'title': titleController.text,
-        //   'question': questionController.text,
-        // };
-        // final result = await ref
-        //     .read(qnaProvider.notifier)
-        //     .updateQna(qna['id'], qnaDetail);
-        // if (result['result_code'] == 200) {
-        //   ref.refresh(getQnaProvider);
-        //   Navigator.pop(context);
-        // } else {
-        //   errorAlert(context, result['result_msg']);
-        // }
+        // 파일 경로를 통해 formData 생성
+        FormData bodyData = FormData.fromMap({
+          'nickname': nicknameController.text,
+          'introduction': introductionController.text,
+          'image_url': await MultipartFile.fromFile(imagePath),
+        });
+
+        final result =
+            await ref.watch(postUserProfileProvider(bodyData).future);
+        if (jsonDecode(result.toString())['result_code'] == 200) {
+          ref.refresh(getUserProfileProvider);
+          Navigator.pop(context);
+        } else {
+          errorAlert(context, jsonDecode(result.toString())['result_msg']);
+        }
       }
 
       showDialog(
@@ -65,40 +83,98 @@ class ProfileScreen extends ConsumerWidget {
                     Radius.circular(15), // 모달 전체 라운딩 처리
                   ),
                 ),
-                child: Column(
-                  children: [
-                    const Text(
-                      '프로필 변경',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
+                child: userProfile.when(
+                  data: (userData) {
+                    String nickname = userData['nickname'];
+                    String introduction = userData['introduction'];
+                    String imageUrl = userData['image_url'];
+
+                    nicknameController.text = nickname;
+                    introductionController.text = introduction;
+                    // imagePath = imageUrl;
+
+                    return Column(
                       children: [
-                        GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: Colors.black26,
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.camera_alt_outlined,
-                                color: Colors.white,
-                              ),
-                            ),
+                        const Text(
+                          '프로필 변경',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: pickImage,
+                              child: (imagePath != '')
+                                  ? Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black26,
+                                        borderRadius: BorderRadius.circular(40),
+                                      ),
+                                      child: imageUrl.split(':')[0] == 'https'
+                                          ? CircleAvatar(
+                                              radius: 50,
+                                              foregroundImage:
+                                                  NetworkImage(imageUrl),
+                                              child: Text(nickname),
+                                            )
+                                          : Image.file(
+                                              File(imagePath),
+                                              fit: BoxFit.fill,
+                                            ),
+                                    )
+                                  : Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black26,
+                                        borderRadius: BorderRadius.circular(40),
+                                      ),
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.camera_alt_outlined,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: nicknameController,
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.grey.shade400,
+                                      width: 1.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.grey.shade400,
+                                      width: 1.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
                         Expanded(
                           child: TextField(
-                            controller: nicknameController,
+                            textAlignVertical: TextAlignVertical.top,
+                            controller: introductionController,
+                            expands: true,
+                            maxLines: null,
                             decoration: InputDecoration(
+                              hintText: '자기소개',
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.grey.shade400,
@@ -116,77 +192,59 @@ class ProfileScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: TextField(
-                        textAlignVertical: TextAlignVertical.top,
-                        controller: descriptionController,
-                        expands: true,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          hintText: '자기소개',
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade400,
-                              width: 1.0,
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.black38,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text(
+                                '취소',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade400,
-                              width: 1.0,
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFFA48AFF),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                              ),
+                              onPressed: onSaveTap,
+                              child: const Text(
+                                '저장',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.black38,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            '취소',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor: const Color(0xFFA48AFF),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                          onPressed: onSaveTap,
-                          child: const Text(
-                            '저장',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          ],
                         ),
                       ],
-                    ),
-                  ],
+                    );
+                  },
+                  loading: () => const CircularProgressIndicator(),
+                  error: (error, stack) {
+                    print(error);
+                    return SizedBox(
+                      width: 300,
+                      child: Text('error: $error'),
+                    );
+                  },
                 ),
               ),
             ),
@@ -212,119 +270,98 @@ class ProfileScreen extends ConsumerWidget {
                       padding: const EdgeInsets.only(
                         bottom: 20,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              userProfile.when(
-                                loading: () =>
-                                    const CircularProgressIndicator(),
-                                error: (error, stack) {
-                                  print(error);
-                                  return SizedBox(
-                                    width: 300,
-                                    child: Text('error: $error'),
-                                  );
-                                },
-                                data: (dataList) {
-                                  if (dataList == null) {
-                                    return Container();
-                                  } else {
-                                    final imageUrl = dataList['image_url'];
+                      child: userProfile.when(
+                        data: (dataList) {
+                          final imageUrl = dataList['image_url'];
+                          final nickname = dataList['nickname'];
+                          final email = dataList['email'];
+                          final introduction = dataList['introduction'];
 
-                                    if (imageUrl.split(':')[0] == 'https') {
-                                      return CircleAvatar(
-                                        radius: 50,
-                                        foregroundImage: NetworkImage(imageUrl),
-                                        child: Text(dataList['nickname']),
-                                      );
-                                    } else {
-                                      return CircleAvatar(
-                                        radius: 50,
-                                        foregroundImage: AssetImage(imageUrl),
-                                        child: Text(dataList['nickname']),
-                                      );
-                                    }
-                                  }
-                                },
-                              ),
-                              const SizedBox(width: 10),
-                              userProfile.when(
-                                loading: () =>
-                                    const CircularProgressIndicator(),
-                                error: (error, stack) {
-                                  print(error);
-                                  return SizedBox(
-                                    width: 300,
-                                    child: Text('error: $error'),
-                                  );
-                                },
-                                data: (dataList) {
-                                  if (dataList == null) {
-                                    return Container();
-                                  } else {
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              '@${dataList['email']}',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: profileEditTap,
-                                              child: const Icon(
-                                                Icons
-                                                    .mode_edit_outline_outlined,
-                                                size: 17,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Text(
-                                          dataList['introduction'],
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              IconButton(
-                                visualDensity: const VisualDensity(
-                                  vertical: -4,
-                                  horizontal: -4,
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SettingScreen(),
+                              Row(
+                                children: [
+                                  imageUrl.split(':')[0] == 'https'
+                                      ? CircleAvatar(
+                                          radius: 50,
+                                          foregroundImage:
+                                              NetworkImage(imageUrl),
+                                          child: Text(nickname),
+                                        )
+                                      : CircleAvatar(
+                                          radius: 50,
+                                          foregroundImage: AssetImage(imageUrl),
+                                          child: Text(nickname),
+                                        ),
+                                  const SizedBox(width: 10),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '@$email',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: profileEditTap,
+                                            child: const Icon(
+                                              Icons.mode_edit_outline_outlined,
+                                              size: 17,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        introduction,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    visualDensity: const VisualDensity(
+                                      vertical: -4,
+                                      horizontal: -4,
                                     ),
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.settings,
-                                  size: 25,
-                                ),
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const SettingScreen(),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(
+                                      Icons.settings,
+                                      size: 25,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
-                          ),
-                        ],
+                          );
+                        },
+                        loading: () => const CircularProgressIndicator(),
+                        error: (error, stack) {
+                          print(error);
+                          return SizedBox(
+                            width: 300,
+                            child: Text('error: $error'),
+                          );
+                        },
                       ),
                     ),
                   ),

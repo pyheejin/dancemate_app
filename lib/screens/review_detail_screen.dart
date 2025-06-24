@@ -94,11 +94,14 @@ class ReviewDetailScreen extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                dancerImageUrl,
-                              ),
-                            ),
+                            dancerImageUrl.split(':')[0] == 'https'
+                                ? CircleAvatar(
+                                    foregroundImage:
+                                        NetworkImage(dancerImageUrl),
+                                  )
+                                : CircleAvatar(
+                                    foregroundImage: AssetImage(dancerImageUrl),
+                                  ),
                             const SizedBox(width: 5),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

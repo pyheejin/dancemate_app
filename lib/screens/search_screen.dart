@@ -44,6 +44,12 @@ class SearchScreen extends ConsumerWidget {
                             width: 1.0,
                           ),
                         ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 1.0,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -121,55 +127,51 @@ class SearchResult extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        searchPre.when(
-                          loading: () => const CircularProgressIndicator(),
-                          error: (error, stack) {
-                            return SizedBox(
-                              width: 300,
-                              child: Text('error: $error'),
-                            );
-                          },
-                          data: (dataList) {
-                            return SizedBox(
-                              width: 390,
-                              height: 40,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: dataList['latest_keyword'].length,
-                                itemBuilder: (context, index) {
-                                  final keywordData =
-                                      dataList['latest_keyword'][index];
-                                  return GestureDetector(
-                                    onTap: () {
-                                      onKeywordTap(keywordData['keyword']);
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.only(right: 10),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                            color: Colors.grey.shade400),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 15,
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            keywordData['keyword'],
-                                          ),
-                                        ),
+                    searchPre.when(
+                      loading: () => const CircularProgressIndicator(),
+                      error: (error, stack) {
+                        return SizedBox(
+                          width: 300,
+                          child: Text('error: $error'),
+                        );
+                      },
+                      data: (dataList) {
+                        return SizedBox(
+                          width: 390,
+                          height: 40,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: dataList['latest_keyword'].length,
+                            itemBuilder: (context, index) {
+                              final keywordData =
+                                  dataList['latest_keyword'][index];
+                              return GestureDetector(
+                                onTap: () {
+                                  onKeywordTap(keywordData['keyword']);
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(right: 10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    border:
+                                        Border.all(color: Colors.grey.shade400),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        keywordData['keyword'],
                                       ),
                                     ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -189,55 +191,51 @@ class SearchResult extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        searchPre.when(
-                          loading: () => const CircularProgressIndicator(),
-                          error: (error, stack) {
-                            return SizedBox(
-                              width: 300,
-                              child: Text('error: $error'),
-                            );
-                          },
-                          data: (dataList) {
-                            return SizedBox(
-                              width: 390,
-                              height: 40,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: dataList['recommend_keyword'].length,
-                                itemBuilder: (context, index) {
-                                  final keywordData =
-                                      dataList['recommend_keyword'][index];
-                                  return GestureDetector(
-                                    onTap: () {
-                                      onKeywordTap(keywordData['keyword']);
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.only(right: 10),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                            color: Colors.grey.shade400),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 15,
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            keywordData['keyword'],
-                                          ),
-                                        ),
+                    searchPre.when(
+                      loading: () => const CircularProgressIndicator(),
+                      error: (error, stack) {
+                        return SizedBox(
+                          width: 300,
+                          child: Text('error: $error'),
+                        );
+                      },
+                      data: (dataList) {
+                        return SizedBox(
+                          width: 390,
+                          height: 40,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: dataList['recommend_keyword'].length,
+                            itemBuilder: (context, index) {
+                              final keywordData =
+                                  dataList['recommend_keyword'][index];
+                              return GestureDetector(
+                                onTap: () {
+                                  onKeywordTap(keywordData['keyword']);
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(right: 10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    border:
+                                        Border.all(color: Colors.grey.shade400),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        keywordData['keyword'],
                                       ),
                                     ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
