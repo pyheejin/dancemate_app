@@ -215,19 +215,24 @@ class DancerTicketScreen extends ConsumerWidget {
                                                 borderRadius:
                                                     BorderRadius.circular(35),
                                               ),
-                                              child: dancerImageUrl
-                                                          .split(':')[0] ==
-                                                      'https'
-                                                  ? CircleAvatar(
-                                                      foregroundImage:
-                                                          NetworkImage(
-                                                              dancerImageUrl),
+                                              child: dancerImageUrl == ''
+                                                  ? const CircleAvatar(
+                                                      foregroundImage: AssetImage(
+                                                          'assets/images/app_logo/chat.png'),
                                                     )
-                                                  : CircleAvatar(
-                                                      foregroundImage:
-                                                          AssetImage(
-                                                              dancerImageUrl),
-                                                    ),
+                                                  : dancerImageUrl
+                                                              .split(':')[0] ==
+                                                          'https'
+                                                      ? CircleAvatar(
+                                                          foregroundImage:
+                                                              NetworkImage(
+                                                                  dancerImageUrl),
+                                                        )
+                                                      : CircleAvatar(
+                                                          foregroundImage:
+                                                              AssetImage(
+                                                                  dancerImageUrl),
+                                                        ),
                                             ),
                                             const SizedBox(width: 5),
                                             Column(

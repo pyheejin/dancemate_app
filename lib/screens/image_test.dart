@@ -11,13 +11,13 @@ class ImageTest extends StatefulWidget {
 }
 
 class _ImageTestState extends State<ImageTest> {
-  XFile? file;
+  String imagePath = '';
 
   Future<void> _pickImage() async {
     ImagePicker().pickImage(source: ImageSource.gallery).then((image) {
       if (image != null) {
         setState(() {
-          file = image;
+          imagePath = image.path;
         });
       }
     });
@@ -25,31 +25,31 @@ class _ImageTestState extends State<ImageTest> {
 
   @override
   Widget build(BuildContext context) {
-    final length = MediaQuery.of(context).size.width;
+    const length = 200.0;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Image Picker"),
-        actions: [
-          IconButton(onPressed: _pickImage, icon: const Icon(Icons.image))
-        ],
       ),
-      body: Center(
-          child: Container(
-        color: Colors.grey,
-        height: length,
-        width: length,
-        child: (file != null)
-            ? Image.file(
-                File(file!.path),
-                fit: BoxFit.cover,
-              )
-            : const Icon(
-                Icons.image,
-                size: 50,
-                color: Colors.white,
-              ),
-      )),
+      body: GestureDetector(
+        onTap: _pickImage,
+        child: Center(
+          child: SizedBox(
+            height: length,
+            width: length,
+            child: (imagePath != '')
+                ? CircleAvatar(
+                    radius: 50,
+                    foregroundImage: AssetImage(imagePath),
+                  )
+                : const Icon(
+                    Icons.image,
+                    size: 50,
+                    color: Colors.white,
+                  ),
+          ),
+        ),
+      ),
     );
   }
 }

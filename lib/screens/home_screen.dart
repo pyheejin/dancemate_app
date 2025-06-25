@@ -3,7 +3,9 @@ import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/image_test.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
+import 'package:dancemate_app/screens/profile_detail_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,17 +52,26 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        actions: const [
+        actions: [
           // Icon(
           //   Icons.send_outlined,
           //   size: 27,
           // ),
           // SizedBox(width: 5),
-          Icon(
-            Icons.notifications_outlined,
-            size: 27,
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ProfileDetailScreen(),
+                ),
+              );
+            },
+            child: const Icon(
+              Icons.notifications_outlined,
+              size: 27,
+            ),
           ),
-          SizedBox(width: 17),
+          const SizedBox(width: 17),
         ],
       ),
       body: Padding(
@@ -107,23 +118,26 @@ class HomeScreen extends ConsumerWidget {
                                     width: 70,
                                     height: 70,
                                     decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey.shade400,
-                                      ),
                                       borderRadius: BorderRadius.circular(35),
                                     ),
-                                    child: imageUrl.split(':')[0] == 'https'
-                                        ? CircleAvatar(
+                                    child: imageUrl == ''
+                                        ? const CircleAvatar(
                                             radius: 50,
-                                            foregroundImage:
-                                                NetworkImage(imageUrl),
-                                            child: Text(nickname),
+                                            foregroundImage: AssetImage(
+                                                'assets/images/app_logo/chat.png'),
                                           )
-                                        : CircleAvatar(
-                                            backgroundImage: AssetImage(
-                                              imageUrl,
-                                            ),
-                                          ),
+                                        : imageUrl.split(':')[0] == 'https'
+                                            ? CircleAvatar(
+                                                radius: 50,
+                                                foregroundImage:
+                                                    NetworkImage(imageUrl),
+                                                child: Text(nickname),
+                                              )
+                                            : CircleAvatar(
+                                                foregroundImage: AssetImage(
+                                                  imageUrl,
+                                                ),
+                                              ),
                                   ),
                                   const SizedBox(height: 5),
                                   Text(nickname),
@@ -263,15 +277,22 @@ class HomeScreen extends ConsumerWidget {
                                     const SizedBox(height: 10),
                                     Row(
                                       children: [
-                                        dancerImageUrl.split(':')[0] == 'https'
-                                            ? CircleAvatar(
-                                                foregroundImage: NetworkImage(
-                                                    dancerImageUrl),
+                                        dancerImageUrl == ''
+                                            ? const CircleAvatar(
+                                                foregroundImage: AssetImage(
+                                                    'assets/images/app_logo/chat.png'),
                                               )
-                                            : CircleAvatar(
-                                                foregroundImage:
-                                                    AssetImage(dancerImageUrl),
-                                              ),
+                                            : dancerImageUrl.split(':')[0] ==
+                                                    'https'
+                                                ? CircleAvatar(
+                                                    foregroundImage:
+                                                        NetworkImage(
+                                                            dancerImageUrl),
+                                                  )
+                                                : CircleAvatar(
+                                                    foregroundImage: AssetImage(
+                                                        dancerImageUrl),
+                                                  ),
                                         const SizedBox(width: 5),
                                         Container(
                                           decoration: BoxDecoration(
@@ -475,17 +496,24 @@ class HomeScreen extends ConsumerWidget {
                                       children: [
                                         Row(
                                           children: [
-                                            dancerImageUrl.split(':')[0] ==
-                                                    'https'
-                                                ? CircleAvatar(
-                                                    foregroundImage:
-                                                        NetworkImage(
-                                                            dancerImageUrl),
-                                                  )
-                                                : CircleAvatar(
+                                            dancerImageUrl == ''
+                                                ? const CircleAvatar(
                                                     foregroundImage: AssetImage(
-                                                        dancerImageUrl),
-                                                  ),
+                                                        'assets/images/app_logo/chat.png'),
+                                                  )
+                                                : dancerImageUrl
+                                                            .split(':')[0] ==
+                                                        'https'
+                                                    ? CircleAvatar(
+                                                        foregroundImage:
+                                                            NetworkImage(
+                                                                dancerImageUrl),
+                                                      )
+                                                    : CircleAvatar(
+                                                        foregroundImage:
+                                                            AssetImage(
+                                                                dancerImageUrl),
+                                                      ),
                                             const SizedBox(width: 5),
                                             Column(
                                               crossAxisAlignment:

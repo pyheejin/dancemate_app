@@ -203,25 +203,30 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                                                           .circular(
                                                                               35),
                                                                 ),
-                                                                child: imageUrl.split(
-                                                                            ':')[0] ==
-                                                                        'https'
-                                                                    ? CircleAvatar(
-                                                                        radius:
-                                                                            50,
+                                                                child: imageUrl ==
+                                                                        ''
+                                                                    ? const CircleAvatar(
                                                                         foregroundImage:
-                                                                            NetworkImage(imageUrl),
-                                                                        child: Text(
-                                                                            userNickname),
+                                                                            AssetImage('assets/images/app_logo/chat.png'),
                                                                       )
-                                                                    : CircleAvatar(
-                                                                        radius:
-                                                                            50,
-                                                                        foregroundImage:
-                                                                            AssetImage(imageUrl),
-                                                                        child: Text(
-                                                                            userNickname),
-                                                                      ),
+                                                                    : imageUrl.split(':')[0] ==
+                                                                            'https'
+                                                                        ? CircleAvatar(
+                                                                            radius:
+                                                                                50,
+                                                                            foregroundImage:
+                                                                                NetworkImage(imageUrl),
+                                                                            child:
+                                                                                Text(userNickname),
+                                                                          )
+                                                                        : CircleAvatar(
+                                                                            radius:
+                                                                                50,
+                                                                            foregroundImage:
+                                                                                AssetImage(imageUrl),
+                                                                            child:
+                                                                                Text(userNickname),
+                                                                          ),
                                                               ),
                                                               const SizedBox(
                                                                   width: 5),

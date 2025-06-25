@@ -95,14 +95,20 @@ class ReviewScreen extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            dancerImageUrl.split(':')[0] == 'https'
-                                ? CircleAvatar(
-                                    foregroundImage:
-                                        NetworkImage(dancerImageUrl),
+                            dancerImageUrl == ''
+                                ? const CircleAvatar(
+                                    foregroundImage: AssetImage(
+                                        'assets/images/app_logo/chat.png'),
                                   )
-                                : CircleAvatar(
-                                    foregroundImage: AssetImage(dancerImageUrl),
-                                  ),
+                                : dancerImageUrl.split(':')[0] == 'https'
+                                    ? CircleAvatar(
+                                        foregroundImage:
+                                            NetworkImage(dancerImageUrl),
+                                      )
+                                    : CircleAvatar(
+                                        foregroundImage:
+                                            AssetImage(dancerImageUrl),
+                                      ),
                             const SizedBox(width: 5),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

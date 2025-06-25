@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:dancemate_app/database/api.dart';
 import 'package:dancemate_app/database/model.dart';
 import 'package:dancemate_app/screens/signup_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 
 final postUserLoginProvider =
     FutureProvider.family<Map<String, dynamic>, List<dynamic>>(

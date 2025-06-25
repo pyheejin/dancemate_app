@@ -336,11 +336,23 @@ class SearchResult extends StatelessWidget {
                                     children: [
                                       Row(
                                         children: [
-                                          CircleAvatar(
-                                            backgroundImage: NetworkImage(
-                                              dancerImageUrl,
-                                            ),
-                                          ),
+                                          dancerImageUrl == ''
+                                              ? const CircleAvatar(
+                                                  foregroundImage: AssetImage(
+                                                      'assets/images/app_logo/chat.png'),
+                                                )
+                                              : dancerImageUrl.split(':')[0] ==
+                                                      'https'
+                                                  ? CircleAvatar(
+                                                      foregroundImage:
+                                                          NetworkImage(
+                                                              dancerImageUrl),
+                                                    )
+                                                  : CircleAvatar(
+                                                      foregroundImage:
+                                                          AssetImage(
+                                                              dancerImageUrl),
+                                                    ),
                                           const SizedBox(width: 5),
                                           Column(
                                             crossAxisAlignment:

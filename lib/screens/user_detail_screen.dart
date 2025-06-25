@@ -197,19 +197,25 @@ class UserDetailScreen extends ConsumerWidget {
                                             children: [
                                               Row(
                                                 children: [
-                                                  dancerImageUrl
-                                                              .split(':')[0] ==
-                                                          'https'
-                                                      ? CircleAvatar(
-                                                          foregroundImage:
-                                                              NetworkImage(
-                                                                  dancerImageUrl),
-                                                        )
-                                                      : CircleAvatar(
+                                                  dancerImageUrl == ''
+                                                      ? const CircleAvatar(
                                                           foregroundImage:
                                                               AssetImage(
-                                                                  dancerImageUrl),
-                                                        ),
+                                                                  'assets/images/app_logo/chat.png'),
+                                                        )
+                                                      : dancerImageUrl.split(
+                                                                  ':')[0] ==
+                                                              'https'
+                                                          ? CircleAvatar(
+                                                              foregroundImage:
+                                                                  NetworkImage(
+                                                                      dancerImageUrl),
+                                                            )
+                                                          : CircleAvatar(
+                                                              foregroundImage:
+                                                                  AssetImage(
+                                                                      dancerImageUrl),
+                                                            ),
                                                   const SizedBox(width: 5),
                                                   Column(
                                                     crossAxisAlignment:
