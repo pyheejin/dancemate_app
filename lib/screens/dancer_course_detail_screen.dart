@@ -1559,6 +1559,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
         'description': descriptionController.text,
         'detail_list': bodyList,
       };
+      print(detail);
 
       final result = await ref
           .read(dancerCourseProvider.notifier)
@@ -1569,6 +1570,10 @@ class DancerCourseDetailScreen extends ConsumerWidget {
           ref.refresh(getDancerCourseProvider);
           ref.refresh(dancerCourseProvider);
           ref.refresh(oldDancerCourseProvider);
+
+          DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+          DateTime selectDay = ref.watch(selectDateProvider);
+          ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
 
           Navigator.pop(context);
         } else {
@@ -1940,11 +1945,10 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 10),
                       ListView.builder(
                         shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         padding: EdgeInsets.zero,
                         itemCount: newDetailList.length,
                         itemBuilder: (context, index) {
-                          print('=========');
-                          print(newDetailList);
                           if (newDetailList.length > 0) {
                             return GestureDetector(
                               onTap: () {

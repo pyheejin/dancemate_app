@@ -1,9 +1,19 @@
+import 'dart:convert';
+
 import 'package:dancemate_app/database/api.dart';
+import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileDetailScreen extends StatefulWidget {
-  const ProfileDetailScreen({super.key});
+  final WidgetRef ref;
+
+  const ProfileDetailScreen({
+    super.key,
+    required this.ref,
+  });
 
   @override
   State<ProfileDetailScreen> createState() => _ProfileDetailScreenState();
@@ -22,6 +32,14 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
         });
       }
     });
+  }
+
+  void onSaveTap(FormData bodyData) async {
+    final result = await api.postUserProfile(bodyData);
+    if (jsonDecode(result.toString())['result_code'] == 200) {
+      widget.ref.refresh(getUserProfileProvider);
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -164,7 +182,24 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () async {
+                          // 파일 경로를 통해 formData 생성
+                          FormData bodyData = FormData.fromMap({
+                            'nickname': nicknameController.text,
+                            'introduction': introductionController.text,
+                          });
+
+                          if (imagePath != '') {
+                            bodyData = FormData.fromMap({
+                              'nickname': nicknameController.text,
+                              'introduction': introductionController.text,
+                              'image_url':
+                                  await MultipartFile.fromFile(imagePath),
+                            });
+                          }
+
+                          onSaveTap(bodyData);
+                        },
                         child: const Text(
                           '저장',
                           style: TextStyle(

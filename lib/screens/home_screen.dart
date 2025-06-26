@@ -3,7 +3,6 @@ import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
-import 'package:dancemate_app/screens/image_test.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:dancemate_app/screens/profile_detail_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
@@ -60,11 +59,11 @@ class HomeScreen extends ConsumerWidget {
           // SizedBox(width: 5),
           GestureDetector(
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ProfileDetailScreen(),
-                ),
-              );
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => ProfileDetailScreen(ref: ref),
+              //   ),
+              // );
             },
             child: const Icon(
               Icons.notifications_outlined,

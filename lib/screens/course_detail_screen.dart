@@ -189,8 +189,8 @@ class CourseDetailScreen extends ConsumerWidget {
                                     horizontal: 5,
                                   ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    // mainAxisAlignment:
+                                    //     MainAxisAlignment.spaceAround,
                                     children: [
                                       Container(
                                         decoration: BoxDecoration(
@@ -214,6 +214,9 @@ class CourseDetailScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                        ),
                                         decoration: BoxDecoration(
                                           border: Border.all(
                                             color: const Color(0xff3F51B5),
@@ -283,91 +286,93 @@ class CourseDetailScreen extends ConsumerWidget {
       ),
       bottomNavigationBar: BottomAppBar(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              courseDetailData.when(
-                loading: () => const CircularProgressIndicator(),
-                error: (error, stack) {
-                  print(error);
-                  return SizedBox(
-                    width: 300,
-                    child: Text('error: $error'),
-                  );
-                },
-                data: (courseDetail) {
-                  final courseDetailList = courseDetail['course'];
+              Expanded(
+                child: courseDetailData.when(
+                  loading: () => const CircularProgressIndicator(),
+                  error: (error, stack) {
+                    print(error);
+                    return SizedBox(
+                      width: 300,
+                      child: Text('error: $error'),
+                    );
+                  },
+                  data: (courseDetail) {
+                    final courseDetailList = courseDetail['course'];
 
-                  return DecoratedBox(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFFA48AFF),
+                    return DecoratedBox(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFFA48AFF),
+                        ),
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                      ),
-                      child: DropdownButton(
-                        value: selectCourseDetailId,
-                        items: courseDetailList.map<DropdownMenuItem<Object>>(
-                          (dynamic e) {
-                            return DropdownMenuItem<Object>(
-                              value: e['id'],
-                              child: Text(
-                                '${e['course_date']} ${e['title']}',
-                                style: const TextStyle(
-                                  color: Color(0xFFA48AFF),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
+                      child: Center(
+                        child: DropdownButton(
+                          value: selectCourseDetailId,
+                          items: courseDetailList.map<DropdownMenuItem<Object>>(
+                            (dynamic e) {
+                              return DropdownMenuItem<Object>(
+                                value: e['id'],
+                                child: Text(
+                                  '${e['title']}',
+                                  style: const TextStyle(
+                                    color: Color(0xFFA48AFF),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            },
+                          ).toList(),
+                          onChanged: (value) {
+                            ref
+                                .read(selectCourseDetailIdProvider.notifier)
+                                .update((state) => value as int);
                           },
-                        ).toList(),
-                        onChanged: (value) {
-                          ref
-                              .read(selectCourseDetailIdProvider.notifier)
-                              .update((state) => value as int);
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-              TextButton(
-                onPressed: () {
-                  if (courseDetailData.value != null) {
-                    final dancerId = courseDetailData.value['course'][0]
-                        ['lesson']['dancer']['id'];
-                    onReserveTap(selectCourseDetailId, dancerId);
-                  }
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFFA48AFF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 3,
-                    horizontal: 15,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '예약하기',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    if (courseDetailData.value != null) {
+                      final dancerId = courseDetailData.value['course'][0]
+                          ['lesson']['dancer']['id'];
+                      onReserveTap(selectCourseDetailId, dancerId);
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFFA48AFF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 3,
+                      horizontal: 15,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '예약하기',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

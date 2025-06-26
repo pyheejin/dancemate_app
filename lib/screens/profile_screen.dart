@@ -1,17 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/screens/profile_detail_screen.dart';
 import 'package:dancemate_app/screens/setting_screen.dart';
-import 'package:dancemate_app/widgets/error.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -20,6 +15,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userProfile = ref.watch(getUserProfileProvider);
+    // String imagePath = ref.watch(profileImagePathProvider);
 
     NumberFormat format = NumberFormat('###,###,###,###');
     DateTime today = DateTime.now();
@@ -32,248 +28,236 @@ class ProfileScreen extends ConsumerWidget {
       );
     }
 
+    // Future<void> pickImage() async {
+    //   ImagePicker imagePicker = ImagePicker();
+    //   final image = await imagePicker.pickImage(source: ImageSource.gallery);
+    //   if (image != null) {
+    //     ref
+    //         .read(profileImagePathProvider.notifier)
+    //         .update((state) => image.path);
+
+    //     print(imagePath);
+    //   }
+    // }
+
     void profileEditTap() {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => const ProfileDetailScreen(),
+          builder: (context) => ProfileDetailScreen(ref: ref),
         ),
       );
+
       // final TextEditingController nicknameController = TextEditingController();
       // final TextEditingController introductionController =
       //     TextEditingController();
-      // String imagePath = ref.watch(profileImagePathProvider);
 
-      // Future<void> pickImage() async {
-      //   ImagePicker imagePicker = ImagePicker();
-      //   final image = await imagePicker.pickImage(source: ImageSource.gallery);
-      //   if (image != null) {
-      //     ref.read(profileImagePathProvider.notifier).update((state) {
-      //       state = image.path;
-      //       print(state);
-      //       return state;
-      //     });
+      // void onSaveTap() async {
+      //   print(imagePath);
+      //   // 파일 경로를 통해 formData 생성
+      //   FormData bodyData = FormData.fromMap({
+      //     'nickname': nicknameController.text,
+      //     'introduction': introductionController.text,
+      //     'image_url': await MultipartFile.fromFile(imagePath),
+      //   });
 
-      //     // print(image.path);
-      //     print(imagePath);
+      //   final result =
+      //       await ref.watch(postUserProfileProvider(bodyData).future);
+      //   if (jsonDecode(result.toString())['result_code'] == 200) {
+      //     ref.refresh(getUserProfileProvider);
+      //     Navigator.pop(context);
+      //   } else {
+      //     errorAlert(context, jsonDecode(result.toString())['result_msg']);
       //   }
+      // }
 
-      // ImagePicker().pickImage(source: ImageSource.gallery).then((image) {
-      //   if (image != null) {
-      //     imagePath = image.path;
-      //     ref
-      //         .read(profileImagePathProvider.notifier)
-      //         .update((state) => image.path);
-      //   }
-      // });
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return Dialog(
+      //       child: Padding(
+      //         padding: const EdgeInsets.symmetric(
+      //           vertical: 20,
+      //           horizontal: 10,
+      //         ),
+      //         child: Container(
+      //           width: 400,
+      //           height: 400,
+      //           decoration: const BoxDecoration(
+      //             borderRadius: BorderRadius.all(
+      //               Radius.circular(15), // 모달 전체 라운딩 처리
+      //             ),
+      //           ),
+      //           child: userProfile.when(
+      //             data: (userData) {
+      //               String nickname = userData['nickname'];
+      //               String introduction = userData['introduction'];
+      //               String imageUrl = userData['image_url'];
+
+      //               nicknameController.text = nickname;
+      //               introductionController.text = introduction;
+      //               // imagePath = imageUrl;
+      //               print('imagePath 2: $imagePath');
+
+      //               return Column(
+      //                 children: [
+      //                   const Text(
+      //                     '프로필 변경',
+      //                     style: TextStyle(
+      //                       fontSize: 18,
+      //                       fontWeight: FontWeight.bold,
+      //                     ),
+      //                   ),
+      //                   const SizedBox(height: 10),
+      //                   Row(
+      //                     children: [
+      //                       GestureDetector(
+      //                         onTap: pickImage,
+      //                         child: (imagePath != '')
+      //                             ? CircleAvatar(
+      //                                 radius: 40,
+      //                                 foregroundImage: AssetImage(imagePath),
+      //                                 child: const Text('local'),
+      //                               )
+      //                             : Container(
+      //                                 width: 80,
+      //                                 height: 80,
+      //                                 decoration: BoxDecoration(
+      //                                   color: Colors.black26,
+      //                                   borderRadius: BorderRadius.circular(40),
+      //                                 ),
+      //                                 child: imageUrl == ''
+      //                                     ? const Center(
+      //                                         child: Icon(
+      //                                           Icons.camera_alt_outlined,
+      //                                           color: Colors.white,
+      //                                           size: 25,
+      //                                         ),
+      //                                       )
+      //                                     : imageUrl.split(':')[0] == 'https'
+      //                                         ? CircleAvatar(
+      //                                             radius: 40,
+      //                                             foregroundImage:
+      //                                                 NetworkImage(imageUrl),
+      //                                             child: Text(nickname),
+      //                                           )
+      //                                         : CircleAvatar(
+      //                                             radius: 40,
+      //                                             foregroundImage:
+      //                                                 AssetImage(imageUrl),
+      //                                             child: const Text('local'),
+      //                                           ),
+      //                               ),
+      //                       ),
+      //                       const SizedBox(width: 10),
+      //                       Expanded(
+      //                         child: TextField(
+      //                           controller: nicknameController,
+      //                           decoration: InputDecoration(
+      //                             enabledBorder: OutlineInputBorder(
+      //                               borderSide: BorderSide(
+      //                                 color: Colors.grey.shade400,
+      //                                 width: 1.0,
+      //                               ),
+      //                               borderRadius: BorderRadius.circular(10),
+      //                             ),
+      //                             focusedBorder: OutlineInputBorder(
+      //                               borderSide: BorderSide(
+      //                                 color: Colors.grey.shade400,
+      //                                 width: 1.0,
+      //                               ),
+      //                               borderRadius: BorderRadius.circular(10),
+      //                             ),
+      //                           ),
+      //                         ),
+      //                       ),
+      //                     ],
+      //                   ),
+      //                   const SizedBox(height: 10),
+      //                   Expanded(
+      //                     child: TextField(
+      //                       textAlignVertical: TextAlignVertical.top,
+      //                       controller: introductionController,
+      //                       expands: true,
+      //                       maxLines: null,
+      //                       decoration: InputDecoration(
+      //                         hintText: '자기소개',
+      //                         enabledBorder: OutlineInputBorder(
+      //                           borderSide: BorderSide(
+      //                             color: Colors.grey.shade400,
+      //                             width: 1.0,
+      //                           ),
+      //                           borderRadius: BorderRadius.circular(10),
+      //                         ),
+      //                         focusedBorder: OutlineInputBorder(
+      //                           borderSide: BorderSide(
+      //                             color: Colors.grey.shade400,
+      //                             width: 1.0,
+      //                           ),
+      //                           borderRadius: BorderRadius.circular(10),
+      //                         ),
+      //                       ),
+      //                     ),
+      //                   ),
+      //                   const SizedBox(height: 10),
+      //                   Row(
+      //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //                     children: [
+      //                       TextButton(
+      //                         style: TextButton.styleFrom(
+      //                           backgroundColor: Colors.black38,
+      //                           shape: RoundedRectangleBorder(
+      //                             borderRadius: BorderRadius.circular(5),
+      //                           ),
+      //                         ),
+      //                         onPressed: () {
+      //                           Navigator.pop(context);
+      //                         },
+      //                         child: const Text(
+      //                           '취소',
+      //                           style: TextStyle(
+      //                             color: Colors.white,
+      //                             fontSize: 18,
+      //                             fontWeight: FontWeight.bold,
+      //                           ),
+      //                         ),
+      //                       ),
+      //                       TextButton(
+      //                         style: TextButton.styleFrom(
+      //                           backgroundColor: const Color(0xFFA48AFF),
+      //                           shape: RoundedRectangleBorder(
+      //                             borderRadius: BorderRadius.circular(5),
+      //                           ),
+      //                         ),
+      //                         onPressed: onSaveTap,
+      //                         child: const Text(
+      //                           '저장',
+      //                           style: TextStyle(
+      //                             color: Colors.white,
+      //                             fontSize: 18,
+      //                             fontWeight: FontWeight.bold,
+      //                           ),
+      //                         ),
+      //                       ),
+      //                     ],
+      //                   ),
+      //                 ],
+      //               );
+      //             },
+      //             loading: () => const CircularProgressIndicator(),
+      //             error: (error, stack) {
+      //               print(error);
+      //               return SizedBox(
+      //                 width: 300,
+      //                 child: Text('error: $error'),
+      //               );
+      //             },
+      //           ),
+      //         ),
+      //       ),
+      //     );
+      //   },
+      // );
     }
-
-    //   void onSaveTap() async {
-    //     print(imagePath);
-    //     // 파일 경로를 통해 formData 생성
-    //     FormData bodyData = FormData.fromMap({
-    //       'nickname': nicknameController.text,
-    //       'introduction': introductionController.text,
-    //       'image_url': await MultipartFile.fromFile(imagePath),
-    //     });
-
-    //     final result =
-    //         await ref.watch(postUserProfileProvider(bodyData).future);
-    //     if (jsonDecode(result.toString())['result_code'] == 200) {
-    //       ref.refresh(getUserProfileProvider);
-    //       Navigator.pop(context);
-    //     } else {
-    //       errorAlert(context, jsonDecode(result.toString())['result_msg']);
-    //     }
-    //   }
-
-    //   showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return Dialog(
-    //         child: Padding(
-    //           padding: const EdgeInsets.symmetric(
-    //             vertical: 20,
-    //             horizontal: 10,
-    //           ),
-    //           child: Container(
-    //             width: 400,
-    //             height: 400,
-    //             decoration: const BoxDecoration(
-    //               borderRadius: BorderRadius.all(
-    //                 Radius.circular(15), // 모달 전체 라운딩 처리
-    //               ),
-    //             ),
-    //             child: userProfile.when(
-    //               data: (userData) {
-    //                 String nickname = userData['nickname'];
-    //                 String introduction = userData['introduction'];
-    //                 String imageUrl = userData['image_url'];
-
-    //                 nicknameController.text = nickname;
-    //                 introductionController.text = introduction;
-    //                 // imagePath = imageUrl;
-    //                 print('imagePath 2: $imagePath');
-
-    //                 return Column(
-    //                   children: [
-    //                     const Text(
-    //                       '프로필 변경',
-    //                       style: TextStyle(
-    //                         fontSize: 18,
-    //                         fontWeight: FontWeight.bold,
-    //                       ),
-    //                     ),
-    //                     const SizedBox(height: 10),
-    //                     Row(
-    //                       children: [
-    //                         GestureDetector(
-    //                           onTap: pickImage,
-    //                           child: (imagePath != '')
-    //                               ? Container(
-    //                                   width: 80,
-    //                                   height: 80,
-    //                                   decoration: BoxDecoration(
-    //                                     color: Colors.black26,
-    //                                     borderRadius: BorderRadius.circular(40),
-    //                                   ),
-    //                                   child: imageUrl.split(':')[0] == 'https'
-    //                                       ? CircleAvatar(
-    //                                           radius: 50,
-    //                                           foregroundImage:
-    //                                               NetworkImage(imagePath),
-    //                                           child: Text(nickname),
-    //                                         )
-    //                                       : CircleAvatar(
-    //                                           radius: 50,
-    //                                           foregroundImage:
-    //                                               AssetImage(imagePath),
-    //                                           child: Text(nickname),
-    //                                         ))
-    //                               : Container(
-    //                                   width: 80,
-    //                                   height: 80,
-    //                                   decoration: BoxDecoration(
-    //                                     color: Colors.black26,
-    //                                     borderRadius: BorderRadius.circular(40),
-    //                                   ),
-    //                                   child: const Center(
-    //                                     child: Icon(
-    //                                       Icons.camera_alt_outlined,
-    //                                       color: Colors.white,
-    //                                     ),
-    //                                   ),
-    //                                 ),
-    //                         ),
-    //                         const SizedBox(width: 10),
-    //                         Expanded(
-    //                           child: TextField(
-    //                             controller: nicknameController,
-    //                             decoration: InputDecoration(
-    //                               enabledBorder: OutlineInputBorder(
-    //                                 borderSide: BorderSide(
-    //                                   color: Colors.grey.shade400,
-    //                                   width: 1.0,
-    //                                 ),
-    //                                 borderRadius: BorderRadius.circular(10),
-    //                               ),
-    //                               focusedBorder: OutlineInputBorder(
-    //                                 borderSide: BorderSide(
-    //                                   color: Colors.grey.shade400,
-    //                                   width: 1.0,
-    //                                 ),
-    //                                 borderRadius: BorderRadius.circular(10),
-    //                               ),
-    //                             ),
-    //                           ),
-    //                         ),
-    //                       ],
-    //                     ),
-    //                     const SizedBox(height: 10),
-    //                     Expanded(
-    //                       child: TextField(
-    //                         textAlignVertical: TextAlignVertical.top,
-    //                         controller: introductionController,
-    //                         expands: true,
-    //                         maxLines: null,
-    //                         decoration: InputDecoration(
-    //                           hintText: '자기소개',
-    //                           enabledBorder: OutlineInputBorder(
-    //                             borderSide: BorderSide(
-    //                               color: Colors.grey.shade400,
-    //                               width: 1.0,
-    //                             ),
-    //                             borderRadius: BorderRadius.circular(10),
-    //                           ),
-    //                           focusedBorder: OutlineInputBorder(
-    //                             borderSide: BorderSide(
-    //                               color: Colors.grey.shade400,
-    //                               width: 1.0,
-    //                             ),
-    //                             borderRadius: BorderRadius.circular(10),
-    //                           ),
-    //                         ),
-    //                       ),
-    //                     ),
-    //                     const SizedBox(height: 10),
-    //                     Row(
-    //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //                       children: [
-    //                         TextButton(
-    //                           style: TextButton.styleFrom(
-    //                             backgroundColor: Colors.black38,
-    //                             shape: RoundedRectangleBorder(
-    //                               borderRadius: BorderRadius.circular(5),
-    //                             ),
-    //                           ),
-    //                           onPressed: () {
-    //                             Navigator.pop(context);
-    //                           },
-    //                           child: const Text(
-    //                             '취소',
-    //                             style: TextStyle(
-    //                               color: Colors.white,
-    //                               fontSize: 18,
-    //                               fontWeight: FontWeight.bold,
-    //                             ),
-    //                           ),
-    //                         ),
-    //                         TextButton(
-    //                           style: TextButton.styleFrom(
-    //                             backgroundColor: const Color(0xFFA48AFF),
-    //                             shape: RoundedRectangleBorder(
-    //                               borderRadius: BorderRadius.circular(5),
-    //                             ),
-    //                           ),
-    //                           onPressed: onSaveTap,
-    //                           child: const Text(
-    //                             '저장',
-    //                             style: TextStyle(
-    //                               color: Colors.white,
-    //                               fontSize: 18,
-    //                               fontWeight: FontWeight.bold,
-    //                             ),
-    //                           ),
-    //                         ),
-    //                       ],
-    //                     ),
-    //                   ],
-    //                 );
-    //               },
-    //               loading: () => const CircularProgressIndicator(),
-    //               error: (error, stack) {
-    //                 print(error);
-    //                 return SizedBox(
-    //                   width: 300,
-    //                   child: Text('error: $error'),
-    //                 );
-    //               },
-    //             ),
-    //           ),
-    //         ),
-    //       );
-    //     },
-    //   );
-    // }
 
     return Scaffold(
       body: SafeArea(
@@ -296,7 +280,6 @@ class ProfileScreen extends ConsumerWidget {
                         data: (dataList) {
                           final imageUrl = dataList['image_url'];
                           final nickname = dataList['nickname'];
-                          final email = dataList['email'];
                           final introduction = dataList['introduction'];
 
                           return Row(
@@ -332,7 +315,7 @@ class ProfileScreen extends ConsumerWidget {
                                       Row(
                                         children: [
                                           Text(
-                                            '@$email',
+                                            '$nickname',
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 18,
