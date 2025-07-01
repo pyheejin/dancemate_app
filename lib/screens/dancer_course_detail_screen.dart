@@ -1,10 +1,15 @@
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/dancer_provider.dart';
 import 'package:dancemate_app/widgets/error.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
+// import 'package:flutter_quill/flutter_quill.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:path/path.dart' as path;
+import 'dart:io' as io show Directory, File;
 
 class DancerCourseDetailScreen extends ConsumerWidget {
   final int courseId;
@@ -18,8 +23,17 @@ class DancerCourseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final courseDetailData = ref.watch(getLessonDetailProvider(courseId));
 
-    String title = ref.watch(courseTitleProvider);
-    String description = ref.watch(courseDescriptionProvider);
+    String imagePath = ref.watch(selectLessonImagePathProvider);
+
+    Future<void> pickImage() async {
+      ImagePicker().pickImage(source: ImageSource.gallery).then((image) {
+        if (image != null) {
+          ref
+              .read(selectLessonImagePathProvider.notifier)
+              .update((state) => image.path);
+        }
+      });
+    }
 
     final TextEditingController titleController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
@@ -1582,6 +1596,35 @@ class DancerCourseDetailScreen extends ConsumerWidget {
       }
     }
 
+    // final QuillController controller = () {
+    //   return QuillController.basic(
+    //       config: QuillControllerConfig(
+    //     clipboardConfig: QuillClipboardConfig(
+    //       enableExternalRichPaste: true,
+    //       onImagePaste: (imageBytes) async {
+    //         // if (kIsWeb) {
+    //         //   // Dart IO is unsupported on the web.
+    //         //   return null;
+    //         // }
+    //         // Save the image somewhere and return the image URL that will be
+    //         // stored in the Quill Delta JSON (the document).
+    //         final newFileName =
+    //             'image-file-${DateTime.now().toIso8601String()}.png';
+    //         final newPath = path.join(
+    //           io.Directory.systemTemp.path,
+    //           newFileName,
+    //         );
+    //         final file = await io.File(
+    //           newPath,
+    //         ).writeAsBytes(imageBytes, flush: true);
+    //         return file.path;
+    //       },
+    //     ),
+    //   ));
+    // }();
+    // final FocusNode editorFocusNode = FocusNode();
+    // final ScrollController editorScrollController = ScrollController();
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(30),
@@ -1607,27 +1650,53 @@ class DancerCourseDetailScreen extends ConsumerWidget {
           data: (courseData) {
             titleController.text = courseData['title'];
             descriptionController.text = courseData['description'];
+            dynamic lessonImageUrl = courseData['image_url'];
 
             return Column(
               children: [
-                Container(
-                  height: 220,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade400),
-                    ),
-                  ),
-                  child: const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        bottom: 40,
-                      ),
-                      child: Icon(
-                        Icons.add_photo_alternate_outlined,
-                        size: 40,
-                        color: Colors.black87,
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: pickImage,
+                  child: Container(
+                    height: 220,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey.shade400),
                       ),
                     ),
+                    child: lessonImageUrl == null
+                        ? imagePath == ''
+                            ? const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom: 40,
+                                  ),
+                                  child: Icon(
+                                    Icons.add_photo_alternate_outlined,
+                                    size: 40,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              )
+                            : Image.asset(
+                                width: 430,
+                                height: 220,
+                                imagePath,
+                                fit: BoxFit.fill,
+                              )
+                        : imagePath == ''
+                            ? Image.network(
+                                width: 430,
+                                height: 220,
+                                fit: BoxFit.fill,
+                                lessonImageUrl,
+                              )
+                            : Image.asset(
+                                width: 430,
+                                height: 220,
+                                imagePath,
+                                fit: BoxFit.fill,
+                              ),
                   ),
                 ),
                 Padding(
@@ -2219,6 +2288,35 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
+                      // QuillEditor(
+                      //   focusNode: editorFocusNode,
+                      //   scrollController: editorScrollController,
+                      //   controller: controller,
+                      //   config: const QuillEditorConfig(
+                      //     placeholder: 'Start writing your notes...',
+                      //     padding: EdgeInsets.all(16),
+                      //     embedBuilders: [
+                      //       // ...FlutterQuillEmbeds.editorBuilders(
+                      //       //   imageEmbedConfig: QuillEditorImageEmbedConfig(
+                      //       //     imageProviderBuilder: (context, imageUrl) {
+                      //       //       // https://pub.dev/packages/flutter_quill_extensions#-image-assets
+                      //       //       if (imageUrl.startsWith('assets/')) {
+                      //       //         return AssetImage(imageUrl);
+                      //       //       }
+                      //       //       return null;
+                      //       //     },
+                      //       //   ),
+                      //       //   videoEmbedConfig: QuillEditorVideoEmbedConfig(
+                      //       //     customVideoBuilder: (videoUrl, readOnly) {
+                      //       //       // To load YouTube videos https://github.com/singerdmx/flutter-quill/releases/tag/v10.8.0
+                      //       //       return null;
+                      //       //     },
+                      //       //   ),
+                      //       // ),
+                      //       // TimeStampEmbedBuilder(),
+                      //     ],
+                      //   ),
+                      // ),
                       TextField(
                         controller: descriptionController,
                         // expands: true,

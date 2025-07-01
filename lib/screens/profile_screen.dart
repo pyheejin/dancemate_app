@@ -282,87 +282,101 @@ class ProfileScreen extends ConsumerWidget {
                           final nickname = dataList['nickname'];
                           final introduction = dataList['introduction'];
 
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          return Column(
                             children: [
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  imageUrl == ''
-                                      ? const CircleAvatar(
-                                          radius: 50,
-                                          foregroundImage: AssetImage(
-                                              'assets/images/app_logo/chat.png'),
-                                        )
-                                      : imageUrl.split(':')[0] == 'https'
-                                          ? CircleAvatar(
-                                              radius: 50,
-                                              foregroundImage:
-                                                  NetworkImage(imageUrl),
-                                              child: Text(nickname),
-                                            )
-                                          : CircleAvatar(
-                                              radius: 50,
-                                              foregroundImage:
-                                                  AssetImage(imageUrl),
-                                              child: Text(nickname),
-                                            ),
-                                  const SizedBox(width: 10),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  Row(
                                     children: [
-                                      Row(
+                                      imageUrl == ''
+                                          ? const CircleAvatar(
+                                              radius: 50,
+                                              foregroundImage: AssetImage(
+                                                  'assets/images/app_logo/chat.png'),
+                                            )
+                                          : imageUrl.split(':')[0] == 'https'
+                                              ? CircleAvatar(
+                                                  radius: 50,
+                                                  foregroundImage:
+                                                      NetworkImage(imageUrl),
+                                                  child: Text(nickname),
+                                                )
+                                              : CircleAvatar(
+                                                  radius: 50,
+                                                  foregroundImage:
+                                                      AssetImage(imageUrl),
+                                                  child: Text(nickname),
+                                                ),
+                                      const SizedBox(width: 10),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            '$nickname',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 18,
-                                            ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '$nickname',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: profileEditTap,
+                                                child: const Icon(
+                                                  Icons
+                                                      .mode_edit_outline_outlined,
+                                                  size: 17,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          GestureDetector(
-                                            onTap: profileEditTap,
-                                            child: const Icon(
-                                              Icons.mode_edit_outline_outlined,
-                                              size: 17,
+                                          Text(
+                                            introduction,
+                                            style: const TextStyle(
+                                              fontSize: 15,
                                             ),
                                           ),
                                         ],
                                       ),
-                                      Text(
-                                        introduction,
-                                        style: const TextStyle(
-                                          fontSize: 15,
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                        visualDensity: const VisualDensity(
+                                          vertical: -4,
+                                          horizontal: -4,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const SettingScreen(),
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(
+                                          Icons.settings,
+                                          size: 25,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ],
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                    visualDensity: const VisualDensity(
-                                      vertical: -4,
-                                      horizontal: -4,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SettingScreen(),
-                                        ),
-                                      );
-                                    },
-                                    icon: const Icon(
-                                      Icons.settings,
-                                      size: 25,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              // const Row(
+                              //   mainAxisAlignment:
+                              //       MainAxisAlignment.spaceBetween,
+                              //   children: [
+                              //     Text('팔로잉'),
+                              //     Text('팔로워'),
+                              //   ],
+                              // ),
                             ],
                           );
                         },

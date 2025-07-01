@@ -59,3 +59,7 @@ final postCourseDetailExistsProvider =
   final result = await api.postCourseDetailExists(courseDetailId);
   return result;
 });
+
+final selectLessonImagePathProvider = StateProvider.autoDispose<String>((ref) {
+  return '';
+});
