@@ -40,10 +40,18 @@ final getUserProfileProvider = FutureProvider<dynamic>((ref) async {
 });
 
 final postUserProfileProvider =
-    FutureProvider.family<dynamic, FormData>((ref, bodyData) async {
+    FutureProvider.family<dynamic, Map<String, dynamic>>((ref, bodyData) async {
   final ApiServices api = ApiServices();
 
   final result = await api.postUserProfile(bodyData);
+  return result;
+});
+
+final postUserProfileImageProvider =
+    FutureProvider.family<dynamic, FormData>((ref, bodyData) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.postUserProfileImage(bodyData);
   return result;
 });
 
