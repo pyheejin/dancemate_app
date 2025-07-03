@@ -1,6 +1,10 @@
+import 'dart:convert';
+
+import 'package:dancemate_app/provider/image_provider.dart';
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/dancer_provider.dart';
 import 'package:dancemate_app/widgets/error.dart';
+import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +12,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 // import 'package:flutter_quill/flutter_quill.dart';
 // import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:path/path.dart' as path;
-import 'dart:io' as io show Directory, File;
 
 class DancerCourseDetailScreen extends ConsumerWidget {
   final int courseId;
@@ -1573,7 +1575,6 @@ class DancerCourseDetailScreen extends ConsumerWidget {
         'description': descriptionController.text,
         'detail_list': bodyList,
       };
-      print(detail);
 
       final result = await ref
           .read(dancerCourseProvider.notifier)
@@ -1581,6 +1582,22 @@ class DancerCourseDetailScreen extends ConsumerWidget {
 
       if (result != null) {
         if (result['result_code'] == 200) {
+          // 파일 경로를 통해 formData 생성
+          FormData bodyData = FormData.fromMap({
+            'bucket': 'lesson',
+            'lesson_id': courseId,
+            'image_url': await MultipartFile.fromFile(imagePath),
+          });
+
+          final result =
+              await ref.watch(postImageUploadProvider(bodyData).future);
+          final response = jsonDecode(result.toString());
+          if (response['result_code'] == 200) {
+            ref.refresh(getLessonDetailProvider(courseId));
+          } else {
+            errorAlert(context, response['result_msg']);
+          }
+
           ref.refresh(getDancerCourseProvider);
           ref.refresh(dancerCourseProvider);
           ref.refresh(oldDancerCourseProvider);

@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:dancemate_app/provider/dancer_provider.dart';
+import 'package:dancemate_app/provider/image_provider.dart';
+import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/widgets/error.dart';
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,8 +18,19 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    String imagePath = ref.watch(selectLessonImagePathProvider);
     String title = ref.watch(courseTitleProvider);
     String description = ref.watch(courseDescriptionProvider);
+
+    Future<void> pickImage() async {
+      ImagePicker().pickImage(source: ImageSource.gallery).then((image) {
+        if (image != null) {
+          ref
+              .read(selectLessonImagePathProvider.notifier)
+              .update((state) => image.path);
+        }
+      });
+    }
 
     final TextEditingController titleController =
         TextEditingController(text: title);
@@ -1105,6 +1122,22 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
 
       if (result != null) {
         if (result['result_code'] == 200) {
+          // 파일 경로를 통해 formData 생성
+          FormData bodyData = FormData.fromMap({
+            'bucket': 'lesson',
+            'lesson_id': result['result_data']['lesson_id'],
+            'image_url': await MultipartFile.fromFile(imagePath),
+          });
+
+          final imageResult =
+              await ref.watch(postImageUploadProvider(bodyData).future);
+          final response = jsonDecode(imageResult.toString());
+          if (response['result_code'] == 200) {
+            ref.refresh(getDancerCourseProvider);
+          } else {
+            errorAlert(context, response['result_msg']);
+          }
+
           Navigator.pop(context);
           ref.refresh(getDancerCourseProvider);
           ref.refresh(dancerCourseProvider);
@@ -1134,24 +1167,35 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              height: 220,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey.shade400),
-                ),
-              ),
-              child: const Center(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    bottom: 40,
-                  ),
-                  child: Icon(
-                    Icons.add_photo_alternate_outlined,
-                    size: 40,
-                    color: Colors.black87,
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: pickImage,
+              child: Container(
+                height: 220,
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade400),
                   ),
                 ),
+                child: imagePath == ''
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: 40,
+                          ),
+                          child: Icon(
+                            Icons.add_photo_alternate_outlined,
+                            size: 40,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      )
+                    : Image.asset(
+                        width: 430,
+                        height: 220,
+                        imagePath,
+                        fit: BoxFit.fill,
+                      ),
               ),
             ),
             Padding(

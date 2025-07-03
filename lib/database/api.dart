@@ -178,13 +178,13 @@ class ApiServices {
     return resultData;
   }
 
-  Future<dynamic> postUserProfileImage(FormData bodyData) async {
+  Future<dynamic> postImageUpload(FormData bodyData) async {
     final accessToken = await getAccessToken();
 
     Dio dio = Dio();
 
     final response = await dio.post(
-      '$baseUrl/user/profile/image',
+      '$baseUrl/image',
       options: Options(
         headers: {
           'Authorization': 'Bearer $accessToken',
@@ -268,31 +268,6 @@ class ApiServices {
       body: body,
     );
     final resultData = jsonDecode(utf8.decode(response.bodyBytes));
-
-    // -----------------
-
-    // Dio dio = Dio();
-
-    // // 파일 경로를 통해 formData 생성
-    // FormData bodyData = FormData.fromMap({
-    //   'status': jsonDecode(body)['status'],
-    //   'title': jsonDecode(body)['title'],
-    //   'description': jsonDecode(body)['description'],
-    //   'detail_list': jsonDecode(body)['detail_list'],
-    // });
-
-    // final response = await dio.post(
-    //   '$baseUrl/lesson',
-    //   options: Options(
-    //     headers: {
-    //       'Authorization': 'Bearer $accessToken',
-    //       'Content-Type': 'application/json',
-    //     },
-    //     responseType: ResponseType.json,
-    //   ),
-    //   data: bodyData,
-    // );
-    // final resultData = response;
 
     return resultData;
   }

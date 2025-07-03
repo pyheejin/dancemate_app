@@ -47,14 +47,6 @@ final postUserProfileProvider =
   return result;
 });
 
-final postUserProfileImageProvider =
-    FutureProvider.family<dynamic, FormData>((ref, bodyData) async {
-  final ApiServices api = ApiServices();
-
-  final result = await api.postUserProfileImage(bodyData);
-  return result;
-});
-
 final getUserDetailProvider =
     FutureProvider.family<dynamic, int>((ref, userId) async {
   final ApiServices api = ApiServices();
