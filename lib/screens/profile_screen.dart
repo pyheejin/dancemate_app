@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dancemate_app/provider/image_provider.dart';
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
@@ -42,11 +43,12 @@ class ProfileScreen extends ConsumerWidget {
 
         // 파일 경로를 통해 formData 생성
         FormData bodyData = FormData.fromMap({
+          'bucket': 'profile',
           'image_url': await MultipartFile.fromFile(image.path),
         });
 
         final result =
-            await ref.watch(postUserProfileImageProvider(bodyData).future);
+            await ref.watch(postImageUploadProvider(bodyData).future);
         final response = jsonDecode(result.toString());
         if (response['result_code'] == 200) {
           ref.refresh(getUserProfileProvider);
