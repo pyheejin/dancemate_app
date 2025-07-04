@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -33,6 +34,36 @@ class ProfileScreen extends ConsumerWidget {
       );
     }
 
+    Future<void> pickCameraImage() async {
+      Permission permission = Permission.camera;
+      final status = await permission.request();
+      print(status);
+
+      ImagePicker imagePicker = ImagePicker();
+      final image = await imagePicker.pickImage(source: ImageSource.camera);
+      if (image != null) {
+        ref
+            .read(profileImagePathProvider.notifier)
+            .update((state) => image.path);
+
+        // 파일 경로를 통해 formData 생성
+        FormData bodyData = FormData.fromMap({
+          'bucket': 'profile',
+          'images': MultipartFile.fromFileSync(image.path),
+        });
+
+        final result =
+            await ref.watch(postImageUploadProvider(bodyData).future);
+        final response = jsonDecode(result.toString());
+        if (response['result_code'] == 200) {
+          Navigator.pop(context);
+          ref.refresh(getUserProfileProvider);
+        } else {
+          errorAlert(context, response['result_msg']);
+        }
+      }
+    }
+
     Future<void> pickImage() async {
       ImagePicker imagePicker = ImagePicker();
       final image = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -44,18 +75,98 @@ class ProfileScreen extends ConsumerWidget {
         // 파일 경로를 통해 formData 생성
         FormData bodyData = FormData.fromMap({
           'bucket': 'profile',
-          'image_url': await MultipartFile.fromFile(image.path),
+          'images': MultipartFile.fromFileSync(image.path),
         });
 
         final result =
             await ref.watch(postImageUploadProvider(bodyData).future);
         final response = jsonDecode(result.toString());
         if (response['result_code'] == 200) {
+          Navigator.pop(context);
           ref.refresh(getUserProfileProvider);
         } else {
           errorAlert(context, response['result_msg']);
         }
       }
+    }
+
+    Future<void> onProfileImageTap() async {
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            height: 200, // 모달 높이 크기
+            decoration: const BoxDecoration(
+              color: Colors.white, // 모달 배경색
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: pickCameraImage,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black54),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Icon(
+                            Icons.camera_alt_outlined,
+                            size: 40,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      const Text(
+                        '사진 찍기',
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: pickImage,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black54),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Icon(
+                            Icons.photo_library_outlined,
+                            size: 40,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      const Text(
+                        '갤러리에서 선택',
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
     }
 
     void profileEditTap() {
@@ -285,7 +396,7 @@ class ProfileScreen extends ConsumerWidget {
                                   Row(
                                     children: [
                                       GestureDetector(
-                                        onTap: pickImage,
+                                        onTap: onProfileImageTap,
                                         child: Container(
                                           child: imageUrl == ''
                                               ? imagePath != ''

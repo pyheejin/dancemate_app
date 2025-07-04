@@ -1126,7 +1126,7 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
           FormData bodyData = FormData.fromMap({
             'bucket': 'lesson',
             'lesson_id': result['result_data']['lesson_id'],
-            'image_url': await MultipartFile.fromFile(imagePath),
+            'images': MultipartFile.fromFileSync(imagePath),
           });
 
           final imageResult =
