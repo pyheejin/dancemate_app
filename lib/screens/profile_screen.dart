@@ -39,27 +39,29 @@ class ProfileScreen extends ConsumerWidget {
       final status = await permission.request();
       print(status);
 
-      ImagePicker imagePicker = ImagePicker();
-      final image = await imagePicker.pickImage(source: ImageSource.camera);
-      if (image != null) {
-        ref
-            .read(profileImagePathProvider.notifier)
-            .update((state) => image.path);
+      if (status == PermissionStatus.granted) {
+        ImagePicker imagePicker = ImagePicker();
+        final image = await imagePicker.pickImage(source: ImageSource.camera);
+        if (image != null) {
+          ref
+              .read(profileImagePathProvider.notifier)
+              .update((state) => image.path);
 
-        // 파일 경로를 통해 formData 생성
-        FormData bodyData = FormData.fromMap({
-          'bucket': 'profile',
-          'images': MultipartFile.fromFileSync(image.path),
-        });
+          // 파일 경로를 통해 formData 생성
+          FormData bodyData = FormData.fromMap({
+            'bucket': 'profile',
+            'images': MultipartFile.fromFileSync(image.path),
+          });
 
-        final result =
-            await ref.watch(postImageUploadProvider(bodyData).future);
-        final response = jsonDecode(result.toString());
-        if (response['result_code'] == 200) {
-          Navigator.pop(context);
-          ref.refresh(getUserProfileProvider);
-        } else {
-          errorAlert(context, response['result_msg']);
+          final result =
+              await ref.watch(postImageUploadProvider(bodyData).future);
+          final response = jsonDecode(result.toString());
+          if (response['result_code'] == 200) {
+            Navigator.pop(context);
+            ref.refresh(getUserProfileProvider);
+          } else {
+            errorAlert(context, response['result_msg']);
+          }
         }
       }
     }

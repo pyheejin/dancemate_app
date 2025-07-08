@@ -310,23 +310,23 @@ class SearchResult extends StatelessWidget {
                                               fit: BoxFit.cover,
                                               courseImage,
                                             ),
-                                      Positioned(
-                                        top: 5,
-                                        left: 5,
-                                        child: Container(
-                                          width: 40,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            color: const Color(0xff9475FF),
-                                          ),
-                                          child: const Icon(
-                                            Icons.favorite_border,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
+                                      // Positioned(
+                                      //   top: 5,
+                                      //   left: 5,
+                                      //   child: Container(
+                                      //     width: 40,
+                                      //     height: 40,
+                                      //     decoration: BoxDecoration(
+                                      //       borderRadius:
+                                      //           BorderRadius.circular(20),
+                                      //       color: const Color(0xff9475FF),
+                                      //     ),
+                                      //     child: const Icon(
+                                      //       Icons.favorite_border,
+                                      //       color: Colors.white,
+                                      //     ),
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                   const SizedBox(width: 10),

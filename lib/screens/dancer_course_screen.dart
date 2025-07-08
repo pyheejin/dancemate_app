@@ -26,7 +26,7 @@ class DancerCourseScreen extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: 10,
+          // vertical: 10,
           horizontal: 10,
         ),
         child: courseData.when(
@@ -104,46 +104,63 @@ class DancerCourseScreen extends ConsumerWidget {
           },
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white24,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: TextButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const DancerCourseDetailCreateScreen(),
-                ),
-              );
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFFA48AFF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFFA48AFF),
+        elevation: 0.5,
+        shape: const CircleBorder(),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const DancerCourseDetailCreateScreen(),
             ),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 3,
-                horizontal: 15,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '추가하기',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          );
+        },
+        child: const Icon(
+          Icons.add,
+          size: 50,
+          color: Colors.white,
         ),
       ),
+      // bottomNavigationBar: BottomAppBar(
+      //   color: Colors.white24,
+      //   child: Padding(
+      //     padding: const EdgeInsets.symmetric(horizontal: 30),
+      //     child: TextButton(
+      //       onPressed: () {
+      //         Navigator.of(context).push(
+      //           MaterialPageRoute(
+      //             builder: (context) => const DancerCourseDetailCreateScreen(),
+      //           ),
+      //         );
+      //       },
+      //       style: TextButton.styleFrom(
+      //         backgroundColor: const Color(0xFFA48AFF),
+      //         shape: RoundedRectangleBorder(
+      //           borderRadius: BorderRadius.circular(5),
+      //         ),
+      //       ),
+      //       child: const Padding(
+      //         padding: EdgeInsets.symmetric(
+      //           vertical: 3,
+      //           horizontal: 15,
+      //         ),
+      //         child: Row(
+      //           mainAxisAlignment: MainAxisAlignment.center,
+      //           children: [
+      //             Text(
+      //               '추가하기',
+      //               style: TextStyle(
+      //                 color: Colors.white,
+      //                 fontSize: 18,
+      //                 fontWeight: FontWeight.bold,
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

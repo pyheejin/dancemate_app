@@ -2,6 +2,7 @@ import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:dancemate_app/screens/chat_screen.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
@@ -51,16 +52,25 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
-          // Icon(
-          //   Icons.send_outlined,
-          //   size: 27,
-          // ),
-          // SizedBox(width: 5),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ChatScreen(),
+                ),
+              );
+            },
+            child: const Icon(
+              Icons.send_outlined,
+              size: 27,
+            ),
+          ),
+          const SizedBox(width: 5),
           GestureDetector(
             onTap: () {
               // Navigator.of(context).push(
               //   MaterialPageRoute(
-              //     builder: (context) => ProfileDetailScreen(ref: ref),
+              //     builder: (context) => const QuillScreen(),
               //   ),
               // );
             },
@@ -238,38 +248,38 @@ class HomeScreen extends ConsumerWidget {
                                                 fit: BoxFit.cover,
                                                 todayCoursesData['image_url'],
                                               ),
-                                        Positioned(
-                                          top: 5,
-                                          left: 5,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              print('is click?');
-                                              ref.watch(postCourseLikeProvider(
-                                                  todayCoursesData['id']));
-                                              // print(result.value!['result_code']);
-                                              // if (result['result_code'] == 200) {
-                                              //   ref.refresh(getHomeProvider);
-                                              // } else {
-                                              //   print('like fail');
-                                              // }
-                                            },
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                color: const Color(0xff9475FF),
-                                              ),
-                                              child: Icon(
-                                                isCourseLike
-                                                    ? Icons.favorite
-                                                    : Icons.favorite_border,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        // Positioned(
+                                        //   top: 5,
+                                        //   left: 5,
+                                        //   child: GestureDetector(
+                                        //     onTap: () {
+                                        //       print('is click?');
+                                        //       ref.watch(postCourseLikeProvider(
+                                        //           todayCoursesData['id']));
+                                        //       // print(result.value!['result_code']);
+                                        //       // if (result['result_code'] == 200) {
+                                        //       //   ref.refresh(getHomeProvider);
+                                        //       // } else {
+                                        //       //   print('like fail');
+                                        //       // }
+                                        //     },
+                                        //     child: Container(
+                                        //       width: 40,
+                                        //       height: 40,
+                                        //       decoration: BoxDecoration(
+                                        //         borderRadius:
+                                        //             BorderRadius.circular(20),
+                                        //         color: const Color(0xff9475FF),
+                                        //       ),
+                                        //       child: Icon(
+                                        //         isCourseLike
+                                        //             ? Icons.favorite
+                                        //             : Icons.favorite_border,
+                                        //         color: Colors.white,
+                                        //       ),
+                                        //     ),
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                     const SizedBox(height: 10),

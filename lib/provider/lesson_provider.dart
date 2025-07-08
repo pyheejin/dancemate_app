@@ -1,5 +1,6 @@
 import 'package:dancemate_app/database/api.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 final getLessonProvider =
     FutureProvider.family<dynamic, dynamic>((ref, date) async {
@@ -60,6 +61,15 @@ final postCourseDetailExistsProvider =
   return result;
 });
 
+final initialImagePageProvider = StateProvider.autoDispose<int>((ref) {
+  return 0;
+});
+
 final selectLessonImagePathProvider = StateProvider.autoDispose<String>((ref) {
   return '';
+});
+
+final selectLessonImagesPathProvider =
+    StateProvider.autoDispose<List<XFile>>((ref) {
+  return [];
 });

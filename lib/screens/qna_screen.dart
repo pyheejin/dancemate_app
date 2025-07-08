@@ -176,9 +176,9 @@ class QnaScreen extends ConsumerWidget {
       final TextEditingController titleController = TextEditingController();
       final TextEditingController questionController = TextEditingController();
 
-      emailController.text = qna['email'];
-      titleController.text = qna['title'];
-      questionController.text = qna['question'];
+      emailController.text = qna['email'] ?? '';
+      titleController.text = qna['title'] ?? '';
+      questionController.text = qna['question'] ?? '';
 
       void onSaveTap() async {
         final qnaDetail = {
@@ -224,7 +224,7 @@ class QnaScreen extends ConsumerWidget {
                               ),
                               const SizedBox(width: 10),
                               Text(
-                                qna['email'],
+                                qna['email'] ?? '',
                                 style: const TextStyle(
                                   fontSize: 15,
                                 ),
@@ -276,7 +276,7 @@ class QnaScreen extends ConsumerWidget {
                           const SizedBox(height: 5),
                           Expanded(
                             child: Text(
-                              qna['answer'],
+                              qna['answer'] ?? '',
                               style: const TextStyle(
                                 fontSize: 15,
                               ),

@@ -5,6 +5,7 @@ import 'package:dancemate_app/screens/reserve_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class CourseDetailScreen extends ConsumerWidget {
   final int courseId;
@@ -59,6 +60,14 @@ class CourseDetailScreen extends ConsumerWidget {
       }
     }
 
+    int initialImagePage = ref.watch(initialImagePageProvider);
+
+    final pageController = PageController(
+      initialPage: initialImagePage,
+      viewportFraction: 0.8,
+      keepPage: true,
+    );
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(30),
@@ -78,7 +87,7 @@ class CourseDetailScreen extends ConsumerWidget {
           },
           data: (courseDetail) {
             final lessonTitle = courseDetail['title'];
-            final lessonImageUrl = courseDetail['image_url'];
+            final lessonImages = courseDetail['lesson_image'];
             final lessonDescription = courseDetail['description'];
 
             final dancerData = courseDetail['dancer'];
@@ -90,16 +99,61 @@ class CourseDetailScreen extends ConsumerWidget {
             return Column(
               children: [
                 const SizedBox(height: 10),
-                lessonImageUrl == null
+                lessonImages.isEmpty
                     ? Image.asset(
                         height: 270,
                         'assets/images/app_logo/detail_2x.png',
                       )
-                    : Image.network(
-                        width: 430,
-                        height: 270,
-                        fit: BoxFit.fitWidth,
-                        lessonImageUrl,
+                    : SizedBox(
+                        height: 220,
+                        child: Stack(
+                          children: [
+                            ListView.builder(
+                              controller: pageController,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: lessonImages.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final path = lessonImages[index]['image_url'];
+                                return Image.network(
+                                  width: 430,
+                                  height: 220,
+                                  fit: BoxFit.fill,
+                                  path,
+                                );
+                              },
+                            ),
+                            lessonImages.isEmpty
+                                ? Container()
+                                : Positioned(
+                                    left: (MediaQuery.of(context).size.width /
+                                            2) -
+                                        (lessonImages.length * 10),
+                                    bottom: 10,
+                                    child: Row(
+                                      children: [
+                                        Center(
+                                          child: SmoothPageIndicator(
+                                            controller: pageController,
+                                            count: lessonImages.length,
+                                            effect: const SwapEffect(
+                                              dotHeight: 12,
+                                              dotWidth: 12,
+                                              dotColor: Color(0xFFA48AFF),
+                                              activeDotColor: Color(0xFF74D0FF),
+                                            ),
+                                            onDotClicked: (index) {
+                                              ref
+                                                  .read(initialImagePageProvider
+                                                      .notifier)
+                                                  .update((state) => index);
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                          ],
+                        ),
                       ),
                 const SizedBox(height: 10),
                 Padding(

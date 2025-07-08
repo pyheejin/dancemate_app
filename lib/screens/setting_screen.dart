@@ -47,10 +47,10 @@ class SettingScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SettingMenu(
-              name: '찜한 수업',
-              screen: LikeCourseScreen(),
-            ),
+            // const SettingMenu(
+            //   name: '찜한 수업',
+            //   screen: LikeCourseScreen(),
+            // ),
             const SettingMenu(
               name: '수업 수강 내역',
               screen: CourseHistoryScreen(),

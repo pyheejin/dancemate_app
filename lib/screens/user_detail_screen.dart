@@ -34,6 +34,18 @@ class UserDetailScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
+        title: userDetail.when(
+          data: (userData) {
+            return Text(userData['user']['nickname']);
+          },
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stack) {
+            return SizedBox(
+              width: 300,
+              child: Text('user detail error: $error'),
+            );
+          },
+        ),
       ),
       body: SafeArea(
         child: DefaultTabController(
@@ -47,81 +59,85 @@ class UserDetailScreen extends ConsumerWidget {
               headerSliverBuilder: (context, innerBoxIsScrolled) {
                 return [
                   SliverToBoxAdapter(
-                    child: Row(
-                      children: [
-                        Row(
-                          children: [
-                            userDetail.when(
-                              loading: () => const CircularProgressIndicator(),
-                              error: (error, stack) {
-                                print(error);
-                                return SizedBox(
-                                  width: 300,
-                                  child: Text('error: $error'),
-                                );
-                              },
-                              data: (dataList) {
-                                if (dataList['user'] == null) {
-                                  return Container();
-                                } else {
-                                  final imageUrl =
-                                      dataList['user']['image_url'];
+                    child: userDetail.when(
+                      loading: () => const CircularProgressIndicator(),
+                      error: (error, stack) {
+                        print(error);
+                        return SizedBox(
+                          width: 300,
+                          child: Text('error: $error'),
+                        );
+                      },
+                      data: (dataList) {
+                        if (dataList['user'] == null) {
+                          return Container();
+                        } else {
+                          final imageUrl = dataList['user']['image_url'];
 
-                                  if (imageUrl.split(':')[0] == 'https') {
-                                    return CircleAvatar(
-                                      radius: 50,
-                                      foregroundImage: NetworkImage(imageUrl),
-                                      child: Text(dataList['user']['nickname']),
-                                    );
-                                  } else {
-                                    return CircleAvatar(
-                                      radius: 50,
-                                      foregroundImage: AssetImage(imageUrl),
-                                      child: Text(dataList['user']['nickname']),
-                                    );
-                                  }
-                                }
-                              },
-                            ),
-                            const SizedBox(width: 10),
-                            userDetail.when(
-                              loading: () => const CircularProgressIndicator(),
-                              error: (error, stack) {
-                                print(error);
-                                return SizedBox(
-                                  width: 300,
-                                  child: Text('error: $error'),
-                                );
-                              },
-                              data: (dataList) {
-                                if (dataList['user'] == null) {
-                                  return Container();
-                                } else {
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '@${dataList['user']['email']}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 18,
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  imageUrl.split(':')[0] == 'https'
+                                      ? CircleAvatar(
+                                          radius: 50,
+                                          foregroundImage:
+                                              NetworkImage(imageUrl),
+                                          child: Text(
+                                              dataList['user']['nickname']),
+                                        )
+                                      : CircleAvatar(
+                                          radius: 50,
+                                          foregroundImage: AssetImage(imageUrl),
+                                          child: Text(
+                                              dataList['user']['nickname']),
                                         ),
-                                      ),
-                                      Text(
-                                        dataList['user']['introduction'],
-                                        style: const TextStyle(
-                                          fontSize: 15,
+                                  const SizedBox(width: 10),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 10,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          dataList['user']['introduction'],
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
+                                        const SizedBox(width: 10),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFA48AFF),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 5,
+                                              horizontal: 20,
+                                            ),
+                                            child: Text(
+                                              '메시지',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        }
+                      },
                     ),
                   ),
                   SliverPersistentHeader(

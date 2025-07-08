@@ -35,10 +35,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
-  # flutter_quill: ^11.4.1
-
-  smooth_page_indicator: ^1.2.0+3
-
   http: ^1.2.2
 
   shared_preferences: ^2.3.3
@@ -51,7 +47,11 @@ dependencies:
 
   flutter_rating_bar: ^4.0.1
 
-  image_picker: ^1.1.2
+  image_picker: ^1.0.0
+
+  carousel_slider: ^5.1.1
+
+  smooth_page_indicator: ^1.2.1
 
   dio: ^5.8.0+1
 

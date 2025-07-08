@@ -10,8 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
-// import 'package:flutter_quill/flutter_quill.dart';
-// import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class DancerCourseDetailScreen extends ConsumerWidget {
   final int courseId;
@@ -25,16 +24,25 @@ class DancerCourseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final courseDetailData = ref.watch(getLessonDetailProvider(courseId));
 
-    String imagePath = ref.watch(selectLessonImagePathProvider);
+    List<XFile> imagesPath = ref.watch(selectLessonImagesPathProvider);
 
     Future<void> pickImage() async {
-      ImagePicker().pickImage(source: ImageSource.gallery).then((image) {
-        if (image != null) {
-          ref
-              .read(selectLessonImagePathProvider.notifier)
-              .update((state) => image.path);
-        }
-      });
+      ImagePicker().pickMultiImage(limit: 5).then(
+        (images) {
+          if (images.isNotEmpty) {
+            ref
+                .read(selectLessonImagesPathProvider.notifier)
+                .update((state) => images);
+          }
+        },
+      );
+      // ImagePicker().pickImage(source: ImageSource.gallery).then((image) {
+      //   if (image != null) {
+      //     ref
+      //         .read(selectLessonImagePathProvider.notifier)
+      //         .update((state) => image.path);
+      //   }
+      // });
     }
 
     final TextEditingController titleController = TextEditingController();
@@ -1582,11 +1590,14 @@ class DancerCourseDetailScreen extends ConsumerWidget {
 
       if (result != null) {
         if (result['result_code'] == 200) {
+          final List<MultipartFile> images = imagesPath
+              .map((img) => MultipartFile.fromFileSync(img.path))
+              .toList();
           // 파일 경로를 통해 formData 생성
           FormData bodyData = FormData.fromMap({
             'bucket': 'lesson',
             'lesson_id': courseId,
-            'images': MultipartFile.fromFileSync(imagePath),
+            'images': images,
           });
 
           final result =
@@ -1613,38 +1624,9 @@ class DancerCourseDetailScreen extends ConsumerWidget {
       }
     }
 
-    // final QuillController controller = () {
-    //   return QuillController.basic(
-    //       config: QuillControllerConfig(
-    //     clipboardConfig: QuillClipboardConfig(
-    //       enableExternalRichPaste: true,
-    //       onImagePaste: (imageBytes) async {
-    //         // if (kIsWeb) {
-    //         //   // Dart IO is unsupported on the web.
-    //         //   return null;
-    //         // }
-    //         // Save the image somewhere and return the image URL that will be
-    //         // stored in the Quill Delta JSON (the document).
-    //         final newFileName =
-    //             'image-file-${DateTime.now().toIso8601String()}.png';
-    //         final newPath = path.join(
-    //           io.Directory.systemTemp.path,
-    //           newFileName,
-    //         );
-    //         final file = await io.File(
-    //           newPath,
-    //         ).writeAsBytes(imageBytes, flush: true);
-    //         return file.path;
-    //       },
-    //     ),
-    //   ));
-    // }();
-    // final FocusNode editorFocusNode = FocusNode();
-    // final ScrollController editorScrollController = ScrollController();
-
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(30),
+        preferredSize: const Size.fromHeight(40),
         child: AppBar(
           automaticallyImplyLeading: true,
           leading: IconButton(
@@ -1667,53 +1649,179 @@ class DancerCourseDetailScreen extends ConsumerWidget {
           data: (courseData) {
             titleController.text = courseData['title'];
             descriptionController.text = courseData['description'];
-            dynamic lessonImageUrl = courseData['image_url'];
+            dynamic lessonImages = courseData['lesson_image'];
+            int initialImagePage = ref.watch(initialImagePageProvider);
+
+            final pageController = PageController(
+              initialPage: initialImagePage,
+              viewportFraction: 0.8,
+              keepPage: true,
+            );
 
             return Column(
               children: [
-                const SizedBox(height: 10),
                 GestureDetector(
                   onTap: pickImage,
-                  child: Container(
-                    height: 220,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.grey.shade400),
-                      ),
-                    ),
-                    child: lessonImageUrl == null
-                        ? imagePath == ''
-                            ? const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: 40,
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: 220,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(color: Colors.grey.shade400),
+                          ),
+                        ),
+                        child: lessonImages.isEmpty
+                            ? imagesPath.isEmpty
+                                ? const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom: 40,
+                                      ),
+                                      child: Icon(
+                                        Icons.add_photo_alternate_outlined,
+                                        size: 40,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    controller: pageController,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: imagesPath.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final path = imagesPath[index].path;
+                                      return Image.asset(
+                                        width: 430,
+                                        height: 220,
+                                        path,
+                                        fit: BoxFit.fill,
+                                      );
+                                    },
+                                  )
+                            : imagesPath.isEmpty
+                                ? ListView.builder(
+                                    controller: pageController,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: lessonImages.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final path =
+                                          lessonImages[index]['image_url'];
+                                      return Image.network(
+                                        width: 430,
+                                        height: 220,
+                                        fit: BoxFit.fill,
+                                        path,
+                                      );
+                                    },
+                                  )
+                                : ListView.builder(
+                                    controller: pageController,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: imagesPath.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final path = imagesPath[index].path;
+                                      return Image.asset(
+                                        width: 430,
+                                        height: 220,
+                                        path,
+                                        fit: BoxFit.fill,
+                                      );
+                                    },
                                   ),
-                                  child: Icon(
-                                    Icons.add_photo_alternate_outlined,
-                                    size: 40,
-                                    color: Colors.black87,
+                      ),
+                      lessonImages.isEmpty
+                          ? imagesPath.isEmpty
+                              ? Container()
+                              : Positioned(
+                                  left:
+                                      (MediaQuery.of(context).size.width / 2) -
+                                          (imagesPath.length * 10),
+                                  bottom: 10,
+                                  child: Row(
+                                    children: [
+                                      Center(
+                                        child: SmoothPageIndicator(
+                                          controller: pageController,
+                                          count: imagesPath.length,
+                                          effect: const SwapEffect(
+                                            dotHeight: 12,
+                                            dotWidth: 12,
+                                            dotColor: Color(0xFFA48AFF),
+                                            activeDotColor: Color(0xFF74D0FF),
+                                          ),
+                                          onDotClicked: (index) {
+                                            ref
+                                                .read(initialImagePageProvider
+                                                    .notifier)
+                                                .update((state) => index);
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                          : imagesPath.isEmpty
+                              ? Positioned(
+                                  left:
+                                      (MediaQuery.of(context).size.width / 2) -
+                                          (lessonImages.length * 10),
+                                  bottom: 10,
+                                  child: Row(
+                                    children: [
+                                      Center(
+                                        child: SmoothPageIndicator(
+                                          controller: pageController,
+                                          count: lessonImages.length,
+                                          effect: const SwapEffect(
+                                            dotHeight: 12,
+                                            dotWidth: 12,
+                                            dotColor: Color(0xFFA48AFF),
+                                            activeDotColor: Color(0xFF74D0FF),
+                                          ),
+                                          onDotClicked: (index) {
+                                            ref
+                                                .read(initialImagePageProvider
+                                                    .notifier)
+                                                .update((state) => index);
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Positioned(
+                                  left:
+                                      (MediaQuery.of(context).size.width / 2) -
+                                          (imagesPath.length * 10),
+                                  bottom: 10,
+                                  child: Row(
+                                    children: [
+                                      Center(
+                                        child: SmoothPageIndicator(
+                                          controller: pageController,
+                                          count: imagesPath.length,
+                                          effect: const SwapEffect(
+                                            dotHeight: 12,
+                                            dotWidth: 12,
+                                            dotColor: Color(0xFFA48AFF),
+                                            activeDotColor: Color(0xFF74D0FF),
+                                          ),
+                                          onDotClicked: (index) {
+                                            ref
+                                                .read(initialImagePageProvider
+                                                    .notifier)
+                                                .update((state) => index);
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              )
-                            : Image.asset(
-                                width: 430,
-                                height: 220,
-                                imagePath,
-                                fit: BoxFit.fill,
-                              )
-                        : imagePath == ''
-                            ? Image.network(
-                                width: 430,
-                                height: 220,
-                                fit: BoxFit.fill,
-                                lessonImageUrl,
-                              )
-                            : Image.asset(
-                                width: 430,
-                                height: 220,
-                                imagePath,
-                                fit: BoxFit.fill,
-                              ),
+                    ],
                   ),
                 ),
                 Padding(

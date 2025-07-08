@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DancerCourseDetailCreateScreen extends ConsumerWidget {
@@ -22,14 +23,25 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
     String title = ref.watch(courseTitleProvider);
     String description = ref.watch(courseDescriptionProvider);
 
+    List<XFile> imagesPath = ref.watch(selectLessonImagesPathProvider);
+
     Future<void> pickImage() async {
-      ImagePicker().pickImage(source: ImageSource.gallery).then((image) {
-        if (image != null) {
-          ref
-              .read(selectLessonImagePathProvider.notifier)
-              .update((state) => image.path);
-        }
-      });
+      ImagePicker().pickMultiImage(limit: 5).then(
+        (images) {
+          if (images.isNotEmpty) {
+            ref
+                .read(selectLessonImagesPathProvider.notifier)
+                .update((state) => images);
+          }
+        },
+      );
+      // ImagePicker().pickImage(source: ImageSource.gallery).then((image) {
+      //   if (image != null) {
+      //     ref
+      //         .read(selectLessonImagePathProvider.notifier)
+      //         .update((state) => image.path);
+      //   }
+      // });
     }
 
     final TextEditingController titleController =
@@ -1122,11 +1134,14 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
 
       if (result != null) {
         if (result['result_code'] == 200) {
+          final List<MultipartFile> images = imagesPath
+              .map((img) => MultipartFile.fromFileSync(img.path))
+              .toList();
           // 파일 경로를 통해 formData 생성
           FormData bodyData = FormData.fromMap({
             'bucket': 'lesson',
             'lesson_id': result['result_data']['lesson_id'],
-            'images': MultipartFile.fromFileSync(imagePath),
+            'images': images,
           });
 
           final imageResult =
@@ -1147,9 +1162,17 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
       }
     }
 
+    int initialImagePage = ref.watch(initialImagePageProvider);
+
+    final pageController = PageController(
+      initialPage: initialImagePage,
+      viewportFraction: 0.8,
+      keepPage: true,
+    );
+
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(30),
+        preferredSize: const Size.fromHeight(40),
         child: AppBar(
           automaticallyImplyLeading: true,
           leading: IconButton(
@@ -1167,35 +1190,74 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 10),
             GestureDetector(
               onTap: pickImage,
-              child: Container(
-                height: 220,
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade400),
-                  ),
-                ),
-                child: imagePath == ''
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            bottom: 40,
-                          ),
-                          child: Icon(
-                            Icons.add_photo_alternate_outlined,
-                            size: 40,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      )
-                    : Image.asset(
-                        width: 430,
-                        height: 220,
-                        imagePath,
-                        fit: BoxFit.fill,
+              child: Stack(
+                children: [
+                  Container(
+                    height: 220,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey.shade400),
                       ),
+                    ),
+                    child: imagesPath.isEmpty
+                        ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                bottom: 40,
+                              ),
+                              child: Icon(
+                                Icons.add_photo_alternate_outlined,
+                                size: 40,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: pageController,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: imagesPath.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final path = imagesPath[index].path;
+                              return Image.asset(
+                                width: 430,
+                                height: 220,
+                                path,
+                                fit: BoxFit.fill,
+                              );
+                            },
+                          ),
+                  ),
+                  imagesPath.isEmpty
+                      ? Container()
+                      : Positioned(
+                          left: (MediaQuery.of(context).size.width / 2) -
+                              (imagesPath.length * 10),
+                          bottom: 10,
+                          child: Row(
+                            children: [
+                              Center(
+                                child: SmoothPageIndicator(
+                                  controller: pageController,
+                                  count: imagesPath.length,
+                                  effect: const SwapEffect(
+                                    dotHeight: 12,
+                                    dotWidth: 12,
+                                    dotColor: Color(0xFFA48AFF),
+                                    activeDotColor: Color(0xFF74D0FF),
+                                  ),
+                                  onDotClicked: (index) {
+                                    ref
+                                        .read(initialImagePageProvider.notifier)
+                                        .update((state) => index);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                ],
               ),
             ),
             Padding(
