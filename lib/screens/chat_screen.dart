@@ -10,7 +10,7 @@ class ChatScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chatRoomData = ref.watch(getChatRoomProvider);
+    final chatRoomData = ref.watch(getChatRoomProvider(1));
 
     void onChatRoomTap(int chatRoomId) {
       ref.refresh(getChatRoomDetailProvider(chatRoomId));
@@ -50,6 +50,7 @@ class ChatScreen extends ConsumerWidget {
                         }
 
                         final roomData = room['chat_rooms'][index];
+                        final roomType = roomData['type'];
                         final lastChat = roomData['last_chat'];
                         final lastChatTime = roomData['last_chat_time'];
 
@@ -61,14 +62,6 @@ class ChatScreen extends ConsumerWidget {
                           isCheck = roomNotificationData[0]['status'];
                         }
 
-                        final lessonData = roomData['lesson'];
-                        final lessonImage = lessonData['image_url'];
-                        final lessonTitle = lessonData['title'];
-
-                        final dancerData = lessonData['dancer'];
-                        final dancerEmail = dancerData['email'];
-                        final dancerNickname = dancerData['nickname'];
-                        final dancerImage = dancerData['image_url'];
                         return GestureDetector(
                           onTap: () {
                             print(roomData['id']);
@@ -92,19 +85,12 @@ class ChatScreen extends ConsumerWidget {
                                           ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(50),
-                                            child: lessonImage == null
-                                                ? Image.asset(
-                                                    width: 100,
-                                                    height: 100,
-                                                    fit: BoxFit.cover,
-                                                    'assets/images/app_logo/chat.png',
-                                                  )
-                                                : Image.network(
-                                                    width: 100,
-                                                    height: 100,
-                                                    fit: BoxFit.cover,
-                                                    lessonImage,
-                                                  ),
+                                            child: Image.asset(
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                              'assets/images/app_logo/chat.png',
+                                            ),
                                           ),
                                           isCheck == 0
                                               ? Positioned(
@@ -131,9 +117,9 @@ class ChatScreen extends ConsumerWidget {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            lessonTitle,
-                                            style: const TextStyle(
+                                          const Text(
+                                            '유저 가져와야 함',
+                                            style: TextStyle(
                                               color: Color(0xff3F51B5),
                                               fontSize: 17,
                                             ),

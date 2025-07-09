@@ -95,7 +95,7 @@ class MainNavigationScreen extends ConsumerWidget {
               icon: Icons.chat_outlined,
               selectedIcon: Icons.chat,
               onTap: () {
-                ref.refresh(getChatRoomProvider);
+                ref.refresh(getChatRoomProvider(50));
                 return onTap(3);
               },
               selectedIndex: selectedIndex,

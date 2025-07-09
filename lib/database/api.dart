@@ -658,10 +658,10 @@ class ApiServices {
     return resultData;
   }
 
-  Future<dynamic> getChatRoom() async {
+  Future<dynamic> getChatRoom(int type) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/chat-room'),
+      Uri.parse('$baseUrl/chat-room?type=$type'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },

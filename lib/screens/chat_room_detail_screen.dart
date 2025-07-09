@@ -39,7 +39,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
           ),
           onPressed: () {
             Navigator.pop(context);
-            ref.refresh(getChatRoomProvider);
+            ref.refresh(getChatRoomProvider(50));
           },
         ),
       ),
@@ -397,7 +397,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                               if (result['result_code'] == 200) {
                                 ref.refresh(
                                     getChatRoomDetailProvider(chatRoomId));
-                                ref.refresh(getChatRoomProvider);
+                                ref.refresh(getChatRoomProvider(50));
                               }
 
                               // 스크롤 위치를 맨 아래로 이동 시킴

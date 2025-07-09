@@ -10,7 +10,7 @@ class LessonChatScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chatRoomData = ref.watch(getChatRoomProvider);
+    final chatRoomData = ref.watch(getChatRoomProvider(50));
 
     void onChatRoomTap(int chatRoomId) {
       ref.refresh(getChatRoomDetailProvider(chatRoomId));

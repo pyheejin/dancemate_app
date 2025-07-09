@@ -6,6 +6,7 @@ import 'package:dancemate_app/screens/chat_screen.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
+import 'package:dancemate_app/widgets/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -67,12 +68,14 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(width: 5),
           GestureDetector(
-            onTap: () {
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => const QuillScreen(),
-              //   ),
-              // );
+            onTap: () async {
+              await FlutterLocalNotification.init();
+              // 3초 후 권한 요청
+              Future.delayed(
+                const Duration(seconds: 1),
+                FlutterLocalNotification.requestNotificationPermission(),
+              );
+              FlutterLocalNotification.showNotification();
             },
             child: const Icon(
               Icons.notifications_outlined,

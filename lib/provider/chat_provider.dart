@@ -1,10 +1,11 @@
 import 'package:dancemate_app/database/api.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final getChatRoomProvider = FutureProvider<dynamic>((ref) async {
+final getChatRoomProvider =
+    FutureProvider.family<dynamic, int>((ref, type) async {
   final ApiServices api = ApiServices();
 
-  final result = await api.getChatRoom();
+  final result = await api.getChatRoom(type);
   return result;
 });
 
