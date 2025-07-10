@@ -1,16 +1,17 @@
 import 'package:dancemate_app/provider/chat_provider.dart';
 import 'package:dancemate_app/screens/chat_room_detail_screen.dart';
+import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LessonChatScreen extends ConsumerWidget {
-  const LessonChatScreen({
+class ChatRoomScreen extends ConsumerWidget {
+  const ChatRoomScreen({
     super.key,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chatRoomData = ref.watch(getChatRoomProvider(50));
+    final chatRoomData = ref.watch(getChatRoomProvider(1));
 
     void onChatRoomTap(int chatRoomId) {
       ref.refresh(getChatRoomDetailProvider(chatRoomId));
@@ -25,8 +26,22 @@ class LessonChatScreen extends ConsumerWidget {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('수업톡'),
+        automaticallyImplyLeading: true,
+        title: const Text('DM'),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.chevron_left,
+            size: 30,
+          ),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const MainNavigationScreen(),
+              ),
+            );
+            ref.refresh(getChatRoomProvider(1));
+          },
+        ),
       ),
       body: Column(
         children: [
@@ -52,23 +67,18 @@ class LessonChatScreen extends ConsumerWidget {
                         final roomData = room['chat_rooms'][index];
                         final lastChat = roomData['last_chat'];
                         final lastChatTime = roomData['last_chat_time'];
-
                         final roomNotificationData =
                             roomData['room_notification'];
+
+                        final friendData = roomData['friend'];
+                        final friendNickname = friendData['nickname'];
+                        final friendImageUrl = friendData['image_url'];
 
                         int isCheck = 0;
                         if (roomNotificationData.isNotEmpty) {
                           isCheck = roomNotificationData[0]['status'];
                         }
 
-                        final lessonData = roomData['lesson'];
-                        final lessonImage = lessonData['image_url'];
-                        final lessonTitle = lessonData['title'];
-
-                        final dancerData = lessonData['dancer'];
-                        final dancerEmail = dancerData['email'];
-                        final dancerNickname = dancerData['nickname'];
-                        final dancerImage = dancerData['image_url'];
                         return GestureDetector(
                           onTap: () {
                             print(roomData['id']);
@@ -92,19 +102,21 @@ class LessonChatScreen extends ConsumerWidget {
                                           ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(50),
-                                            child: lessonImage == null
-                                                ? Image.asset(
-                                                    width: 100,
-                                                    height: 100,
-                                                    fit: BoxFit.cover,
-                                                    'assets/images/app_logo/chat.png',
-                                                  )
-                                                : Image.network(
-                                                    width: 100,
-                                                    height: 100,
-                                                    fit: BoxFit.cover,
-                                                    lessonImage,
-                                                  ),
+                                            child:
+                                                friendImageUrl.split(':')[0] ==
+                                                        'https'
+                                                    ? Image.network(
+                                                        width: 100,
+                                                        height: 100,
+                                                        fit: BoxFit.cover,
+                                                        friendImageUrl,
+                                                      )
+                                                    : Image.asset(
+                                                        width: 100,
+                                                        height: 100,
+                                                        fit: BoxFit.cover,
+                                                        'assets/images/app_logo/chat.png',
+                                                      ),
                                           ),
                                           isCheck == 0
                                               ? Positioned(
@@ -132,7 +144,7 @@ class LessonChatScreen extends ConsumerWidget {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            lessonTitle,
+                                            friendNickname,
                                             style: const TextStyle(
                                               color: Color(0xff3F51B5),
                                               fontSize: 17,

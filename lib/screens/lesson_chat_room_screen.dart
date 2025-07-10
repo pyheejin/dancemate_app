@@ -1,23 +1,24 @@
 import 'package:dancemate_app/provider/chat_provider.dart';
-import 'package:dancemate_app/screens/chat_room_detail_screen.dart';
+import 'package:dancemate_app/screens/lesson_chat_room_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ChatScreen extends ConsumerWidget {
-  const ChatScreen({
+class LessonChatRoomScreen extends ConsumerWidget {
+  const LessonChatRoomScreen({
     super.key,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chatRoomData = ref.watch(getChatRoomProvider(1));
+    final chatRoomData = ref.watch(getChatRoomProvider(50));
 
     void onChatRoomTap(int chatRoomId) {
       ref.refresh(getChatRoomDetailProvider(chatRoomId));
 
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => ChatRoomDetailScreen(chatRoomId: chatRoomId),
+          builder: (context) =>
+              LessonChatRoomDetailScreen(chatRoomId: chatRoomId),
         ),
       );
     }
@@ -25,8 +26,8 @@ class ChatScreen extends ConsumerWidget {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        automaticallyImplyLeading: true,
-        title: const Text('DM'),
+        automaticallyImplyLeading: false,
+        title: const Text('수업톡'),
       ),
       body: Column(
         children: [
@@ -50,7 +51,6 @@ class ChatScreen extends ConsumerWidget {
                         }
 
                         final roomData = room['chat_rooms'][index];
-                        final roomType = roomData['type'];
                         final lastChat = roomData['last_chat'];
                         final lastChatTime = roomData['last_chat_time'];
 
@@ -62,6 +62,14 @@ class ChatScreen extends ConsumerWidget {
                           isCheck = roomNotificationData[0]['status'];
                         }
 
+                        final lessonData = roomData['lesson'];
+                        final lessonImage = lessonData['image_url'];
+                        final lessonTitle = lessonData['title'];
+
+                        final dancerData = lessonData['dancer'];
+                        final dancerEmail = dancerData['email'];
+                        final dancerNickname = dancerData['nickname'];
+                        final dancerImage = dancerData['image_url'];
                         return GestureDetector(
                           onTap: () {
                             print(roomData['id']);
@@ -85,12 +93,19 @@ class ChatScreen extends ConsumerWidget {
                                           ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(50),
-                                            child: Image.asset(
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              'assets/images/app_logo/chat.png',
-                                            ),
+                                            child: lessonImage == null
+                                                ? Image.asset(
+                                                    width: 100,
+                                                    height: 100,
+                                                    fit: BoxFit.cover,
+                                                    'assets/images/app_logo/chat.png',
+                                                  )
+                                                : Image.network(
+                                                    width: 100,
+                                                    height: 100,
+                                                    fit: BoxFit.cover,
+                                                    lessonImage,
+                                                  ),
                                           ),
                                           isCheck == 0
                                               ? Positioned(
@@ -117,9 +132,9 @@ class ChatScreen extends ConsumerWidget {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          const Text(
-                                            '유저 가져와야 함',
-                                            style: TextStyle(
+                                          Text(
+                                            lessonTitle,
+                                            style: const TextStyle(
                                               color: Color(0xff3F51B5),
                                               fontSize: 17,
                                             ),

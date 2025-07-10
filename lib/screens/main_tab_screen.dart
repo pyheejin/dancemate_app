@@ -5,7 +5,7 @@ import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/search_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/calendar_screen.dart';
-import 'package:dancemate_app/screens/lesson_chat_screen.dart';
+import 'package:dancemate_app/screens/lesson_chat_room_screen.dart';
 import 'package:dancemate_app/screens/home_screen.dart';
 import 'package:dancemate_app/screens/profile_screen.dart';
 import 'package:dancemate_app/screens/search_screen.dart';
@@ -42,7 +42,7 @@ class MainNavigationScreen extends ConsumerWidget {
           ),
           Offstage(
             offstage: selectedIndex != 3,
-            child: const LessonChatScreen(),
+            child: const LessonChatRoomScreen(),
           ),
           Offstage(
             offstage: selectedIndex != 4,

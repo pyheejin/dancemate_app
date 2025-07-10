@@ -1,6 +1,7 @@
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:dancemate_app/screens/chat_room_create_screen.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/screens/setting_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
@@ -27,6 +28,17 @@ class UserDetailScreen extends ConsumerWidget {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => CourseDetailScreen(courseId: courseId),
+        ),
+      );
+    }
+
+    void onChatTap(String nickname) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ChatRoomCreateScreen(
+            userId: userId,
+            nickname: nickname,
+          ),
         ),
       );
     }
@@ -72,6 +84,8 @@ class UserDetailScreen extends ConsumerWidget {
                         if (dataList['user'] == null) {
                           return Container();
                         } else {
+                          final userId = dataList['user']['id'];
+                          final nickname = dataList['user']['nickname'];
                           final imageUrl = dataList['user']['image_url'];
 
                           return Row(
@@ -109,22 +123,27 @@ class UserDetailScreen extends ConsumerWidget {
                                           ),
                                         ),
                                         const SizedBox(width: 10),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFA48AFF),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: const Padding(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 5,
-                                              horizontal: 20,
+                                        GestureDetector(
+                                          onTap: () {
+                                            onChatTap(nickname);
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFA48AFF),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                             ),
-                                            child: Text(
-                                              '메시지',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
+                                            child: const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                vertical: 5,
+                                                horizontal: 20,
+                                              ),
+                                              child: Text(
+                                                '메시지',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
                                           ),

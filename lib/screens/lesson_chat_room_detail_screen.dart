@@ -1,12 +1,11 @@
 import 'package:dancemate_app/provider/chat_provider.dart';
-import 'package:dancemate_app/screens/chat_room_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ChatRoomDetailScreen extends ConsumerWidget {
+class LessonChatRoomDetailScreen extends ConsumerWidget {
   final int chatRoomId;
 
-  const ChatRoomDetailScreen({
+  const LessonChatRoomDetailScreen({
     super.key,
     required this.chatRoomId,
   });
@@ -20,12 +19,10 @@ class ChatRoomDetailScreen extends ConsumerWidget {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        centerTitle: true,
         automaticallyImplyLeading: true,
         title: chatRoomData.when(
           data: (room) {
-            final nickname = room['chat_room']['friend']['nickname'];
-            return Text(nickname);
+            return Text(room['lesson']['title']);
           },
           loading: () => const CircularProgressIndicator(),
           error: (error, stack) {
@@ -41,24 +38,10 @@ class ChatRoomDetailScreen extends ConsumerWidget {
             size: 30,
           ),
           onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const ChatRoomScreen(),
-              ),
-            );
-            ref.refresh(getChatRoomProvider(1));
+            Navigator.pop(context);
+            ref.refresh(getChatRoomProvider(50));
           },
         ),
-        actions: [
-          GestureDetector(
-            onTap: () async {},
-            child: const Icon(
-              Icons.notifications_outlined,
-              size: 27,
-            ),
-          ),
-          const SizedBox(width: 5),
-        ],
       ),
       body: Column(
         children: [
@@ -77,6 +60,10 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                     Expanded(
                       child: chatRoomData.when(
                         data: (room) {
+                          final roomData = room['chat_room'];
+                          final lessonData = roomData['lesson'];
+                          final dancerData = lessonData['dancer'];
+                          final dancerId = dancerData['id'];
                           return Align(
                             alignment: Alignment.topCenter,
                             child: ListView.builder(
@@ -86,16 +73,6 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                               controller: scrollController,
                               itemCount: room['chats'].length,
                               itemBuilder: (context, index) {
-                                final userData = room['chat_room']['user'];
-                                final userId = userData['id'];
-                                final userNickname = userData['nickname'];
-                                final userImageUrl = userData['image_url'];
-
-                                final friendData = room['chat_room']['friend'];
-                                final friendId = friendData['id'];
-                                final friendNickname = friendData['nickname'];
-                                final friendImageUrl = friendData['image_url'];
-
                                 final chatData = room['chats'][index];
                                 final date = chatData['date'];
                                 final chatList = chatData['chat_list'];
@@ -127,8 +104,12 @@ class ChatRoomDetailScreen extends ConsumerWidget {
 
                                         final loginUserId =
                                             chatData['login_user_id'];
-                                        final chatUserId =
-                                            chatData['user']['id'];
+
+                                        final userData = chatData['user'];
+                                        final userId = userData['id'];
+                                        final imageUrl = userData['image_url'];
+                                        final userNickname =
+                                            userData['nickname'];
 
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -137,14 +118,12 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                           child: chatType ==
                                                   1 // 채팅 메시지이면 1, 공지나 날짜이면 99(가운데 정렬)
                                               ? Row(
-                                                  mainAxisAlignment:
-                                                      chatUserId == loginUserId
-                                                          ? MainAxisAlignment
-                                                              .end
-                                                          : MainAxisAlignment
-                                                              .start,
+                                                  mainAxisAlignment: userId ==
+                                                          loginUserId
+                                                      ? MainAxisAlignment.end
+                                                      : MainAxisAlignment.start,
                                                   children: [
-                                                    chatUserId == loginUserId
+                                                    userId == loginUserId
                                                         ? Row(
                                                             crossAxisAlignment:
                                                                 CrossAxisAlignment
@@ -200,32 +179,53 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                                                 MainAxisAlignment
                                                                     .start,
                                                             children: [
-                                                              SizedBox(
+                                                              Container(
                                                                 width: 50,
                                                                 height: 50,
-                                                                child: friendImageUrl ==
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  border: Border
+                                                                      .all(
+                                                                    width: userId ==
+                                                                            dancerId
+                                                                        ? 2
+                                                                        : 1,
+                                                                    color: userId ==
+                                                                            dancerId
+                                                                        ? const Color(
+                                                                            0xFFA48AFF)
+                                                                        : Colors
+                                                                            .grey
+                                                                            .shade400,
+                                                                  ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              35),
+                                                                ),
+                                                                child: imageUrl ==
                                                                         ''
                                                                     ? const CircleAvatar(
                                                                         foregroundImage:
                                                                             AssetImage('assets/images/app_logo/chat.png'),
                                                                       )
-                                                                    : friendImageUrl.split(':')[0] ==
+                                                                    : imageUrl.split(':')[0] ==
                                                                             'https'
                                                                         ? CircleAvatar(
                                                                             radius:
                                                                                 50,
                                                                             foregroundImage:
-                                                                                NetworkImage(friendImageUrl),
-                                                                            // child:
-                                                                            //     Text(friendNickname),
+                                                                                NetworkImage(imageUrl),
+                                                                            child:
+                                                                                Text(userNickname),
                                                                           )
                                                                         : CircleAvatar(
                                                                             radius:
                                                                                 50,
                                                                             foregroundImage:
-                                                                                AssetImage(friendImageUrl),
+                                                                                AssetImage(imageUrl),
                                                                             child:
-                                                                                Text(friendNickname),
+                                                                                Text(userNickname),
                                                                           ),
                                                               ),
                                                               const SizedBox(
@@ -236,7 +236,22 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    friendNickname,
+                                                                    userNickname,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: userId ==
+                                                                              dancerId
+                                                                          ? const Color(
+                                                                              0xFFA48AFF)
+                                                                          : Colors
+                                                                              .black,
+                                                                      fontWeight: userId ==
+                                                                              dancerId
+                                                                          ? FontWeight
+                                                                              .bold
+                                                                          : FontWeight
+                                                                              .normal,
+                                                                    ),
                                                                   ),
                                                                   const SizedBox(
                                                                       height:
@@ -382,7 +397,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                               if (result['result_code'] == 200) {
                                 ref.refresh(
                                     getChatRoomDetailProvider(chatRoomId));
-                                ref.refresh(getChatRoomProvider(1));
+                                ref.refresh(getChatRoomProvider(50));
                               }
 
                               // 스크롤 위치를 맨 아래로 이동 시킴
