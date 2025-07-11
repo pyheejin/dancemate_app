@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:dancemate_app/provider/chat_provider.dart';
 import 'package:dancemate_app/screens/chat_room_screen.dart';
+import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ChatRoomDetailScreen extends ConsumerWidget {
   final int chatRoomId;
@@ -17,6 +21,17 @@ class ChatRoomDetailScreen extends ConsumerWidget {
     final TextEditingController chatController = TextEditingController();
     final chatRoomData = ref.watch(getChatRoomDetailProvider(chatRoomId));
 
+    void onNoticeTap() async {
+      final result = await ref
+          .read(chatRoomProvider.notifier)
+          .putChatRoomDetail(chatRoomId);
+      if (result['result_code'] == 200) {
+        ref.refresh(getChatRoomDetailProvider(chatRoomId));
+      } else {
+        errorAlert(context, result['result_msg']);
+      }
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -24,7 +39,17 @@ class ChatRoomDetailScreen extends ConsumerWidget {
         automaticallyImplyLeading: true,
         title: chatRoomData.when(
           data: (room) {
-            final nickname = room['chat_room']['friend']['nickname'];
+            final loginUserId = room['login_user_id'];
+
+            final userData = room['chat_room']['user'];
+            final userId = userData['id'];
+
+            final friendData = room['chat_room']['friend'];
+
+            String nickname = userData['nickname'];
+            if (loginUserId == userId) {
+              nickname = friendData['nickname'];
+            }
             return Text(nickname);
           },
           loading: () => const CircularProgressIndicator(),
@@ -51,10 +76,24 @@ class ChatRoomDetailScreen extends ConsumerWidget {
         ),
         actions: [
           GestureDetector(
-            onTap: () async {},
-            child: const Icon(
-              Icons.notifications_outlined,
-              size: 27,
+            onTap: onNoticeTap,
+            child: chatRoomData.when(
+              data: (room) {
+                final isNotice = room['is_notice'];
+                return Icon(
+                  isNotice == 1
+                      ? Icons.notifications_outlined
+                      : Icons.notifications_off_outlined,
+                  size: 27,
+                );
+              },
+              loading: () => const CircularProgressIndicator(),
+              error: (error, stack) {
+                return SizedBox(
+                  width: 300,
+                  child: Text('chat room detail actions error: $error'),
+                );
+              },
             ),
           ),
           const SizedBox(width: 5),
@@ -77,6 +116,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                     Expanded(
                       child: chatRoomData.when(
                         data: (room) {
+                          final loginUserId = room['login_user_id'];
                           return Align(
                             alignment: Alignment.topCenter,
                             child: ListView.builder(
@@ -93,8 +133,8 @@ class ChatRoomDetailScreen extends ConsumerWidget {
 
                                 final friendData = room['chat_room']['friend'];
                                 final friendId = friendData['id'];
-                                final friendNickname = friendData['nickname'];
-                                final friendImageUrl = friendData['image_url'];
+                                String friendNickname = friendData['nickname'];
+                                String friendImageUrl = friendData['image_url'];
 
                                 final chatData = room['chats'][index];
                                 final date = chatData['date'];
@@ -125,11 +165,20 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                         final chatTime = chatData['created_at']
                                             .split(' ')[1];
 
-                                        final loginUserId =
-                                            chatData['login_user_id'];
                                         final chatUserId =
                                             chatData['user']['id'];
 
+                                        if (chatUserId == loginUserId) {
+                                          friendNickname =
+                                              friendData['nickname'];
+                                          friendImageUrl =
+                                              friendData['image_url'];
+                                        } else {
+                                          friendNickname =
+                                              chatData['user']['nickname'];
+                                          friendImageUrl =
+                                              chatData['user']['image_url'];
+                                        }
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(
                                             vertical: 5,

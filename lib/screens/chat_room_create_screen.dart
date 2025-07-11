@@ -15,7 +15,6 @@ class ChatRoomCreateScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scrollController = ScrollController();
     final TextEditingController chatController = TextEditingController();
 
     return Scaffold(

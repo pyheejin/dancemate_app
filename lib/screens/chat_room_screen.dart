@@ -63,16 +63,28 @@ class ChatRoomScreen extends ConsumerWidget {
                         if (room['chat_rooms'].isEmpty) {
                           return Container();
                         }
+                        final loginUserId = room['login_user_id'];
 
                         final roomData = room['chat_rooms'][index];
+                        final chatUserId = roomData['user_id'];
                         final lastChat = roomData['last_chat'];
                         final lastChatTime = roomData['last_chat_time'];
                         final roomNotificationData =
                             roomData['room_notification'];
 
                         final friendData = roomData['friend'];
-                        final friendNickname = friendData['nickname'];
-                        final friendImageUrl = friendData['image_url'];
+                        String friendNickname = friendData['nickname'];
+                        String friendImageUrl = friendData['image_url'];
+
+                        final userData = roomData['user'];
+
+                        if (loginUserId == chatUserId) {
+                          friendNickname = friendData['nickname'];
+                          friendImageUrl = friendData['image_url'];
+                        } else {
+                          friendNickname = userData['nickname'];
+                          friendImageUrl = userData['image_url'];
+                        }
 
                         int isCheck = 0;
                         if (roomNotificationData.isNotEmpty) {
@@ -81,7 +93,6 @@ class ChatRoomScreen extends ConsumerWidget {
 
                         return GestureDetector(
                           onTap: () {
-                            print(roomData['id']);
                             onChatRoomTap(roomData['id']);
                           },
                           child: Padding(
