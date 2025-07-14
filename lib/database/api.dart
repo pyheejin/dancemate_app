@@ -720,6 +720,21 @@ class ApiServices {
     return result;
   }
 
+  Future<dynamic> deleteChatRoomDetail(int chatRoomId) async {
+    final accessToken = await getAccessToken();
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/chat-room/$chatRoomId'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+    final result = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return result;
+  }
+
   Future<dynamic> postChatRoomDetailChat(int chatRoomId, String message) async {
     final accessToken = await getAccessToken();
 

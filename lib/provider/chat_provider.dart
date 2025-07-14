@@ -34,6 +34,13 @@ class ChatRoomNotifier extends StateNotifier<dynamic> {
     return result;
   }
 
+  dynamic deleteChatRoomDetail(int chatRoomId) async {
+    final ApiServices api = ApiServices();
+
+    final result = await api.deleteChatRoomDetail(chatRoomId);
+    return result;
+  }
+
   dynamic postChatRoomDetailChat(int chatRoomId, String message) async {
     final ApiServices api = ApiServices();
 

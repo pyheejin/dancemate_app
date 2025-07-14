@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:dancemate_app/provider/chat_provider.dart';
 import 'package:dancemate_app/screens/chat_room_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ChatRoomDetailScreen extends ConsumerWidget {
   final int chatRoomId;
@@ -27,6 +24,18 @@ class ChatRoomDetailScreen extends ConsumerWidget {
           .putChatRoomDetail(chatRoomId);
       if (result['result_code'] == 200) {
         ref.refresh(getChatRoomDetailProvider(chatRoomId));
+      } else {
+        errorAlert(context, result['result_msg']);
+      }
+    }
+
+    void onExitTap() async {
+      final result = await ref
+          .read(chatRoomProvider.notifier)
+          .deleteChatRoomDetail(chatRoomId);
+      if (result['result_code'] == 200) {
+        Navigator.pop(context);
+        ref.refresh(getChatRoomProvider(1));
       } else {
         errorAlert(context, result['result_msg']);
       }
@@ -96,7 +105,26 @@ class ChatRoomDetailScreen extends ConsumerWidget {
               },
             ),
           ),
-          const SizedBox(width: 5),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: onExitTap,
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFA48AFF),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(5),
+                child: Text(
+                  '채팅방 나가기',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
         ],
       ),
       body: Column(
