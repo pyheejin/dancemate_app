@@ -78,8 +78,8 @@ class ReserveScreen extends ConsumerWidget {
                                     'assets/images/app_logo/2x.png',
                                   )
                                 : Image.network(
-                                    width: 170,
-                                    height: 200,
+                                    width: 120,
+                                    height: 120,
                                     fit: BoxFit.cover,
                                     courseImage,
                                   )
