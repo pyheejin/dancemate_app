@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "979856082985",
+    "project_id": "dance-mate-fc3af",
+    "storage_bucket": "dance-mate-fc3af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:979856082985:android:bca5f331c1f270dc3cb438",
+        "android_client_info": {
+          "package_name": "com.example.dancemate_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVsEZJZ7ispMe3iiKWDE59kdHLB2NN8W8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

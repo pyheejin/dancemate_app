@@ -2,6 +2,7 @@ import 'package:dancemate_app/provider/dancer_provider.dart';
 import 'package:dancemate_app/provider/order_provider.dart';
 import 'package:dancemate_app/provider/reserve_provider.dart';
 import 'package:dancemate_app/screens/order_complete_screen.dart';
+import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -40,7 +41,7 @@ class OrderScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('결제하기'),
+        title: const Text('티켓 결제하기'),
       ),
       body: SingleChildScrollView(
         child: ticketData.when(
@@ -415,6 +416,8 @@ class OrderScreen extends ConsumerWidget {
                     ),
                   ),
                 );
+              } else {
+                errorAlert(context, result['result_msg']);
               }
             },
             style: TextButton.styleFrom(

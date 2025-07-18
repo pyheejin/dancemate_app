@@ -7,6 +7,7 @@ import 'package:dancemate_app/screens/course_detail_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
 import 'package:dancemate_app/widgets/notification.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,27 +18,21 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeData = ref.watch(getHomeProvider);
 
-    void onDancerTap(int userId) {
-      final userData = ref.watch(getUserDetailProvider(userId));
+    void onDancerTap(int userId, int loginUserId) {
+      if (userId != loginUserId) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => UserDetailScreen(userId: userId),
+          ),
+        );
+      } else {
+        ref.read(mainTapProvider.notifier).update((state) => 4);
 
-      if (userData.value != null) {
-        final isMine = userData.value['is_mine'];
-
-        if (isMine == false) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => UserDetailScreen(userId: userId),
-            ),
-          );
-        } else {
-          ref.read(mainTapProvider.notifier).update((state) => 4);
-
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const MainNavigationScreen(),
-            ),
-          );
-        }
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const MainNavigationScreen(),
+          ),
+        );
       }
     }
 
@@ -69,13 +64,29 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(width: 5),
           GestureDetector(
             onTap: () async {
-              await FlutterLocalNotification.init();
-              // 3초 후 권한 요청
-              Future.delayed(
-                const Duration(seconds: 1),
-                FlutterLocalNotification.requestNotificationPermission(),
-              );
-              FlutterLocalNotification.showNotification();
+              // // FCM 토큰 발급받기
+              // final req = await FirebaseMessaging.instance.requestPermission(
+              //   alert: true,
+              //   badge: true,
+              //   sound: true,
+              // );
+
+              // final fcmToken = await FirebaseMessaging.instance.getAPNSToken();
+              // print(fcmToken);
+              // if (req.authorizationStatus == AuthorizationStatus.authorized &&
+              //     fcmToken != null) {
+              //   print('FCM Token: $fcmToken');
+              // } else {
+              //   print('FCM Token: null');
+              // }
+
+              // await FlutterLocalNotification.init();
+              // // 3초 후 권한 요청
+              // Future.delayed(
+              //   const Duration(seconds: 1),
+              //   FlutterLocalNotification.requestNotificationPermission(),
+              // );
+              // FlutterLocalNotification.showNotification();
             },
             child: const Icon(
               Icons.notifications_outlined,
@@ -110,13 +121,14 @@ class HomeScreen extends ConsumerWidget {
                         itemCount: homeData['recommend_users'].length,
                         itemBuilder: (context, index) {
                           final userData = homeData['recommend_users'][index];
+                          final loginUserId = homeData['login_user_id'];
 
                           final userId = userData['id'];
                           final imageUrl = userData['image_url'];
                           final nickname = userData['nickname'];
                           return GestureDetector(
                             onTap: () {
-                              onDancerTap(userId);
+                              onDancerTap(userId, loginUserId);
                             },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(

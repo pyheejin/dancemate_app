@@ -1,6 +1,7 @@
 import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/signup_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,20 @@ class LoginScreen extends ConsumerWidget {
             builder: (context) => const MainNavigationScreen(),
           ),
         );
+
+        // FCM 토큰 발급받기
+        final req = await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+        if (req.authorizationStatus == AuthorizationStatus.authorized &&
+            fcmToken != null) {
+          print('FCM Token: $fcmToken');
+        } else {
+          print('FCM Token: null');
+        }
       }
     }
 

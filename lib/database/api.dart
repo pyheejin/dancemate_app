@@ -303,7 +303,7 @@ class ApiServices {
     );
     final resultData =
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
-    final reserveCourses = resultData['lesson'];
+    final reserveCourses = resultData;
 
     return reserveCourses;
   }

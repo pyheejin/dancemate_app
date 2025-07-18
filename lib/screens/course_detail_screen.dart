@@ -23,40 +23,27 @@ class CourseDetailScreen extends ConsumerWidget {
 
     if (courseDetailData.value != null) {
       if (selectCourseDetailId == 0) {
-        selectCourseDetailId = courseDetailData.value['course'][0]['id'];
+        selectCourseDetailId =
+            courseDetailData.value['lesson']['course'][0]['id'];
       }
     }
 
-    void onReserveTap(int courseDetailId, int dancerId) async {
-      dynamic isCourseReserveExists =
-          ref.watch(postCourseDetailExistsProvider(selectCourseDetailId));
-
-      if (isCourseReserveExists.value != null) {
-        if (isCourseReserveExists.value['result_code'] > 200) {
-          errorAlert(context, isCourseReserveExists.value['result_msg']);
-        } else {
-          final ticketData = ref.watch(getUserTicketProvider(dancerId));
-
-          if (ticketData.hasValue) {
-            if (ticketData.value['result_count'] > 0) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ReserveScreen(courseDetailId: courseDetailId),
-                ),
-              );
-            } else {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => OrderScreen(
-                    courseDetailId: courseDetailId,
-                    dancerId: dancerId,
-                  ),
-                ),
-              );
-            }
-          }
-        }
+    void onReserveTap(int courseDetailId, int dancerId, int ticketCount) async {
+      if (ticketCount > 0) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ReserveScreen(courseDetailId: courseDetailId),
+          ),
+        );
+      } else {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => OrderScreen(
+              courseDetailId: courseDetailId,
+              dancerId: dancerId,
+            ),
+          ),
+        );
       }
     }
 
@@ -86,16 +73,16 @@ class CourseDetailScreen extends ConsumerWidget {
             );
           },
           data: (courseDetail) {
-            final lessonTitle = courseDetail['title'];
-            final lessonImages = courseDetail['lesson_image'];
-            final lessonDescription = courseDetail['description'];
+            final lessonTitle = courseDetail['lesson']['title'];
+            final lessonImages = courseDetail['lesson']['lesson_image'];
+            final lessonDescription = courseDetail['lesson']['description'];
 
-            final dancerData = courseDetail['dancer'];
+            final dancerData = courseDetail['lesson']['dancer'];
             final dancerEmail = dancerData['email'];
             final dancerNickname = dancerData['nickname'];
             final dancerImageUrl = dancerData['image_url'];
 
-            final courseDetailList = courseDetail['course'];
+            final courseDetailList = courseDetail['lesson']['course'];
             return Column(
               children: [
                 const SizedBox(height: 10),
@@ -355,7 +342,7 @@ class CourseDetailScreen extends ConsumerWidget {
                     );
                   },
                   data: (courseDetail) {
-                    final courseDetailList = courseDetail['course'];
+                    final courseDetailList = courseDetail['lesson']['course'];
 
                     return DecoratedBox(
                       decoration: BoxDecoration(
@@ -395,39 +382,53 @@ class CourseDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: TextButton(
-                  onPressed: () {
-                    if (courseDetailData.value != null) {
-                      final dancerId = courseDetailData.value['course'][0]
-                          ['lesson']['dancer']['id'];
-                      onReserveTap(selectCourseDetailId, dancerId);
-                    }
+                child: courseDetailData.when(
+                  loading: () => const CircularProgressIndicator(),
+                  error: (error, stack) {
+                    print(error);
+                    return SizedBox(
+                      width: 300,
+                      child: Text('error: $error'),
+                    );
                   },
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFA48AFF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 3,
-                      horizontal: 15,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '예약하기',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  data: (data) {
+                    return TextButton(
+                      onPressed: () {
+                        final dancerId = data['lesson']['dancer']['id'];
+                        final ticketCount = data['ticket_count'];
+                        onReserveTap(
+                          selectCourseDetailId,
+                          dancerId,
+                          ticketCount,
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xFFA48AFF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 3,
+                          horizontal: 15,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '예약하기',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
