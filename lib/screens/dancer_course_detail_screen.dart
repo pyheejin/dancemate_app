@@ -13,16 +13,16 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class DancerCourseDetailScreen extends ConsumerWidget {
-  final int courseId;
+  final int lessonId;
 
   const DancerCourseDetailScreen({
     super.key,
-    required this.courseId,
+    required this.lessonId,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final courseDetailData = ref.watch(getLessonDetailProvider(courseId));
+    final courseDetailData = ref.watch(getLessonDetailProvider(lessonId));
 
     List<XFile> imagesPath = ref.watch(selectLessonImagesPathProvider);
 
@@ -50,6 +50,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
 
     dynamic newDetailList = ref.watch(dancerCourseProvider);
     dynamic detailList = ref.watch(oldDancerCourseProvider);
+    // detailList ??= [];
 
     DateTime now = DateTime.now();
     TimeOfDay initialStartTime = TimeOfDay.now();
@@ -1586,7 +1587,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
 
       final result = await ref
           .read(dancerCourseProvider.notifier)
-          .updateCourse(courseId, detail);
+          .updateCourse(lessonId, detail);
 
       if (result != null) {
         if (result['result_code'] == 200) {
@@ -1596,7 +1597,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
           // 파일 경로를 통해 formData 생성
           FormData bodyData = FormData.fromMap({
             'bucket': 'lesson',
-            'lesson_id': courseId,
+            'lesson_id': lessonId,
             'images': images,
           });
 
@@ -1604,12 +1605,12 @@ class DancerCourseDetailScreen extends ConsumerWidget {
               await ref.watch(postImageUploadProvider(bodyData).future);
           final response = jsonDecode(result.toString());
           if (response['result_code'] == 200) {
-            ref.refresh(getLessonDetailProvider(courseId));
+            ref.refresh(getLessonDetailProvider(lessonId));
           } else {
             errorAlert(context, response['result_msg']);
           }
 
-          ref.refresh(getDancerCourseProvider);
+          ref.refresh(getDancerLessonProvider);
           ref.refresh(dancerCourseProvider);
           ref.refresh(oldDancerCourseProvider);
 
@@ -1636,7 +1637,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
             ),
             onPressed: () {
               ref.refresh(dancerCourseProvider);
-              ref.refresh(getLessonDetailProvider(courseId));
+              ref.refresh(getLessonDetailProvider(lessonId));
               ref.refresh(oldDancerCourseProvider);
 
               Navigator.pop(context);
@@ -1647,10 +1648,11 @@ class DancerCourseDetailScreen extends ConsumerWidget {
       body: SingleChildScrollView(
         child: courseDetailData.when(
           data: (courseData) {
-            titleController.text = courseData['title'];
-            descriptionController.text = courseData['description'];
-            dynamic lessonImages = courseData['lesson_image'];
+            titleController.text = courseData['lesson']['title'];
+            descriptionController.text = courseData['lesson']['description'];
+            dynamic lessonImages = courseData['lesson']['lesson_image'];
             int initialImagePage = ref.watch(initialImagePageProvider);
+            detailList ??= courseData['lesson']['course'];
 
             final pageController = PageController(
               initialPage: initialImagePage,
@@ -1916,7 +1918,7 @@ class DancerCourseDetailScreen extends ConsumerWidget {
                                   Expanded(
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        vertical: 5,
+                                        vertical: 10,
                                         horizontal: 5,
                                       ),
                                       child: Column(

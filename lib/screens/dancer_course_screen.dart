@@ -9,15 +9,15 @@ class DancerCourseScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final courseData = ref.watch(getDancerCourseProvider);
+    final lessonData = ref.watch(getDancerLessonProvider);
 
-    void onCourseTap(int courseId) {
+    void onLessonTap(int lessonId) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => DancerCourseDetailScreen(courseId: courseId),
+          builder: (context) => DancerCourseDetailScreen(lessonId: lessonId),
         ),
       );
-      ref.read(oldDancerCourseProvider.notifier).addCourseDetailList(courseId);
+      ref.read(oldDancerCourseProvider.notifier).addCourseDetailList(lessonId);
     }
 
     return Scaffold(
@@ -29,23 +29,23 @@ class DancerCourseScreen extends ConsumerWidget {
           // vertical: 10,
           horizontal: 10,
         ),
-        child: courseData.when(
-          data: (courseList) {
+        child: lessonData.when(
+          data: (lessonList) {
             return ListView.builder(
               padding: EdgeInsets.zero,
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
-              itemCount: courseList['lessons'].length,
+              itemCount: lessonList['lessons'].length,
               itemBuilder: (context, index) {
-                if (courseList['lessons'].isEmpty) {
+                if (lessonList['lessons'].isEmpty) {
                   return Container();
                 }
-                final courseData = courseList['lessons'][index];
-                final courseTitle = courseData['title'];
-                final courseImage = courseData['image_url'];
+                final lessonData = lessonList['lessons'][index];
+                final courseTitle = lessonData['title'];
+                final courseImage = lessonData['image_url'];
                 return GestureDetector(
                   onTap: () {
-                    onCourseTap(courseData['id']);
+                    onLessonTap(lessonData['id']);
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

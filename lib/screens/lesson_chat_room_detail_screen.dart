@@ -12,6 +12,7 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('chatRoomId: $chatRoomId');
     final scrollController = ScrollController();
     final TextEditingController chatController = TextEditingController();
     final chatRoomData = ref.watch(getChatRoomDetailProvider(chatRoomId));
@@ -19,10 +20,12 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
+        centerTitle: true,
         automaticallyImplyLeading: true,
         title: chatRoomData.when(
           data: (room) {
-            return Text(room['lesson']['title']);
+            String roomTitle = room['lesson']['title'];
+            return Text(roomTitle);
           },
           loading: () => const CircularProgressIndicator(),
           error: (error, stack) {
@@ -40,6 +43,154 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
           onPressed: () {
             Navigator.pop(context);
             ref.refresh(getChatRoomProvider(50));
+          },
+        ),
+      ),
+      endDrawer: Drawer(
+        child: chatRoomData.when(
+          data: (room) {
+            String roomTitle = room['lesson']['title'];
+            final dancerData = room['dancer'];
+            final dancerImageUrl = dancerData['image_url'];
+            final dancerNickname = dancerData['nickname'];
+            return Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 70),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          size: 30,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        roomTitle,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 2,
+                            color: const Color(0xFFA48AFF),
+                          ),
+                          borderRadius: BorderRadius.circular(35),
+                        ),
+                        child: dancerImageUrl == ''
+                            ? const CircleAvatar(
+                                foregroundImage: AssetImage(
+                                    'assets/images/app_logo/chat.png'),
+                              )
+                            : dancerImageUrl.split(':')[0] == 'https'
+                                ? CircleAvatar(
+                                    radius: 50,
+                                    foregroundImage:
+                                        NetworkImage(dancerImageUrl),
+                                  )
+                                : CircleAvatar(
+                                    radius: 50,
+                                    foregroundImage: AssetImage(dancerImageUrl),
+                                  ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        dancerNickname,
+                        style: const TextStyle(
+                          color: Color(0xFFA48AFF),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: room['reserve_users'].length,
+                      itemBuilder: (context, index) {
+                        final loginUserId = room['login_user_id'];
+                        final userData = room['reserve_users'][index]['user'];
+                        final userId = userData['id'];
+                        final userImageUrl = userData['image_url'];
+                        final userNickname = userData['nickname'];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 70,
+                                height: 70,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    width: 1,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                  borderRadius: BorderRadius.circular(35),
+                                ),
+                                child: userImageUrl == ''
+                                    ? const CircleAvatar(
+                                        foregroundImage: AssetImage(
+                                            'assets/images/app_logo/chat.png'),
+                                      )
+                                    : userImageUrl.split(':')[0] == 'https'
+                                        ? CircleAvatar(
+                                            radius: 50,
+                                            foregroundImage:
+                                                NetworkImage(userImageUrl),
+                                          )
+                                        : CircleAvatar(
+                                            radius: 50,
+                                            foregroundImage:
+                                                AssetImage(userImageUrl),
+                                          ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                userNickname,
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  color: userId == loginUserId
+                                      ? const Color(0xFF74D0FF)
+                                      : Colors.black54,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stack) {
+            return SizedBox(
+              width: 300,
+              child: Text('chat room detail error: $error'),
+            );
           },
         ),
       ),
@@ -216,8 +367,8 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
                                                                                 50,
                                                                             foregroundImage:
                                                                                 NetworkImage(imageUrl),
-                                                                            child:
-                                                                                Text(userNickname),
+                                                                            // child:
+                                                                            //     Text(userNickname),
                                                                           )
                                                                         : CircleAvatar(
                                                                             radius:

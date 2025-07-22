@@ -293,16 +293,12 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                                                                 50,
                                                                             foregroundImage:
                                                                                 NetworkImage(friendImageUrl),
-                                                                            // child:
-                                                                            //     Text(friendNickname),
                                                                           )
                                                                         : CircleAvatar(
                                                                             radius:
                                                                                 50,
                                                                             foregroundImage:
                                                                                 AssetImage(friendImageUrl),
-                                                                            child:
-                                                                                Text(friendNickname),
                                                                           ),
                                                               ),
                                                               const SizedBox(

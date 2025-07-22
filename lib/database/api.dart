@@ -493,7 +493,7 @@ class ApiServices {
     return resultData;
   }
 
-  Future<dynamic> getDancerCourse() async {
+  Future<dynamic> getDancerLesson() async {
     final accessToken = await getAccessToken();
     final response = await http.get(
       Uri.parse('$baseUrl/dancer/lesson'),

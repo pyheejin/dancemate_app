@@ -1148,13 +1148,13 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
               await ref.watch(postImageUploadProvider(bodyData).future);
           final response = jsonDecode(imageResult.toString());
           if (response['result_code'] == 200) {
-            ref.refresh(getDancerCourseProvider);
+            ref.refresh(getDancerLessonProvider);
           } else {
             errorAlert(context, response['result_msg']);
           }
 
           Navigator.pop(context);
-          ref.refresh(getDancerCourseProvider);
+          ref.refresh(getDancerLessonProvider);
           ref.refresh(dancerCourseProvider);
         } else {
           errorAlert(context, result['result_msg']);

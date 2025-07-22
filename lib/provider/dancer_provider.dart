@@ -9,10 +9,10 @@ final getDancerDetailTicketProvider =
   return result;
 });
 
-final getDancerCourseProvider = FutureProvider<dynamic>((ref) async {
+final getDancerLessonProvider = FutureProvider<dynamic>((ref) async {
   final ApiServices api = ApiServices();
 
-  final result = await api.getDancerCourse();
+  final result = await api.getDancerLesson();
   return result;
 });
 
