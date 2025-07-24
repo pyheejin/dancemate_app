@@ -605,6 +605,20 @@ class ApiServices {
     return resultData;
   }
 
+  Future<dynamic> getTicketSalesList() async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/ticket/sales'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+
+    return resultData;
+  }
+
   Future<dynamic> getReviewDetail(int reviewId) async {
     final accessToken = await getAccessToken();
     final response = await http.get(

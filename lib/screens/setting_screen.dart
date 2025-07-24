@@ -9,6 +9,7 @@ import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/screens/notification_screen.dart';
 import 'package:dancemate_app/screens/qna_screen.dart';
 import 'package:dancemate_app/screens/ticket_history_screen.dart';
+import 'package:dancemate_app/screens/ticket_sales_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -78,6 +79,12 @@ class SettingScreen extends ConsumerWidget {
                 ? const SettingMenu(
                     name: '티켓 관리',
                     screen: DancerTicketScreen(),
+                  )
+                : Container(),
+            isDancer
+                ? const SettingMenu(
+                    name: '티켓 판매 내역',
+                    screen: TicketSalesScreen(),
                   )
                 : Container(),
             Container(
