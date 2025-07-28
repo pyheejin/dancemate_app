@@ -605,10 +605,10 @@ class ApiServices {
     return resultData;
   }
 
-  Future<dynamic> getTicketSalesList() async {
+  Future<dynamic> getTicketSalesList(int year, int month) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/ticket/sales'),
+      Uri.parse('$baseUrl/ticket/sales?year=$year&month=$month'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
