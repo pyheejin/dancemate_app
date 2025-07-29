@@ -1,6 +1,5 @@
 import 'package:dancemate_app/provider/ticket_provider.dart';
 import 'package:dancemate_app/screens/ticket_sales_detail_screen.dart';
-import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -10,14 +9,14 @@ class TicketSalesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    List<int> args = [0, 0];
+    String args = '0-0';
     final ticketData = ref.watch(getTicketSalesProvider(args));
     NumberFormat format = NumberFormat('###,###,###,###');
 
-    void onMonthTap(int year, int month) {
+    void onMonthTap(String date) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => TicketSalesDetailScreen(args: args),
+          builder: (context) => TicketSalesDetailScreen(args: date),
         ),
       );
     }
@@ -25,20 +24,6 @@ class TicketSalesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('티켓 판매내역'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15,
-            ),
-            child: GestureDetector(
-              onTap: () {},
-              child: const Icon(
-                Icons.sort_rounded,
-                size: 25,
-              ),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -46,7 +31,7 @@ class TicketSalesScreen extends ConsumerWidget {
           horizontal: 20,
         ),
         child: ticketData.when(
-          loading: () => const CircularProgressIndicator(),
+          loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) {
             print(error);
             return SizedBox(
@@ -80,7 +65,7 @@ class TicketSalesScreen extends ConsumerWidget {
                           final price = monthList[index]['total_price'];
                           return GestureDetector(
                             onTap: () {
-                              onMonthTap(year, month);
+                              onMonthTap('$year-$month');
                             },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
