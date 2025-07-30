@@ -9,7 +9,7 @@ class TicketSalesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    String args = '0-0';
+    String args = '0-0-1';
     final ticketData = ref.watch(getTicketSalesProvider(args));
     NumberFormat format = NumberFormat('###,###,###,###');
 
@@ -42,10 +42,11 @@ class TicketSalesScreen extends ConsumerWidget {
           data: (dataList) {
             return ListView.builder(
               shrinkWrap: true,
-              itemCount: dataList['tickets'].length,
+              itemCount: dataList.length,
+              // controller: scrollController,
               itemBuilder: (context, index) {
-                final year = dataList['tickets'][index]['year'];
-                final monthList = dataList['tickets'][index]['month_list'];
+                final year = dataList[index]['year'];
+                final monthList = dataList[index]['month_list'];
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                     vertical: 5,

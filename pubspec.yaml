@@ -63,6 +63,8 @@ dependencies:
 
   firebase_messaging: ^15.2.9
 
+  riverpod_annotation: ^2.6.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
