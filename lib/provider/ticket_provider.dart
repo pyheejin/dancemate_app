@@ -17,7 +17,7 @@ final getTicketSalesProvider =
 });
 
 // 상태를 관리할 AsyncNotifier
-class ItemListNotifier extends AsyncNotifier<dynamic> {
+class TicketListNotifier extends FamilyAsyncNotifier<dynamic, String> {
   final ApiServices api = ApiServices();
 
   final int _itemsPerPage = 4; // 한 번에 로드할 아이템 수
@@ -25,19 +25,16 @@ class ItemListNotifier extends AsyncNotifier<dynamic> {
   bool _noMoreData = false;
 
   @override
-  Future<dynamic> build() async {
+  Future<dynamic> build(String args) async {
     // 초기 데이터 로드
-    return _fetchItems(_currentPage);
+    int year = int.parse(args.split('-')[0]);
+    int month = int.parse(args.split('-')[1]);
+    return _fetchItems(_currentPage, year, month);
   }
 
-  Future<dynamic> _fetchItems(int page) async {
-    // 실제 API 호출 로직 (예시)
-    await Future.delayed(const Duration(seconds: 1)); // 네트워크 지연 시뮬레이션
-    final int startIndex = page * _itemsPerPage;
-    final int endIndex = startIndex + _itemsPerPage;
+  Future<dynamic> _fetchItems(int page, int year, int month) async {
+    final result = await api.getTicketSalesList(page, year, month);
 
-    final result = await api.getTicketSalesList(2025, 5, page);
-    print('result: ${result.length}');
     if (result != null) {
       if (result.length < _itemsPerPage) {
         _noMoreData = true;
@@ -46,8 +43,9 @@ class ItemListNotifier extends AsyncNotifier<dynamic> {
     }
   }
 
-  Future<void> loadMoreItems() async {
-    if (state.isLoading || _noMoreData) return; // 이미 로딩 중이거나 더 이상 데이터가 없으면 중단
+  Future<void> loadMoreItems(int year, int month) async {
+    // 이미 로딩 중이거나 더 이상 데이터가 없으면 중단
+    if (state.isLoading || _noMoreData) return;
 
     state = const AsyncValue.loading(); // 로딩 상태로 변경
 
@@ -61,7 +59,7 @@ class ItemListNotifier extends AsyncNotifier<dynamic> {
 
     try {
       _currentPage++;
-      final newItems = await _fetchItems(_currentPage);
+      final newItems = await _fetchItems(_currentPage, year, month);
 
       state = AsyncValue.data([
         ...currentData, // 기존 데이터 유지
@@ -74,6 +72,7 @@ class ItemListNotifier extends AsyncNotifier<dynamic> {
 }
 
 // Provider 선언
-final itemListProvider = AsyncNotifierProvider<ItemListNotifier, dynamic>(() {
-  return ItemListNotifier();
+final ticketListProvider =
+    AsyncNotifierProvider.family<TicketListNotifier, dynamic, String>(() {
+  return TicketListNotifier();
 });

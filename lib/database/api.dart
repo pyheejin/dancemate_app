@@ -605,7 +605,7 @@ class ApiServices {
     return resultData;
   }
 
-  Future<dynamic> getTicketSalesList(int year, int month, int page) async {
+  Future<dynamic> getTicketSalesList(int page, int year, int month) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
       Uri.parse('$baseUrl/ticket/sales?year=$year&month=$month&page=$page'),

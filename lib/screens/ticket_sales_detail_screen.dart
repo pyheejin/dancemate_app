@@ -33,10 +33,15 @@ class _TicketSalesDetailScreenState
 
   // 4. 스크롤 이벤트 핸들러 메서드 생성
   void _onScroll() {
+    int year = int.parse(widget.args.split('-')[0]);
+    int month = int.parse(widget.args.split('-')[1]);
+
     // 스크롤이 끝에 도달했는지 확인
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      ref.read(itemListProvider.notifier).loadMoreItems();
+      ref
+          .read(ticketListProvider(widget.args).notifier)
+          .loadMoreItems(year, month);
     }
   }
 
@@ -59,7 +64,8 @@ class _TicketSalesDetailScreenState
 
     int year = int.parse(widget.args.split('-')[0]);
     int month = int.parse(widget.args.split('-')[1]);
-    final ticketData = ref.watch(itemListProvider);
+
+    final ticketData = ref.watch(ticketListProvider(widget.args));
     NumberFormat format = NumberFormat('###,###,###,###');
 
     void onRefundTap() {}
