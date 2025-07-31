@@ -2,20 +2,6 @@ import 'package:dancemate_app/database/api.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-// part 'data_provider.g.dart';
-
-final getTicketSalesProvider =
-    FutureProvider.family<dynamic, String>((ref, args) async {
-  final ApiServices api = ApiServices();
-
-  int year = int.parse(args.split('-')[0]);
-  int month = int.parse(args.split('-')[1]);
-  int page = int.parse(args.split('-')[2]);
-
-  final result = await api.getTicketSalesList(year, month, page);
-  return result;
-});
-
 // 상태를 관리할 AsyncNotifier
 class TicketListNotifier extends FamilyAsyncNotifier<dynamic, String> {
   final ApiServices api = ApiServices();
