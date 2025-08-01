@@ -1,10 +1,15 @@
+import 'package:dancemate_app/database/model.dart';
+import 'package:dancemate_app/google_sign_in_service.dart';
 import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/signup_screen.dart';
+import 'package:dancemate_app/widgets/error.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
+
+enum UserType { Dancer, Mate }
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({
@@ -36,18 +41,79 @@ class LoginScreen extends ConsumerWidget {
           ),
         );
 
-        // FCM 토큰 발급받기
-        final req = await FirebaseMessaging.instance.requestPermission(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-        final fcmToken = await FirebaseMessaging.instance.getToken();
-        if (req.authorizationStatus == AuthorizationStatus.authorized &&
-            fcmToken != null) {
-          print('FCM Token: $fcmToken');
-        } else {
-          print('FCM Token: null');
+        // // FCM 토큰 발급받기
+        // final req = await FirebaseMessaging.instance.requestPermission(
+        //   alert: true,
+        //   badge: true,
+        //   sound: true,
+        // );
+        // final fcmToken = await FirebaseMessaging.instance.getToken();
+        // if (req.authorizationStatus == AuthorizationStatus.authorized &&
+        //     fcmToken != null) {
+        //   print('FCM Token: $fcmToken');
+        // } else {
+        //   print('FCM Token: null');
+        // }
+      }
+    }
+
+    void onSocialLoginTap(int method) async {
+      final GoogleSignInService signInService = GoogleSignInService();
+      final account = await signInService.signInWithGoogle();
+      if (account != null) {
+        if (account.additionalUserInfo != null) {
+          final isNewUser = account.additionalUserInfo!.isNewUser;
+          final credential = '${account.credential!.token}';
+
+          final userData = account.additionalUserInfo!.profile;
+          final email = userData!['email'];
+          final password = '${account.credential!.token}';
+          final nickname = userData['given_name'];
+          final name = userData['name'];
+          final imageUrl = userData['picture'];
+          const phone = '';
+          const introduction = '';
+          if (isNewUser) {
+            // 신규 회원일 경우에만 회원가입 진행
+            UserModel user = UserModel(
+              type: 1,
+              method: method,
+              email: email,
+              password: password,
+              nickname: nickname,
+              name: name,
+              phone: phone,
+              introduction: introduction,
+              imageUrl: imageUrl,
+            );
+
+            final result = await ref.watch(postUserJoinProvider(user).future);
+            if (result['result_code'] == 200) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const MainNavigationScreen(),
+                ),
+              );
+            } else {
+              errorAlert(context, result['result_msg']);
+            }
+          } else {
+            List<dynamic> args = [
+              email,
+              credential,
+            ];
+            final result = await ref.watch(postUserLoginProvider(args).future);
+
+            if (result['result_code'] == 200) {
+              ref.read(mainTapProvider.notifier).update((state) => 0);
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const MainNavigationScreen(),
+                ),
+              );
+            }
+          }
         }
       }
     }
@@ -228,10 +294,15 @@ class LoginScreen extends ConsumerWidget {
                     height: 60,
                     child: Image.asset('assets/images/kakao_logo.png'),
                   ),
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: Image.asset('assets/images/google_logo.png'),
+                  GestureDetector(
+                    onTap: () {
+                      onSocialLoginTap(2);
+                    },
+                    child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: Image.asset('assets/images/google_logo.png'),
+                    ),
                   ),
                   SizedBox(
                     width: 60,

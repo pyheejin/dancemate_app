@@ -1,6 +1,7 @@
 import 'package:dancemate_app/database/model.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
+import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,14 +24,6 @@ class SignUpScreen extends ConsumerWidget {
 
     UserType userType = UserType.Mate;
 
-    void showSnackBar(BuildContext context, Text text) {
-      final snackBar = SnackBar(
-        content: text,
-        backgroundColor: Colors.red,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-
     void onSignUpTap() async {
       final email = emailController.text;
       final password = passwordController.text;
@@ -41,12 +34,14 @@ class SignUpScreen extends ConsumerWidget {
 
       UserModel userData = UserModel(
         type: userType == UserType.Dancer ? 50 : 1,
+        method: 1,
         email: email,
         password: password,
         nickname: nickname,
         name: name,
         phone: phone,
         introduction: introduction,
+        imageUrl: '',
       );
 
       final result = await ref.watch(postUserJoinProvider(userData).future);
@@ -57,7 +52,7 @@ class SignUpScreen extends ConsumerWidget {
           ),
         );
       } else {
-        showSnackBar(context, const Text('회원가입 실패'));
+        errorAlert(context, result['result_msg']);
       }
     }
 

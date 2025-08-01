@@ -78,12 +78,14 @@ class ApiServices {
       },
       body: json.encode({
         'type': userData.type,
+        'method': userData.method,
         'name': userData.name,
         'nickname': userData.nickname,
         'email': userData.email,
         'password': userData.password,
         'phone': userData.phone,
         'introduction': userData.introduction,
+        'image_url': userData.imageUrl,
       }),
     );
     final resultData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -105,6 +107,7 @@ class ApiServices {
         final payload = jsonEncode({
           'email': userData.email,
           'access_token': accessToken,
+          'userType': userData.type,
         });
 
         await storage.write(

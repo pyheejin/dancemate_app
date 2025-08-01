@@ -385,6 +385,7 @@ class ProfileScreen extends ConsumerWidget {
                       child: userProfile.when(
                         data: (dataList) {
                           final imageUrl = dataList['image_url'];
+
                           final nickname = dataList['nickname'];
                           final introduction = dataList['introduction'];
 
@@ -400,42 +401,54 @@ class ProfileScreen extends ConsumerWidget {
                                       GestureDetector(
                                         onTap: onProfileImageTap,
                                         child: Container(
-                                          child: imageUrl == ''
-                                              ? imagePath != ''
-                                                  ? CircleAvatar(
-                                                      radius: 50,
-                                                      foregroundImage:
-                                                          AssetImage(imagePath),
-                                                      child: Text(nickname),
-                                                    )
-                                                  : const CircleAvatar(
-                                                      radius: 50,
-                                                      foregroundImage: AssetImage(
-                                                          'assets/images/app_logo/chat.png'),
-                                                    )
-                                              : imagePath != ''
-                                                  ? CircleAvatar(
-                                                      radius: 50,
-                                                      foregroundImage:
-                                                          AssetImage(imagePath),
-                                                      child: Text(nickname),
-                                                    )
-                                                  : imageUrl.split(':')[0] ==
-                                                          'https'
+                                          child: imageUrl != null
+                                              ? imageUrl == ''
+                                                  ? imagePath != ''
                                                       ? CircleAvatar(
                                                           radius: 50,
                                                           foregroundImage:
-                                                              NetworkImage(
-                                                                  imageUrl),
+                                                              AssetImage(
+                                                                  imagePath),
                                                           child: Text(nickname),
                                                         )
-                                                      : CircleAvatar(
+                                                      : const CircleAvatar(
                                                           radius: 50,
                                                           foregroundImage:
                                                               AssetImage(
-                                                                  imageUrl),
+                                                                  'assets/images/app_logo/chat.png'),
+                                                        )
+                                                  : imagePath != ''
+                                                      ? CircleAvatar(
+                                                          radius: 50,
+                                                          foregroundImage:
+                                                              AssetImage(
+                                                                  imagePath),
                                                           child: Text(nickname),
-                                                        ),
+                                                        )
+                                                      : imageUrl.split(
+                                                                  ':')[0] ==
+                                                              'https'
+                                                          ? CircleAvatar(
+                                                              radius: 50,
+                                                              foregroundImage:
+                                                                  NetworkImage(
+                                                                      imageUrl),
+                                                              child: Text(
+                                                                  nickname),
+                                                            )
+                                                          : CircleAvatar(
+                                                              radius: 50,
+                                                              foregroundImage:
+                                                                  AssetImage(
+                                                                      imageUrl),
+                                                              child: Text(
+                                                                  nickname),
+                                                            )
+                                              : const CircleAvatar(
+                                                  radius: 50,
+                                                  foregroundImage: AssetImage(
+                                                      'assets/images/app_logo/chat.png'),
+                                                ),
                                         ),
                                       ),
                                       const SizedBox(width: 10),

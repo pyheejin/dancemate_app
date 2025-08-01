@@ -1,7 +1,6 @@
 import 'package:dancemate_app/database/api.dart';
 import 'package:dancemate_app/database/model.dart';
 import 'package:dancemate_app/screens/signup_screen.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final postUserLoginProvider =
