@@ -8,6 +8,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk_template.dart';
 
 enum UserType { Dancer, Mate }
 
@@ -58,53 +60,122 @@ class LoginScreen extends ConsumerWidget {
     }
 
     void onSocialLoginTap(int method) async {
-      final GoogleSignInService signInService = GoogleSignInService();
-      final account = await signInService.signInWithGoogle();
-      if (account != null) {
-        if (account.additionalUserInfo != null) {
-          final isNewUser = account.additionalUserInfo!.isNewUser;
-          final credential = '${account.credential!.token}';
+      if (method == 2) {
+        final GoogleSignInService signInService = GoogleSignInService();
+        final account = await signInService.signInWithGoogle();
+        if (account != null) {
+          if (account.additionalUserInfo != null) {
+            final isNewUser = account.additionalUserInfo!.isNewUser;
+            final credential = '${account.credential!.token}';
 
-          final userData = account.additionalUserInfo!.profile;
-          final email = userData!['email'];
-          final password = '${account.credential!.token}';
-          final nickname = userData['given_name'];
-          final name = userData['name'];
-          final imageUrl = userData['picture'];
-          const phone = '';
-          const introduction = '';
-          if (isNewUser) {
-            // 신규 회원일 경우에만 회원가입 진행
-            UserModel user = UserModel(
-              type: 1,
-              method: method,
-              email: email,
-              password: password,
-              nickname: nickname,
-              name: name,
-              phone: phone,
-              introduction: introduction,
-              imageUrl: imageUrl,
-            );
-
-            final result = await ref.watch(postUserJoinProvider(user).future);
-            if (result['result_code'] == 200) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const MainNavigationScreen(),
-                ),
+            final userData = account.additionalUserInfo!.profile;
+            final email = userData!['email'];
+            final password = '${account.credential!.token}';
+            final nickname = userData['given_name'];
+            final name = userData['name'];
+            final imageUrl = userData['picture'];
+            const phone = '';
+            const introduction = '';
+            if (isNewUser) {
+              // 신규 회원일 경우에만 회원가입 진행
+              UserModel user = UserModel(
+                type: 1,
+                method: method,
+                email: email,
+                password: password,
+                nickname: nickname,
+                name: name,
+                phone: phone,
+                introduction: introduction,
+                imageUrl: imageUrl,
               );
+
+              final result = await ref.watch(postUserJoinProvider(user).future);
+              if (result['result_code'] == 200) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const MainNavigationScreen(),
+                  ),
+                );
+              } else {
+                errorAlert(context, result['result_msg']);
+              }
             } else {
-              errorAlert(context, result['result_msg']);
+              List<dynamic> args = [
+                email,
+                credential,
+              ];
+              final result =
+                  await ref.watch(postUserLoginProvider(args).future);
+
+              if (result['result_code'] == 200) {
+                ref.read(mainTapProvider.notifier).update((state) => 0);
+
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const MainNavigationScreen(),
+                  ),
+                );
+              }
             }
+          }
+        }
+      } else if (method == 3) {
+        // 휴대폰에 카카오톡이 깔려있는지 bool 값으로 반환해주는 함수
+        bool installed = await isKakaoTalkInstalled();
+
+        // 깔려있다면 UserApi.instance.loginWithKakaoTalk() 으로 카카오톡 오픈 후 동의
+        // 깔려있지 않다면 UserApi.instance.loginWithKakaoAccount() 으로 웹을 통한 인증
+        OAuthToken token = installed
+            ? await UserApi.instance.loginWithKakaoTalk()
+            : await UserApi.instance.loginWithKakaoAccount();
+
+        // 위 두가지 방법으로 인증 로그인 성공 후 유저 정보 가져오기
+        User user = await UserApi.instance.me();
+
+        final id = user.id.toString();
+        final email = user.kakaoAccount!.email.toString();
+        final nickname = user.properties!['nickname'].toString();
+        final imageUrl = user.properties!['profile_image'].toString();
+
+        // 서버로 유저 정보 전송하여 데이터베이스에 저장하기
+        // 신규 회원일 경우에만 회원가입 진행
+        UserModel userData = UserModel(
+          type: 1,
+          method: method,
+          email: email,
+          password: id,
+          nickname: nickname,
+          name: nickname,
+          phone: '',
+          introduction: '',
+          imageUrl: imageUrl,
+        );
+
+        try {
+          final result = await ref.watch(postUserJoinProvider(userData).future);
+          if (result['result_code'] == 200) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const MainNavigationScreen(),
+              ),
+            );
           } else {
+            print(result['result_msg']);
+            errorAlert(context, result['result_msg']);
+          }
+        } catch (e) {
+          final resultCode = e.toString().split(' ')[1];
+          if (resultCode == '207') {
+            // 이미 가입된 이메일이면 로그인처리
             List<dynamic> args = [
               email,
-              credential,
+              id,
             ];
-            final result = await ref.watch(postUserLoginProvider(args).future);
+            final loginResult =
+                await ref.watch(postUserLoginProvider(args).future);
 
-            if (result['result_code'] == 200) {
+            if (loginResult['result_code'] == 200) {
               ref.read(mainTapProvider.notifier).update((state) => 0);
 
               Navigator.of(context).push(
@@ -112,6 +183,9 @@ class LoginScreen extends ConsumerWidget {
                   builder: (context) => const MainNavigationScreen(),
                 ),
               );
+            } else {
+              print(loginResult['result_msg']);
+              errorAlert(context, loginResult['result_msg']);
             }
           }
         }
@@ -289,10 +363,15 @@ class LoginScreen extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: Image.asset('assets/images/kakao_logo.png'),
+                  GestureDetector(
+                    onTap: () {
+                      onSocialLoginTap(3);
+                    },
+                    child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: Image.asset('assets/images/kakao_logo.png'),
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {

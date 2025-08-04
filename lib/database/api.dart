@@ -117,7 +117,8 @@ class ApiServices {
       }
       return resultData;
     } else {
-      throw Exception('user join api fail');
+      throw Exception(
+          '${resultData['result_code']} ${resultData['result_msg']}');
     }
   }
 
