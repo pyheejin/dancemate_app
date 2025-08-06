@@ -42,6 +42,8 @@ class SignUpScreen extends ConsumerWidget {
         phone: phone,
         introduction: introduction,
         imageUrl: '',
+        appleToken: '',
+        appleIdentifier: '',
       );
 
       final result = await ref.watch(postUserJoinProvider(userData).future);

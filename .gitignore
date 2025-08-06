@@ -55,3 +55,5 @@ ios/Runner/GoogleService-Info.plist
 ios/Runner/Info.plist
 
 config.dart
+.env
+.p8

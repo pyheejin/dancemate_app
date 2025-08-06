@@ -12,6 +12,7 @@ import 'package:dancemate_app/screens/search_screen.dart';
 import 'package:dancemate_app/widgets/nav_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class MainNavigationScreen extends ConsumerWidget {
   const MainNavigationScreen({super.key});
@@ -20,8 +21,11 @@ class MainNavigationScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     int selectedIndex = ref.watch(mainTapProvider);
 
-    void onTap(int index) {
+    void onTap(int index) async {
       ref.read(mainTapProvider.notifier).update((state) => index);
+
+      // const storage = FlutterSecureStorage();
+      // await storage.delete(key: 'login');
     }
 
     return Scaffold(

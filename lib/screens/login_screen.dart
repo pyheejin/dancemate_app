@@ -5,11 +5,13 @@ import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/signup_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_template.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 enum UserType { Dancer, Mate }
 
@@ -60,6 +62,16 @@ class LoginScreen extends ConsumerWidget {
     }
 
     void onSocialLoginTap(int method) async {
+      await dotenv.load();
+      final String privateKey = [
+        dotenv.env['APPLE_PRIVATE_KEY_LINE1']!,
+        dotenv.env['APPLE_PRIVATE_KEY_LINE2']!,
+        dotenv.env['APPLE_PRIVATE_KEY_LINE3']!,
+        dotenv.env['APPLE_PRIVATE_KEY_LINE4']!,
+        dotenv.env['APPLE_PRIVATE_KEY_LINE5']!,
+        dotenv.env['APPLE_PRIVATE_KEY_LINE6']!,
+      ].join('\\n');
+
       if (method == 2) {
         final GoogleSignInService signInService = GoogleSignInService();
         final account = await signInService.signInWithGoogle();
@@ -88,6 +100,8 @@ class LoginScreen extends ConsumerWidget {
                 phone: phone,
                 introduction: introduction,
                 imageUrl: imageUrl,
+                appleToken: '',
+                appleIdentifier: '',
               );
 
               final result = await ref.watch(postUserJoinProvider(user).future);
@@ -139,7 +153,6 @@ class LoginScreen extends ConsumerWidget {
         final imageUrl = user.properties!['profile_image'].toString();
 
         // 서버로 유저 정보 전송하여 데이터베이스에 저장하기
-        // 신규 회원일 경우에만 회원가입 진행
         UserModel userData = UserModel(
           type: 1,
           method: method,
@@ -150,6 +163,8 @@ class LoginScreen extends ConsumerWidget {
           phone: '',
           introduction: '',
           imageUrl: imageUrl,
+          appleToken: '',
+          appleIdentifier: '',
         );
 
         try {
@@ -187,6 +202,98 @@ class LoginScreen extends ConsumerWidget {
               print(loginResult['result_msg']);
               errorAlert(context, loginResult['result_msg']);
             }
+          }
+        }
+      } else if (method == 4) {
+        final credential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+        );
+
+        // print(credential);
+
+        // // 사용자 이메일
+        // // 사용자 설정에 따라서 비공개 이메일이 올 수 있음.
+        // // 첫 로그인시에만 오고 그 후로는 null 반환.
+        // print(credential.email ?? '');
+
+        // // 사용자 이름 (성)
+        // // 첫 로그인시에만 오고 그 후로는 null 반환.
+        // print(credential.familyName ?? '');
+
+        // // 사용자 이름 (이름)
+        // // 첫 로그인시에만 오고 그 후로는 null 반환.
+        // print(credential.givenName ?? '');
+
+        // // Apple에서 발급하는 해당앱의 유저 고유 식별자.
+        // print(credential.userIdentifier ?? '');
+
+        // // Apple에서 발급하는 JWT 형식의 신원 확인 토큰.
+        // print(credential.identityToken);
+
+        // // 짧은 기간 유효한 인증 코드로, 서버에서 Apple과 통신해 사용자 인증을 확인할 때 사용됩니다.
+        // print(credential.authorizationCode);
+
+        final email = credential.email ?? '';
+        final password = credential.userIdentifier ?? '';
+        final nickname = credential.givenName ?? '';
+        final appleToken = credential.identityToken.toString();
+        final appleIdentifier = credential.userIdentifier ?? '';
+
+        // print('email: $email');
+        // print('password: $password');
+        // print('nickname: $nickname');
+        // print('appleToken: $appleToken');
+
+        if (email == '') {
+          // 이미 가입된 이메일이면 로그인처리
+          List<dynamic> args = [
+            password,
+            password,
+          ];
+          final loginResult =
+              await ref.watch(postUserLoginProvider(args).future);
+
+          if (loginResult['result_code'] == 200) {
+            ref.read(mainTapProvider.notifier).update((state) => 0);
+
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const MainNavigationScreen(),
+              ),
+            );
+          } else {
+            print(loginResult['result_msg']);
+            errorAlert(context, loginResult['result_msg']);
+          }
+        } else {
+          // 서버로 유저 정보 전송하여 데이터베이스에 저장하기
+          UserModel userData = UserModel(
+            type: 1,
+            method: method,
+            email: email,
+            password: password,
+            nickname: nickname,
+            name: nickname,
+            phone: '',
+            introduction: '',
+            imageUrl: '',
+            appleToken: appleToken,
+            appleIdentifier: appleIdentifier,
+          );
+
+          final result = await ref.watch(postUserJoinProvider(userData).future);
+          if (result['result_code'] == 200) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const MainNavigationScreen(),
+              ),
+            );
+          } else {
+            print(result['result_msg']);
+            errorAlert(context, result['result_msg']);
           }
         }
       }
@@ -383,10 +490,15 @@ class LoginScreen extends ConsumerWidget {
                       child: Image.asset('assets/images/google_logo.png'),
                     ),
                   ),
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: Image.asset('assets/images/apple_logo.png'),
+                  GestureDetector(
+                    onTap: () {
+                      onSocialLoginTap(4);
+                    },
+                    child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: Image.asset('assets/images/apple_logo.png'),
+                    ),
                   ),
                 ],
               ),

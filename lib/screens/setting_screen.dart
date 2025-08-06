@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dancemate_app/provider/setting_provider.dart';
@@ -14,27 +15,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class SettingScreen extends ConsumerWidget {
+class SettingScreen extends ConsumerStatefulWidget {
   const SettingScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    bool isDancer = ref.watch(isDancerProvider);
+  _SettingScreenState createState() => _SettingScreenState();
+}
 
-    Future<void> isloginData() async {
-      const storage = FlutterSecureStorage();
+class _SettingScreenState extends ConsumerState<SettingScreen> {
+  // 위젯이 생성될 때 한 번만 호출되도록 initState 사용
+  @override
+  void initState() {
+    super.initState();
+    isloginData();
+  }
 
-      String? data = await storage.read(key: 'login');
-      if (data != null) {
-        int type = json.decode(data)['userType'];
+  Future<void> isloginData() async {
+    const storage = FlutterSecureStorage();
+    String? data = await storage.read(key: 'login');
+    print(data);
+    if (data != null) {
+      int type = json.decode(data)['userType'];
+      ref
+          .read(accessTokenProvider.notifier)
+          .update((state) => json.decode(data)['access_token']);
 
-        if (type == 50) {
-          ref.read(isDancerProvider.notifier).update((state) => true);
-        }
+      if (type == 50) {
+        ref.read(isDancerProvider.notifier).update((state) => true);
       }
     }
+  }
 
-    isloginData();
+  @override
+  Widget build(BuildContext context) {
+    bool isDancer = ref.watch(isDancerProvider);
+    String accessToken = ref.watch(accessTokenProvider);
+    print(accessToken);
 
     return Scaffold(
       appBar: AppBar(
@@ -48,10 +64,6 @@ class SettingScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // const SettingMenu(
-            //   name: '찜한 수업',
-            //   screen: LikeCourseScreen(),
-            // ),
             const SettingMenu(
               name: '수업 수강 내역',
               screen: CourseHistoryScreen(),
@@ -60,33 +72,28 @@ class SettingScreen extends ConsumerWidget {
               name: '티켓 구매 내역',
               screen: TicketHistoryScreen(),
             ),
-            isDancer
-                ? Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: Colors.grey.shade400),
-                      ),
-                    ),
-                  )
-                : Container(),
-            isDancer
-                ? const SettingMenu(
-                    name: '수업 관리',
-                    screen: DancerCourseScreen(),
-                  )
-                : Container(),
-            isDancer
-                ? const SettingMenu(
-                    name: '티켓 관리',
-                    screen: DancerTicketScreen(),
-                  )
-                : Container(),
-            isDancer
-                ? const SettingMenu(
-                    name: '티켓 판매 내역',
-                    screen: TicketSalesScreen(),
-                  )
-                : Container(),
+            if (isDancer) ...[
+              // isDancer가 true일 때만 위젯들을 표시
+              Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.grey.shade400),
+                  ),
+                ),
+              ),
+              const SettingMenu(
+                name: '수업 관리',
+                screen: DancerCourseScreen(),
+              ),
+              const SettingMenu(
+                name: '티켓 관리',
+                screen: DancerTicketScreen(),
+              ),
+              const SettingMenu(
+                name: '티켓 판매 내역',
+                screen: TicketSalesScreen(),
+              ),
+            ],
             Container(
               decoration: BoxDecoration(
                 border: Border(
@@ -123,7 +130,6 @@ class SettingScreen extends ConsumerWidget {
             ),
             const SettingMenu(
               name: '로그아웃',
-              screen: SettingScreen(),
             ),
           ],
         ),
@@ -133,12 +139,12 @@ class SettingScreen extends ConsumerWidget {
 }
 
 class SettingMenu extends StatelessWidget {
-  final name;
-  final screen;
+  final String name;
+  final Widget? screen; // screen을 nullable로 변경
 
   const SettingMenu({
     super.key,
-    this.name,
+    required this.name, // name은 필수 값으로 변경
     this.screen,
   });
 
@@ -150,15 +156,19 @@ class SettingMenu extends StatelessWidget {
           const storage = FlutterSecureStorage();
           await storage.delete(key: 'login');
 
-          Navigator.of(context).push(
+          // Navigator를 사용하여 모든 이전 화면을 제거하고 LoginScreen으로 이동
+          Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) => const LoginScreen(),
             ),
+            (route) => false,
           );
-        } else {
+
+          // 로그아웃 api 호출
+        } else if (screen != null) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => screen,
+              builder: (context) => screen!,
             ),
           );
         }

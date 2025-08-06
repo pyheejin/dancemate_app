@@ -9,6 +9,8 @@ class UserModel {
   String phone;
   String introduction;
   String imageUrl;
+  String appleToken;
+  String appleIdentifier;
 
   // 생성자
   UserModel({
@@ -22,6 +24,8 @@ class UserModel {
     required this.phone,
     required this.introduction,
     required this.imageUrl,
+    required this.appleToken,
+    required this.appleIdentifier,
   });
 
   // Map으로 변환하는 메서드
@@ -37,6 +41,8 @@ class UserModel {
       'phone': phone,
       'introduction': introduction,
       'image_url': imageUrl,
+      'apple_token': appleToken,
+      'apple_identifier': appleIdentifier,
     };
   }
 
@@ -53,6 +59,8 @@ class UserModel {
       phone: json['phone'],
       introduction: json['introduction'],
       imageUrl: json['image_url'],
+      appleToken: json['apple_token'],
+      appleIdentifier: json['apple_identifier'],
     );
   }
 }

@@ -66,7 +66,7 @@ class ApiServices {
       );
       return responseBody;
     } else {
-      throw Exception('user login api fail');
+      throw Exception('${resultData['result_msg']}');
     }
   }
 
@@ -86,17 +86,27 @@ class ApiServices {
         'phone': userData.phone,
         'introduction': userData.introduction,
         'image_url': userData.imageUrl,
+        'apple_token': userData.appleToken,
+        'apple_identifier': userData.appleIdentifier,
       }),
     );
     final resultData = jsonDecode(utf8.decode(response.bodyBytes));
 
     if (resultData['result_code'] == 200) {
+      String email = userData.email;
+      String password = userData.password;
+
+      if (userData.method == 4) {
+        email = userData.appleIdentifier;
+        password = userData.appleIdentifier;
+      }
+
       // 회원가입 후 바로 로그인
       final loginResponse = await http.post(
         Uri.parse('$baseUrl/user/login'),
         body: {
-          'username': userData.email,
-          'password': userData.password,
+          'username': email,
+          'password': password,
         },
       );
 
@@ -105,7 +115,7 @@ class ApiServices {
         final accessToken = responseBody['access_token'];
 
         final payload = jsonEncode({
-          'email': userData.email,
+          'email': email,
           'access_token': accessToken,
           'userType': userData.type,
         });
