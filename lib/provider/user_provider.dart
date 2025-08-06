@@ -1,3 +1,4 @@
+import 'package:dancemate_app/contants/contants.dart';
 import 'package:dancemate_app/database/api.dart';
 import 'package:dancemate_app/database/model.dart';
 import 'package:dancemate_app/screens/signup_screen.dart';

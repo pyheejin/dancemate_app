@@ -4,8 +4,7 @@ import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-enum UserType { Dancer, Mate }
+import 'package:dancemate_app/contants/contants.dart';
 
 class SignUpScreen extends ConsumerWidget {
   const SignUpScreen({
@@ -435,6 +434,7 @@ class SignUpScreen extends ConsumerWidget {
               SizedBox(
                 height: 100,
                 child: TextField(
+                  textAlignVertical: TextAlignVertical.top,
                   controller: introductionController,
                   expands: true,
                   maxLines: null,

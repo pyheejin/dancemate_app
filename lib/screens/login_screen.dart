@@ -13,8 +13,6 @@ import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_template.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-enum UserType { Dancer, Mate }
-
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({
     super.key,

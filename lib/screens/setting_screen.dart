@@ -7,6 +7,7 @@ import 'package:dancemate_app/screens/dancer_course_screen.dart';
 import 'package:dancemate_app/screens/dancer_ticket_screen.dart';
 import 'package:dancemate_app/screens/like_course_screen.dart';
 import 'package:dancemate_app/screens/login_screen.dart';
+import 'package:dancemate_app/screens/my_page_screen.dart';
 import 'package:dancemate_app/screens/notification_screen.dart';
 import 'package:dancemate_app/screens/qna_screen.dart';
 import 'package:dancemate_app/screens/ticket_history_screen.dart';
@@ -33,7 +34,6 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
   Future<void> isloginData() async {
     const storage = FlutterSecureStorage();
     String? data = await storage.read(key: 'login');
-    print(data);
     if (data != null) {
       int type = json.decode(data)['userType'];
       ref
@@ -50,7 +50,6 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
   Widget build(BuildContext context) {
     bool isDancer = ref.watch(isDancerProvider);
     String accessToken = ref.watch(accessTokenProvider);
-    print(accessToken);
 
     return Scaffold(
       appBar: AppBar(
@@ -64,6 +63,10 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SettingMenu(
+              name: '마이페이지',
+              screen: MyPageScreen(),
+            ),
             const SettingMenu(
               name: '수업 수강 내역',
               screen: CourseHistoryScreen(),
