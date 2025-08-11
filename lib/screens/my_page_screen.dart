@@ -20,11 +20,41 @@ class MyPageScreen extends ConsumerStatefulWidget {
 }
 
 class _MyPageScreenState extends ConsumerState<MyPageScreen> {
+  // TextEditingController들을 상태 변수로 선언합니다.
+  late final TextEditingController emailController;
+  late final TextEditingController passwordController;
+  late final TextEditingController nicknameController;
+  late final TextEditingController nameController;
+  late final TextEditingController phoneController;
+  late final TextEditingController introductionController;
+
+  // 컨트롤러 초기화 여부를 추적할 플래그 변수
+  bool _isInitialized = false;
+
   // 위젯이 생성될 때 한 번만 호출되도록 initState 사용
   @override
   void initState() {
     super.initState();
+    // initState에서 컨트롤러들을 초기화합니다.
+    emailController = TextEditingController();
+    passwordController = TextEditingController(text: '************');
+    nicknameController = TextEditingController();
+    nameController = TextEditingController();
+    phoneController = TextEditingController();
+    introductionController = TextEditingController();
     isloginData();
+  }
+
+  // 위젯이 제거될 때 컨트롤러들을 해제하여 메모리 누수를 방지합니다.
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    nicknameController.dispose();
+    nameController.dispose();
+    phoneController.dispose();
+    introductionController.dispose();
+    super.dispose();
   }
 
   Future<void> isloginData() async {
@@ -47,16 +77,8 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
     final userProfile = ref.watch(getUserProfileProvider);
     String imagePath = ref.watch(profileImagePathProvider);
 
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController =
-        TextEditingController(text: '************');
-    final TextEditingController nicknameController = TextEditingController();
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController phoneController = TextEditingController();
-    final TextEditingController introductionController =
-        TextEditingController();
-
-    UserType userType = UserType.Mate;
+    // userTypeProvider의 현재 상태를 watch합니다.
+    UserType? userType = ref.watch(userTypeProvider); // <--- 여기 수정
 
     void onClearTap(TextEditingController controller) {
       controller.clear();
@@ -205,12 +227,21 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
       final phone = phoneController.text;
       final introduction = introductionController.text;
 
-      // final result = await ref.watch(postUserJoinProvider(userData).future);
-      // if (result['result_code'] == 200) {
-      //   Navigator.of(context).pop();
-      // } else {
-      //   errorAlert(context, result['result_msg']);
-      // }
+      Map<String, dynamic> bodyData = {
+        'name': name,
+        'phone': phone,
+        'nickname': nickname,
+        'introduction': introduction,
+        'type': userType == UserType.Dancer ? 50 : 1, // userType 반영
+      };
+
+      final result = await ref.watch(putUserDetailProvider(bodyData).future);
+      if (result['result_code'] == 200) {
+        ref.refresh(getUserProfileProvider);
+        Navigator.pop(context);
+      } else {
+        errorAlert(context, result['result_msg']);
+      }
     }
 
     return Scaffold(
@@ -219,16 +250,29 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
       ),
       body: userProfile.when(
         data: (dataList) {
+          final type = dataList['type'];
           final email = dataList['email'];
           final imageUrl = dataList['image_url'];
           final name = dataList['name'] ?? '';
           final nickname = dataList['nickname'];
           final introduction = dataList['introduction'];
+          final phone = dataList['phone'] ?? '';
 
-          emailController.text = email;
-          nicknameController.text = nickname;
-          nameController.text = name;
-          introductionController.text = introduction;
+          // isInitialized 플래그를 사용하여 처음 한 번만 초기화
+          if (!_isInitialized) {
+            emailController.text = email;
+            nicknameController.text = nickname;
+            nameController.text = name;
+            introductionController.text = introduction;
+            phoneController.text = phone;
+            _isInitialized = true;
+          }
+
+          if (type == 50) {
+            ref
+                .read(userTypeProvider.notifier)
+                .update((state) => UserType.Dancer);
+          }
 
           return SingleChildScrollView(
             child: Padding(
@@ -298,8 +342,12 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
                             value: UserType.Dancer,
                             groupValue: userType,
                             onChanged: (UserType? value) {
-                              userType =
-                                  ref.watch(userTypeProvider(UserType.Dancer));
+                              if (value != null) {
+                                print(value);
+                                ref
+                                    .read(userTypeProvider.notifier)
+                                    .update((state) => value);
+                              }
                             },
                           ),
                           const Text(
@@ -316,8 +364,11 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
                             value: UserType.Mate,
                             groupValue: userType,
                             onChanged: (UserType? value) {
-                              userType =
-                                  ref.watch(userTypeProvider(UserType.Mate));
+                              if (value != null) {
+                                ref
+                                    .read(userTypeProvider.notifier)
+                                    .update((state) => value);
+                              }
                             },
                           ),
                           const Text(
@@ -479,14 +530,14 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
                   const SizedBox(height: 20),
                   const Row(
                     children: [
-                      Text(
-                        '*',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 17,
-                        ),
-                      ),
-                      SizedBox(width: 5),
+                      // Text(
+                      //   '*',
+                      //   style: TextStyle(
+                      //     color: Colors.red,
+                      //     fontSize: 17,
+                      //   ),
+                      // ),
+                      // SizedBox(width: 5),
                       Text(
                         '이름',
                         style: TextStyle(
@@ -529,16 +580,16 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
                   const SizedBox(height: 20),
                   const Row(
                     children: [
+                      // Text(
+                      //   '*',
+                      //   style: TextStyle(
+                      //     color: Colors.red,
+                      //     fontSize: 17,
+                      //   ),
+                      // ),
+                      // SizedBox(width: 5),
                       Text(
-                        '*',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 17,
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        '본인인증',
+                        '핸드폰 번호',
                         style: TextStyle(
                           fontSize: 17,
                         ),
@@ -577,61 +628,61 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: '인증번호',
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade400,
-                                width: 1.0,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade400,
-                                width: 1.0,
-                              ),
-                            ),
-                            suffixIcon: const Icon(
-                              Icons.cancel_outlined,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      TextButton(
-                        onPressed: () {},
-                        style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFFA48AFF),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 7,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '인증번호 전송',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     Expanded(
+                  //       child: TextField(
+                  //         decoration: InputDecoration(
+                  //           hintText: '인증번호',
+                  //           enabledBorder: OutlineInputBorder(
+                  //             borderSide: BorderSide(
+                  //               color: Colors.grey.shade400,
+                  //               width: 1.0,
+                  //             ),
+                  //           ),
+                  //           focusedBorder: OutlineInputBorder(
+                  //             borderSide: BorderSide(
+                  //               color: Colors.grey.shade400,
+                  //               width: 1.0,
+                  //             ),
+                  //           ),
+                  //           suffixIcon: const Icon(
+                  //             Icons.cancel_outlined,
+                  //             color: Colors.black54,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     const SizedBox(width: 5),
+                  //     TextButton(
+                  //       onPressed: () {},
+                  //       style: TextButton.styleFrom(
+                  //         backgroundColor: const Color(0xFFA48AFF),
+                  //         shape: RoundedRectangleBorder(
+                  //           borderRadius: BorderRadius.circular(5),
+                  //         ),
+                  //       ),
+                  //       child: const Padding(
+                  //         padding: EdgeInsets.symmetric(
+                  //           vertical: 7,
+                  //         ),
+                  //         child: Row(
+                  //           mainAxisAlignment: MainAxisAlignment.center,
+                  //           children: [
+                  //             Text(
+                  //               '인증번호 전송',
+                  //               style: TextStyle(
+                  //                 color: Colors.white,
+                  //                 fontSize: 17,
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   const SizedBox(height: 20),
                   const Row(
                     children: [

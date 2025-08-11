@@ -21,7 +21,7 @@ class SignUpScreen extends ConsumerWidget {
     final TextEditingController introductionController =
         TextEditingController();
 
-    UserType userType = UserType.Mate;
+    UserType? userType = ref.watch(userTypeProvider);
 
     void onSignUpTap() async {
       final email = emailController.text;
@@ -81,8 +81,11 @@ class SignUpScreen extends ConsumerWidget {
                         value: UserType.Dancer,
                         groupValue: userType,
                         onChanged: (UserType? value) {
-                          userType =
-                              ref.watch(userTypeProvider(UserType.Dancer));
+                          if (value != null) {
+                            ref
+                                .read(userTypeProvider.notifier)
+                                .update((state) => value);
+                          }
                         },
                       ),
                       const Text(
@@ -99,7 +102,11 @@ class SignUpScreen extends ConsumerWidget {
                         value: UserType.Mate,
                         groupValue: userType,
                         onChanged: (UserType? value) {
-                          userType = ref.watch(userTypeProvider(UserType.Mate));
+                          if (value != null) {
+                            ref
+                                .read(userTypeProvider.notifier)
+                                .update((state) => value);
+                          }
                         },
                       ),
                       const Text(

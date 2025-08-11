@@ -24,9 +24,7 @@ final postUserJoinProvider =
   return result;
 });
 
-final userTypeProvider = StateProvider.family<UserType, UserType>((ref, type) {
-  return type;
-});
+final userTypeProvider = StateProvider<UserType?>((ref) => UserType.Mate);
 
 final profileImagePathProvider = StateProvider.autoDispose<String>((ref) {
   return '';
@@ -52,6 +50,14 @@ final getUserDetailProvider =
   final ApiServices api = ApiServices();
 
   final result = await api.getUserDetail(userId);
+  return result;
+});
+
+final putUserDetailProvider =
+    FutureProvider.family<dynamic, Map<String, dynamic>>((ref, bodyData) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.putUserDetail(bodyData);
   return result;
 });
 
