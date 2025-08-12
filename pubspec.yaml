@@ -75,6 +75,8 @@ dependencies:
 
   flutter_dotenv: ^5.2.1
 
+  photo_view: ^0.15.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

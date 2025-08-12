@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:dancemate_app/provider/setting_provider.dart';
 import 'package:dancemate_app/screens/course_history_screen.dart';
 import 'package:dancemate_app/screens/dancer_course_screen.dart';
 import 'package:dancemate_app/screens/dancer_ticket_screen.dart';
-import 'package:dancemate_app/screens/like_course_screen.dart';
 import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/screens/my_page_screen.dart';
 import 'package:dancemate_app/screens/notification_screen.dart';
@@ -49,7 +47,6 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     bool isDancer = ref.watch(isDancerProvider);
-    String accessToken = ref.watch(accessTokenProvider);
 
     return Scaffold(
       appBar: AppBar(

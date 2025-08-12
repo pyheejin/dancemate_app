@@ -1,19 +1,14 @@
-import 'dart:convert';
-
-import 'package:dancemate_app/provider/image_provider.dart';
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/photo_screen.dart';
 import 'package:dancemate_app/screens/setting_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -34,140 +29,14 @@ class ProfileScreen extends ConsumerWidget {
       );
     }
 
-    Future<void> pickCameraImage() async {
-      Permission permission = Permission.camera;
-      final status = await permission.request();
-      print(status);
-
-      if (status == PermissionStatus.granted) {
-        ImagePicker imagePicker = ImagePicker();
-        final image = await imagePicker.pickImage(source: ImageSource.camera);
-        if (image != null) {
-          ref
-              .read(profileImagePathProvider.notifier)
-              .update((state) => image.path);
-
-          // 파일 경로를 통해 formData 생성
-          FormData bodyData = FormData.fromMap({
-            'bucket': 'profile',
-            'images': MultipartFile.fromFileSync(image.path),
-          });
-
-          final result =
-              await ref.watch(postImageUploadProvider(bodyData).future);
-          final response = jsonDecode(result.toString());
-          if (response['result_code'] == 200) {
-            Navigator.pop(context);
-            ref.refresh(getUserProfileProvider);
-          } else {
-            errorAlert(context, response['result_msg']);
-          }
-        }
-      }
-    }
-
-    Future<void> pickImage() async {
-      ImagePicker imagePicker = ImagePicker();
-      final image = await imagePicker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        ref
-            .read(profileImagePathProvider.notifier)
-            .update((state) => image.path);
-
-        // 파일 경로를 통해 formData 생성
-        FormData bodyData = FormData.fromMap({
-          'bucket': 'profile',
-          'images': MultipartFile.fromFileSync(image.path),
-        });
-
-        final result =
-            await ref.watch(postImageUploadProvider(bodyData).future);
-        final response = jsonDecode(result.toString());
-        if (response['result_code'] == 200) {
-          Navigator.pop(context);
-          ref.refresh(getUserProfileProvider);
-        } else {
-          errorAlert(context, response['result_msg']);
-        }
-      }
-    }
-
     Future<void> onProfileImageTap() async {
-      showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            height: 200, // 모달 높이 크기
-            decoration: const BoxDecoration(
-              color: Colors.white, // 모달 배경색
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: pickCameraImage,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black54),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Icon(
-                            Icons.camera_alt_outlined,
-                            size: 40,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Text(
-                        '사진 찍기',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: pickImage,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black54),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Icon(
-                            Icons.photo_library_outlined,
-                            size: 40,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Text(
-                        '갤러리에서 선택',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PhotoScreen(
+            imagePathList: [imagePath],
+            currentIndex: 0,
+          ),
+        ),
       );
     }
 
@@ -385,9 +254,24 @@ class ProfileScreen extends ConsumerWidget {
                       child: userProfile.when(
                         data: (dataList) {
                           final imageUrl = dataList['image_url'];
-
                           final nickname = dataList['nickname'];
                           final introduction = dataList['introduction'];
+
+                          ImageProvider finalImageProvider;
+                          if (imagePath.isNotEmpty) {
+                            finalImageProvider = AssetImage(imagePath);
+                          } else if (imageUrl != null && imageUrl.isNotEmpty) {
+                            imagePath = imageUrl;
+                            if (imageUrl.split(':')[0] == 'https') {
+                              finalImageProvider = NetworkImage(imagePath);
+                            } else {
+                              finalImageProvider = AssetImage(imagePath);
+                            }
+                          } else {
+                            // 기본 이미지 경로 설정
+                            imagePath = 'assets/images/app_logo/chat.png';
+                            finalImageProvider = AssetImage(imagePath);
+                          }
 
                           return Column(
                             children: [
@@ -400,55 +284,10 @@ class ProfileScreen extends ConsumerWidget {
                                     children: [
                                       GestureDetector(
                                         onTap: onProfileImageTap,
-                                        child: Container(
-                                          child: imageUrl != null
-                                              ? imageUrl == ''
-                                                  ? imagePath != ''
-                                                      ? CircleAvatar(
-                                                          radius: 50,
-                                                          foregroundImage:
-                                                              AssetImage(
-                                                                  imagePath),
-                                                          child: Text(nickname),
-                                                        )
-                                                      : const CircleAvatar(
-                                                          radius: 50,
-                                                          foregroundImage:
-                                                              AssetImage(
-                                                                  'assets/images/app_logo/chat.png'),
-                                                        )
-                                                  : imagePath != ''
-                                                      ? CircleAvatar(
-                                                          radius: 50,
-                                                          foregroundImage:
-                                                              AssetImage(
-                                                                  imagePath),
-                                                          child: Text(nickname),
-                                                        )
-                                                      : imageUrl.split(
-                                                                  ':')[0] ==
-                                                              'https'
-                                                          ? CircleAvatar(
-                                                              radius: 50,
-                                                              foregroundImage:
-                                                                  NetworkImage(
-                                                                      imageUrl),
-                                                              child: Text(
-                                                                  nickname),
-                                                            )
-                                                          : CircleAvatar(
-                                                              radius: 50,
-                                                              foregroundImage:
-                                                                  AssetImage(
-                                                                      imageUrl),
-                                                              child: Text(
-                                                                  nickname),
-                                                            )
-                                              : const CircleAvatar(
-                                                  radius: 50,
-                                                  foregroundImage: AssetImage(
-                                                      'assets/images/app_logo/chat.png'),
-                                                ),
+                                        child: CircleAvatar(
+                                          radius: 50,
+                                          foregroundImage: finalImageProvider,
+                                          child: Text(nickname),
                                         ),
                                       ),
                                       const SizedBox(width: 10),

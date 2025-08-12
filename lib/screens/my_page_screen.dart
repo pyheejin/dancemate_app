@@ -20,7 +20,6 @@ class MyPageScreen extends ConsumerStatefulWidget {
 }
 
 class _MyPageScreenState extends ConsumerState<MyPageScreen> {
-  // TextEditingController들을 상태 변수로 선언합니다.
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
   late final TextEditingController nicknameController;
@@ -31,7 +30,7 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
   // 컨트롤러 초기화 여부를 추적할 플래그 변수
   bool _isInitialized = false;
 
-  // 위젯이 생성될 때 한 번만 호출되도록 initState 사용
+  // 위젯이 생성될 때 한 번만 호출
   @override
   void initState() {
     super.initState();
@@ -45,7 +44,7 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
     isloginData();
   }
 
-  // 위젯이 제거될 때 컨트롤러들을 해제하여 메모리 누수를 방지합니다.
+  // 메모리 누수를 방지
   @override
   void dispose() {
     emailController.dispose();
@@ -66,8 +65,10 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
           .read(accessTokenProvider.notifier)
           .update((state) => json.decode(data)['access_token']);
 
+      // 댄서일 경우, isDancerProvider와 userTypeProvider를 초기화합니다.
       if (type == 50) {
         ref.read(isDancerProvider.notifier).update((state) => true);
+        ref.read(userTypeProvider.notifier).update((state) => UserType.Dancer);
       }
     }
   }
@@ -76,9 +77,7 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
   Widget build(BuildContext context) {
     final userProfile = ref.watch(getUserProfileProvider);
     String imagePath = ref.watch(profileImagePathProvider);
-
-    // userTypeProvider의 현재 상태를 watch합니다.
-    UserType? userType = ref.watch(userTypeProvider); // <--- 여기 수정
+    UserType? userType = ref.watch(userTypeProvider);
 
     void onClearTap(TextEditingController controller) {
       controller.clear();
@@ -96,22 +95,6 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
           ref
               .read(profileImagePathProvider.notifier)
               .update((state) => image.path);
-
-          // 파일 경로를 통해 formData 생성
-          FormData bodyData = FormData.fromMap({
-            'bucket': 'profile',
-            'images': MultipartFile.fromFileSync(image.path),
-          });
-
-          final result =
-              await ref.watch(postImageUploadProvider(bodyData).future);
-          final response = jsonDecode(result.toString());
-          if (response['result_code'] == 200) {
-            Navigator.pop(context);
-            ref.refresh(getUserProfileProvider);
-          } else {
-            errorAlert(context, response['result_msg']);
-          }
         }
       }
     }
@@ -123,22 +106,7 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
         ref
             .read(profileImagePathProvider.notifier)
             .update((state) => image.path);
-
-        // 파일 경로를 통해 formData 생성
-        FormData bodyData = FormData.fromMap({
-          'bucket': 'profile',
-          'images': MultipartFile.fromFileSync(image.path),
-        });
-
-        final result =
-            await ref.watch(postImageUploadProvider(bodyData).future);
-        final response = jsonDecode(result.toString());
-        if (response['result_code'] == 200) {
-          Navigator.pop(context);
-          ref.refresh(getUserProfileProvider);
-        } else {
-          errorAlert(context, response['result_msg']);
-        }
+        Navigator.pop(context);
       }
     }
 
@@ -232,11 +200,50 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
         'phone': phone,
         'nickname': nickname,
         'introduction': introduction,
-        'type': userType == UserType.Dancer ? 50 : 1, // userType 반영
+        'type': userType == UserType.Dancer ? 50 : 1,
       };
 
       final result = await ref.watch(putUserDetailProvider(bodyData).future);
       if (result['result_code'] == 200) {
+        // 새로운 로컬 경로가 있고, URL이 아닐 때만 이미지 업로드 로직 실행
+        if (imagePath.isNotEmpty && !imagePath.startsWith('http')) {
+          try {
+            FormData bodyData = FormData.fromMap({
+              'bucket': 'profile',
+              // 로컬 파일을 전송합니다.
+              'images': await MultipartFile.fromFile(imagePath),
+            });
+
+            final imageResult =
+                await ref.watch(postImageUploadProvider(bodyData).future);
+            final imageResponse = jsonDecode(imageResult.toString());
+            if (imageResponse['result_code'] != 200) {
+              errorAlert(context, imageResponse['result_msg']);
+            }
+          } catch (e) {
+            errorAlert(context, '이미지 업로드 실패: $e');
+          }
+        }
+
+        const storage = FlutterSecureStorage();
+        String? data = await storage.read(key: 'login');
+        if (data != '') {
+          Map<String, dynamic> jsonData = json.decode(data!);
+
+          if (userType == UserType.Dancer) {
+            jsonData['userType'] = 50;
+            ref.read(isDancerProvider.notifier).update((state) => true);
+          } else {
+            jsonData['userType'] = 1;
+            ref.read(isDancerProvider.notifier).update((state) => false);
+          }
+
+          await storage.write(
+            key: 'login',
+            value: jsonEncode(jsonData),
+          );
+        }
+
         ref.refresh(getUserProfileProvider);
         Navigator.pop(context);
       } else {
@@ -247,10 +254,21 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('마이페이지'),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.chevron_left,
+            size: 30,
+          ),
+          onPressed: () {
+            ref.read(profileImagePathProvider.notifier).update((state) => '');
+
+            Navigator.pop(context);
+            ref.refresh(getUserProfileProvider);
+          },
+        ),
       ),
       body: userProfile.when(
         data: (dataList) {
-          final type = dataList['type'];
           final email = dataList['email'];
           final imageUrl = dataList['image_url'];
           final name = dataList['name'] ?? '';
@@ -268,10 +286,20 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
             _isInitialized = true;
           }
 
-          if (type == 50) {
-            ref
-                .read(userTypeProvider.notifier)
-                .update((state) => UserType.Dancer);
+          ImageProvider finalImageProvider;
+          if (imagePath.isNotEmpty) {
+            finalImageProvider = AssetImage(imagePath);
+          } else if (imageUrl != null && imageUrl.isNotEmpty) {
+            imagePath = imageUrl;
+            if (imageUrl.split(':')[0] == 'https') {
+              finalImageProvider = NetworkImage(imagePath);
+            } else {
+              finalImageProvider = AssetImage(imagePath);
+            }
+          } else {
+            // 기본 이미지 경로 설정
+            imagePath = 'assets/images/app_logo/chat.png';
+            finalImageProvider = AssetImage(imagePath);
           }
 
           return SingleChildScrollView(
@@ -288,46 +316,10 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
                     children: [
                       GestureDetector(
                         onTap: onProfileImageTap,
-                        child: Container(
-                          child: imageUrl != null
-                              ? imageUrl == ''
-                                  ? imagePath != ''
-                                      ? CircleAvatar(
-                                          radius: 50,
-                                          foregroundImage:
-                                              AssetImage(imagePath),
-                                          child: Text(nickname),
-                                        )
-                                      : const CircleAvatar(
-                                          radius: 50,
-                                          foregroundImage: AssetImage(
-                                              'assets/images/app_logo/chat.png'),
-                                        )
-                                  : imagePath != ''
-                                      ? CircleAvatar(
-                                          radius: 50,
-                                          foregroundImage:
-                                              AssetImage(imagePath),
-                                          child: Text(nickname),
-                                        )
-                                      : imageUrl.split(':')[0] == 'https'
-                                          ? CircleAvatar(
-                                              radius: 50,
-                                              foregroundImage:
-                                                  NetworkImage(imageUrl),
-                                              child: Text(nickname),
-                                            )
-                                          : CircleAvatar(
-                                              radius: 50,
-                                              foregroundImage:
-                                                  AssetImage(imageUrl),
-                                              child: Text(nickname),
-                                            )
-                              : const CircleAvatar(
-                                  radius: 50,
-                                  foregroundImage: AssetImage(
-                                      'assets/images/app_logo/chat.png'),
-                                ),
+                        child: CircleAvatar(
+                          radius: 50,
+                          foregroundImage: finalImageProvider,
+                          child: Text(nickname),
                         ),
                       ),
                     ],

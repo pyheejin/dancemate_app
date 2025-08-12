@@ -73,6 +73,7 @@ class LessonChatRoomScreen extends ConsumerWidget {
                         final dancerEmail = dancerData['email'];
                         final dancerNickname = dancerData['nickname'];
                         final dancerImage = dancerData['image_url'];
+
                         return GestureDetector(
                           onTap: () {
                             print(roomData['id']);
