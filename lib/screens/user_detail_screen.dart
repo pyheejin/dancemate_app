@@ -3,6 +3,7 @@ import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/chat_room_create_screen.dart';
 import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/photo_screen.dart';
 import 'package:dancemate_app/screens/setting_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
@@ -38,6 +39,17 @@ class UserDetailScreen extends ConsumerWidget {
           builder: (context) => ChatRoomCreateScreen(
             userId: userId,
             nickname: nickname,
+          ),
+        ),
+      );
+    }
+
+    Future<void> onProfileImageTap(String imagePath) async {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PhotoScreen(
+            imagePathList: [imagePath],
+            currentIndex: 0,
           ),
         ),
       );
@@ -86,7 +98,20 @@ class UserDetailScreen extends ConsumerWidget {
                         } else {
                           final userId = dataList['user']['id'];
                           final nickname = dataList['user']['nickname'];
-                          final imageUrl = dataList['user']['image_url'];
+                          String imageUrl = dataList['user']['image_url'];
+
+                          ImageProvider finalImageProvider;
+                          if (imageUrl.isNotEmpty) {
+                            if (imageUrl.split(':')[0] == 'https') {
+                              finalImageProvider = NetworkImage(imageUrl);
+                            } else {
+                              finalImageProvider = AssetImage(imageUrl);
+                            }
+                          } else {
+                            // 기본 이미지 경로 설정
+                            imageUrl = 'assets/images/app_logo/chat.png';
+                            finalImageProvider = AssetImage(imageUrl);
+                          }
 
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,20 +120,16 @@ class UserDetailScreen extends ConsumerWidget {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  imageUrl.split(':')[0] == 'https'
-                                      ? CircleAvatar(
-                                          radius: 50,
-                                          foregroundImage:
-                                              NetworkImage(imageUrl),
-                                          child: Text(
-                                              dataList['user']['nickname']),
-                                        )
-                                      : CircleAvatar(
-                                          radius: 50,
-                                          foregroundImage: AssetImage(imageUrl),
-                                          child: Text(
-                                              dataList['user']['nickname']),
-                                        ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      onProfileImageTap(imageUrl);
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 50,
+                                      foregroundImage: finalImageProvider,
+                                      child: Text(dataList['user']['nickname']),
+                                    ),
+                                  ),
                                   const SizedBox(width: 10),
                                   Padding(
                                     padding: const EdgeInsets.only(
