@@ -251,507 +251,512 @@ class _MyPageScreenState extends ConsumerState<MyPageScreen> {
       }
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('마이페이지'),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.chevron_left,
-            size: 30,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // <-- 키보드 숨기기
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('마이페이지'),
+          leading: IconButton(
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 30,
+            ),
+            onPressed: () {
+              ref.read(profileImagePathProvider.notifier).update((state) => '');
+
+              Navigator.pop(context);
+              ref.refresh(getUserProfileProvider);
+            },
           ),
-          onPressed: () {
-            ref.read(profileImagePathProvider.notifier).update((state) => '');
-
-            Navigator.pop(context);
-            ref.refresh(getUserProfileProvider);
-          },
         ),
-      ),
-      body: userProfile.when(
-        data: (dataList) {
-          final email = dataList['email'];
-          final imageUrl = dataList['image_url'];
-          final name = dataList['name'] ?? '';
-          final nickname = dataList['nickname'];
-          final introduction = dataList['introduction'];
-          final phone = dataList['phone'] ?? '';
+        body: userProfile.when(
+          data: (dataList) {
+            final email = dataList['email'];
+            final imageUrl = dataList['image_url'];
+            final name = dataList['name'] ?? '';
+            final nickname = dataList['nickname'];
+            final introduction = dataList['introduction'];
+            final phone = dataList['phone'] ?? '';
 
-          // isInitialized 플래그를 사용하여 처음 한 번만 초기화
-          if (!_isInitialized) {
-            emailController.text = email;
-            nicknameController.text = nickname;
-            nameController.text = name;
-            introductionController.text = introduction;
-            phoneController.text = phone;
-            _isInitialized = true;
-          }
+            // isInitialized 플래그를 사용하여 처음 한 번만 초기화
+            if (!_isInitialized) {
+              emailController.text = email;
+              nicknameController.text = nickname;
+              nameController.text = name;
+              introductionController.text = introduction;
+              phoneController.text = phone;
+              _isInitialized = true;
+            }
 
-          ImageProvider finalImageProvider;
-          if (imagePath.isNotEmpty) {
-            finalImageProvider = AssetImage(imagePath);
-          } else if (imageUrl != null && imageUrl.isNotEmpty) {
-            imagePath = imageUrl;
-            if (imageUrl.split(':')[0] == 'https') {
-              finalImageProvider = NetworkImage(imagePath);
+            ImageProvider finalImageProvider;
+            if (imagePath.isNotEmpty) {
+              finalImageProvider = AssetImage(imagePath);
+            } else if (imageUrl != null && imageUrl.isNotEmpty) {
+              imagePath = imageUrl;
+              if (imageUrl.split(':')[0] == 'https') {
+                finalImageProvider = NetworkImage(imagePath);
+              } else {
+                finalImageProvider = AssetImage(imagePath);
+              }
             } else {
+              // 기본 이미지 경로 설정
+              imagePath = 'assets/images/app_logo/chat.png';
               finalImageProvider = AssetImage(imagePath);
             }
-          } else {
-            // 기본 이미지 경로 설정
-            imagePath = 'assets/images/app_logo/chat.png';
-            finalImageProvider = AssetImage(imagePath);
-          }
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 20,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: onProfileImageTap,
-                        child: CircleAvatar(
-                          radius: 50,
-                          foregroundImage: finalImageProvider,
-                          child: Text(nickname),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Row(
-                        children: [
-                          Radio(
-                            value: UserType.Dancer,
-                            groupValue: userType,
-                            onChanged: (UserType? value) {
-                              if (value != null) {
-                                print(value);
-                                ref
-                                    .read(userTypeProvider.notifier)
-                                    .update((state) => value);
-                              }
-                            },
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: onProfileImageTap,
+                          child: CircleAvatar(
+                            radius: 50,
+                            foregroundImage: finalImageProvider,
+                            child: Text(nickname),
                           ),
-                          const Text(
-                            '댄서',
-                            style: TextStyle(
-                              fontSize: 17,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          children: [
+                            Radio(
+                              value: UserType.Dancer,
+                              groupValue: userType,
+                              onChanged: (UserType? value) {
+                                if (value != null) {
+                                  print(value);
+                                  ref
+                                      .read(userTypeProvider.notifier)
+                                      .update((state) => value);
+                                }
+                              },
+                            ),
+                            const Text(
+                              '댄서',
+                              style: TextStyle(
+                                fontSize: 17,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Radio(
+                              value: UserType.Mate,
+                              groupValue: userType,
+                              onChanged: (UserType? value) {
+                                if (value != null) {
+                                  ref
+                                      .read(userTypeProvider.notifier)
+                                      .update((state) => value);
+                                }
+                              },
+                            ),
+                            const Text(
+                              '메이트',
+                              style: TextStyle(
+                                fontSize: 17,
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    const Row(
+                      children: [
+                        Text(
+                          '*',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 17,
+                          ),
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          '이메일',
+                          style: TextStyle(
+                            fontSize: 17,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      height: 50,
+                      child: TextField(
+                        enabled: false,
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your email',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
                             ),
                           ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Radio(
-                            value: UserType.Mate,
-                            groupValue: userType,
-                            onChanged: (UserType? value) {
-                              if (value != null) {
-                                ref
-                                    .read(userTypeProvider.notifier)
-                                    .update((state) => value);
-                              }
-                            },
-                          ),
-                          const Text(
-                            '메이트',
-                            style: TextStyle(
-                              fontSize: 17,
+                          disabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
                             ),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    children: [
-                      Text(
-                        '*',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 17,
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        '이메일',
-                        style: TextStyle(
-                          fontSize: 17,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  SizedBox(
-                    height: 50,
-                    child: TextField(
-                      enabled: false,
-                      controller: emailController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter your email',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
                           ),
-                        ),
-                        disabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Row(
-                    children: [
-                      Text(
-                        '*',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 17,
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        '비밀번호',
-                        style: TextStyle(
-                          fontSize: 17,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  SizedBox(
-                    height: 50,
-                    child: TextField(
-                      enabled: false,
-                      controller: passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Enter your password',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                    const SizedBox(height: 20),
+                    const Row(
+                      children: [
+                        Text(
+                          '*',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 17,
                           ),
                         ),
-                        disabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                        SizedBox(width: 5),
+                        Text(
+                          '비밀번호',
+                          style: TextStyle(
+                            fontSize: 17,
                           ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      height: 50,
+                      child: TextField(
+                        enabled: false,
+                        controller: passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your password',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Row(
-                    children: [
-                      Text(
-                        '*',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 17,
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        '닉네임',
-                        style: TextStyle(
-                          fontSize: 17,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  SizedBox(
-                    height: 50,
-                    child: TextField(
-                      controller: nicknameController,
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                    const SizedBox(height: 20),
+                    const Row(
+                      children: [
+                        Text(
+                          '*',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 17,
                           ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                        SizedBox(width: 5),
+                        Text(
+                          '닉네임',
+                          style: TextStyle(
+                            fontSize: 17,
                           ),
                         ),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            onClearTap(nicknameController);
-                          },
-                          child: const Icon(
-                            Icons.cancel_outlined,
-                            color: Colors.black54,
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      height: 50,
+                      child: TextField(
+                        controller: nicknameController,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              onClearTap(nicknameController);
+                            },
+                            child: const Icon(
+                              Icons.cancel_outlined,
+                              color: Colors.black54,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Row(
-                    children: [
-                      // Text(
-                      //   '*',
-                      //   style: TextStyle(
-                      //     color: Colors.red,
-                      //     fontSize: 17,
-                      //   ),
-                      // ),
-                      // SizedBox(width: 5),
-                      Text(
-                        '이름',
-                        style: TextStyle(
-                          fontSize: 17,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  SizedBox(
-                    height: 50,
-                    child: TextField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        hintText: '',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                    const SizedBox(height: 20),
+                    const Row(
+                      children: [
+                        // Text(
+                        //   '*',
+                        //   style: TextStyle(
+                        //     color: Colors.red,
+                        //     fontSize: 17,
+                        //   ),
+                        // ),
+                        // SizedBox(width: 5),
+                        Text(
+                          '이름',
+                          style: TextStyle(
+                            fontSize: 17,
                           ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      height: 50,
+                      child: TextField(
+                        controller: nameController,
+                        decoration: InputDecoration(
+                          hintText: '',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
                           ),
-                        ),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            onClearTap(nameController);
-                          },
-                          child: const Icon(
-                            Icons.cancel_outlined,
-                            color: Colors.black54,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              onClearTap(nameController);
+                            },
+                            child: const Icon(
+                              Icons.cancel_outlined,
+                              color: Colors.black54,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Row(
-                    children: [
-                      // Text(
-                      //   '*',
-                      //   style: TextStyle(
-                      //     color: Colors.red,
-                      //     fontSize: 17,
-                      //   ),
-                      // ),
-                      // SizedBox(width: 5),
-                      Text(
-                        '핸드폰 번호',
-                        style: TextStyle(
-                          fontSize: 17,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  SizedBox(
-                    height: 50,
-                    child: TextField(
-                      controller: phoneController,
-                      decoration: InputDecoration(
-                        hintText: '핸드폰 번호(숫자만 입력)',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                    const SizedBox(height: 20),
+                    const Row(
+                      children: [
+                        // Text(
+                        //   '*',
+                        //   style: TextStyle(
+                        //     color: Colors.red,
+                        //     fontSize: 17,
+                        //   ),
+                        // ),
+                        // SizedBox(width: 5),
+                        Text(
+                          '핸드폰 번호',
+                          style: TextStyle(
+                            fontSize: 17,
                           ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      height: 50,
+                      child: TextField(
+                        controller: phoneController,
+                        decoration: InputDecoration(
+                          hintText: '핸드폰 번호(숫자만 입력)',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
                           ),
-                        ),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            onClearTap(phoneController);
-                          },
-                          child: const Icon(
-                            Icons.cancel_outlined,
-                            color: Colors.black54,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              onClearTap(phoneController);
+                            },
+                            child: const Icon(
+                              Icons.cancel_outlined,
+                              color: Colors.black54,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 5),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     Expanded(
-                  //       child: TextField(
-                  //         decoration: InputDecoration(
-                  //           hintText: '인증번호',
-                  //           enabledBorder: OutlineInputBorder(
-                  //             borderSide: BorderSide(
-                  //               color: Colors.grey.shade400,
-                  //               width: 1.0,
-                  //             ),
-                  //           ),
-                  //           focusedBorder: OutlineInputBorder(
-                  //             borderSide: BorderSide(
-                  //               color: Colors.grey.shade400,
-                  //               width: 1.0,
-                  //             ),
-                  //           ),
-                  //           suffixIcon: const Icon(
-                  //             Icons.cancel_outlined,
-                  //             color: Colors.black54,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     const SizedBox(width: 5),
-                  //     TextButton(
-                  //       onPressed: () {},
-                  //       style: TextButton.styleFrom(
-                  //         backgroundColor: const Color(0xFFA48AFF),
-                  //         shape: RoundedRectangleBorder(
-                  //           borderRadius: BorderRadius.circular(5),
-                  //         ),
-                  //       ),
-                  //       child: const Padding(
-                  //         padding: EdgeInsets.symmetric(
-                  //           vertical: 7,
-                  //         ),
-                  //         child: Row(
-                  //           mainAxisAlignment: MainAxisAlignment.center,
-                  //           children: [
-                  //             Text(
-                  //               '인증번호 전송',
-                  //               style: TextStyle(
-                  //                 color: Colors.white,
-                  //                 fontSize: 17,
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  const SizedBox(height: 20),
-                  const Row(
-                    children: [
-                      Text(
-                        '자기소개',
-                        style: TextStyle(
-                          fontSize: 17,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  SizedBox(
-                    height: 200,
-                    child: TextField(
-                      textAlignVertical: TextAlignVertical.top,
-                      controller: introductionController,
-                      expands: true,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                    const SizedBox(height: 5),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Expanded(
+                    //       child: TextField(
+                    //         decoration: InputDecoration(
+                    //           hintText: '인증번호',
+                    //           enabledBorder: OutlineInputBorder(
+                    //             borderSide: BorderSide(
+                    //               color: Colors.grey.shade400,
+                    //               width: 1.0,
+                    //             ),
+                    //           ),
+                    //           focusedBorder: OutlineInputBorder(
+                    //             borderSide: BorderSide(
+                    //               color: Colors.grey.shade400,
+                    //               width: 1.0,
+                    //             ),
+                    //           ),
+                    //           suffixIcon: const Icon(
+                    //             Icons.cancel_outlined,
+                    //             color: Colors.black54,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     const SizedBox(width: 5),
+                    //     TextButton(
+                    //       onPressed: () {},
+                    //       style: TextButton.styleFrom(
+                    //         backgroundColor: const Color(0xFFA48AFF),
+                    //         shape: RoundedRectangleBorder(
+                    //           borderRadius: BorderRadius.circular(5),
+                    //         ),
+                    //       ),
+                    //       child: const Padding(
+                    //         padding: EdgeInsets.symmetric(
+                    //           vertical: 7,
+                    //         ),
+                    //         child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.center,
+                    //           children: [
+                    //             Text(
+                    //               '인증번호 전송',
+                    //               style: TextStyle(
+                    //                 color: Colors.white,
+                    //                 fontSize: 17,
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    const SizedBox(height: 20),
+                    const Row(
+                      children: [
+                        Text(
+                          '자기소개',
+                          style: TextStyle(
+                            fontSize: 17,
                           ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      height: 200,
+                      child: TextField(
+                        textAlignVertical: TextAlignVertical.top,
+                        controller: introductionController,
+                        expands: true,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-        loading: () => const CircularProgressIndicator(),
-        error: (error, stack) {
-          print(error);
-          return SizedBox(
-            width: 300,
-            child: Text('error: $error'),
-          );
-        },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: TextButton(
-            onPressed: onSaveTap,
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFFA48AFF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
+            );
+          },
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stack) {
+            print(error);
+            return SizedBox(
+              width: 300,
+              child: Text('error: $error'),
+            );
+          },
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: TextButton(
+              onPressed: onSaveTap,
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFFA48AFF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
               ),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 5,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '저장',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: 5,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '저장',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

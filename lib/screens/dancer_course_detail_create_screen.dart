@@ -1170,485 +1170,496 @@ class DancerCourseDetailCreateScreen extends ConsumerWidget {
       keepPage: true,
     );
 
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(40),
-        child: AppBar(
-          automaticallyImplyLeading: true,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.chevron_left,
-              size: 30,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // <-- 키보드 숨기기
+      },
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(40),
+          child: AppBar(
+            automaticallyImplyLeading: true,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.chevron_left,
+                size: 30,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                ref.refresh(dancerCourseProvider);
+              },
             ),
-            onPressed: () {
-              Navigator.pop(context);
-              ref.refresh(dancerCourseProvider);
-            },
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: pickImage,
-              child: Stack(
-                children: [
-                  Container(
-                    height: 220,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.grey.shade400),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: pickImage,
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 220,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.grey.shade400),
+                        ),
                       ),
+                      child: imagesPath.isEmpty
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: 40,
+                                ),
+                                child: Icon(
+                                  Icons.add_photo_alternate_outlined,
+                                  size: 40,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              controller: pageController,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: imagesPath.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final path = imagesPath[index].path;
+                                return Image.asset(
+                                  width: 430,
+                                  height: 220,
+                                  path,
+                                  fit: BoxFit.fill,
+                                );
+                              },
+                            ),
                     ),
-                    child: imagesPath.isEmpty
-                        ? const Center(
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                bottom: 40,
-                              ),
-                              child: Icon(
-                                Icons.add_photo_alternate_outlined,
-                                size: 40,
-                                color: Colors.black87,
-                              ),
+                    imagesPath.isEmpty
+                        ? Container()
+                        : Positioned(
+                            left: (MediaQuery.of(context).size.width / 2) -
+                                (imagesPath.length * 10),
+                            bottom: 10,
+                            child: Row(
+                              children: [
+                                Center(
+                                  child: SmoothPageIndicator(
+                                    controller: pageController,
+                                    count: imagesPath.length,
+                                    effect: const SwapEffect(
+                                      dotHeight: 12,
+                                      dotWidth: 12,
+                                      dotColor: Color(0xFFA48AFF),
+                                      activeDotColor: Color(0xFF74D0FF),
+                                    ),
+                                    onDotClicked: (index) {
+                                      ref
+                                          .read(
+                                              initialImagePageProvider.notifier)
+                                          .update((state) => index);
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           )
-                        : ListView.builder(
-                            controller: pageController,
-                            scrollDirection: Axis.horizontal,
-                            itemCount: imagesPath.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              final path = imagesPath[index].path;
-                              return Image.asset(
-                                width: 430,
-                                height: 220,
-                                path,
-                                fit: BoxFit.fill,
-                              );
-                            },
-                          ),
-                  ),
-                  imagesPath.isEmpty
-                      ? Container()
-                      : Positioned(
-                          left: (MediaQuery.of(context).size.width / 2) -
-                              (imagesPath.length * 10),
-                          bottom: 10,
-                          child: Row(
-                            children: [
-                              Center(
-                                child: SmoothPageIndicator(
-                                  controller: pageController,
-                                  count: imagesPath.length,
-                                  effect: const SwapEffect(
-                                    dotHeight: 12,
-                                    dotWidth: 12,
-                                    dotColor: Color(0xFFA48AFF),
-                                    activeDotColor: Color(0xFF74D0FF),
-                                  ),
-                                  onDotClicked: (index) {
-                                    ref
-                                        .read(initialImagePageProvider.notifier)
-                                        .update((state) => index);
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                ],
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 20,
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFA48AFF),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 30,
-                          ),
-                          child: Text(
-                            '제목',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: SizedBox(
-                          height: 45,
-                          child: TextField(
-                            controller: titleController,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.only(left: 10),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 1.0,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey.shade400,
-                                  width: 1.0,
-                                ),
-                              ),
-                              suffixIcon: const Icon(
-                                Icons.cancel_outlined,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    itemCount: newDetailList.length,
-                    itemBuilder: (context, index) {
-                      if (newDetailList.length > 0) {
-                        return GestureDetector(
-                          onTap: () {
-                            onCourseDetailTap(index, newDetailList[index]);
-                          },
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 5,
-                                    horizontal: 5,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFA48AFF),
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                            child: const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 5,
-                                                horizontal: 15,
-                                              ),
-                                              child: Text(
-                                                '수업 회차',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            '${newDetailList[index]['title']}',
-                                            style: const TextStyle(
-                                              fontSize: 17,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFA48AFF),
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                            child: const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 5,
-                                                horizontal: 15,
-                                              ),
-                                              child: Text(
-                                                '수업 날짜',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            newDetailList[index]['course_date']
-                                                .split(' ')[0],
-                                            style: const TextStyle(
-                                              fontSize: 17,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xFFA48AFF),
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                ),
-                                                child: const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                    vertical: 5,
-                                                    horizontal: 15,
-                                                  ),
-                                                  child: Text(
-                                                    '시작 시간',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 15),
-                                              Text(
-                                                newDetailList[index]
-                                                    ['start_time'],
-                                                style: const TextStyle(
-                                                  fontSize: 17,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(width: 15),
-                                          Row(
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0xFFA48AFF),
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
-                                                child: const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                    vertical: 5,
-                                                    horizontal: 15,
-                                                  ),
-                                                  child: Text(
-                                                    '종료 시간',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 15),
-                                              Text(
-                                                newDetailList[index]
-                                                    ['end_time'],
-                                                style: const TextStyle(
-                                                  fontSize: 17,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFA48AFF),
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                            child: const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 5,
-                                                horizontal: 15,
-                                              ),
-                                              child: Text(
-                                                '수업 장소',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            newDetailList[index]['address'],
-                                            style: const TextStyle(
-                                              fontSize: 17,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 15),
-                              GestureDetector(
-                                onTap: () {
-                                  onRemoveTap(newDetailList[index]);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.redAccent,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Icon(
-                                    Icons.remove_circle_outline,
-                                    color: Colors.white,
-                                    size: 40,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                      return null;
-                    },
-                  ),
-                  GestureDetector(
-                    onTap: onAddTap,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 20,
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.green.shade400,
-                            borderRadius: BorderRadius.circular(20),
+                            color: const Color(0xFFA48AFF),
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.add_circle_outline,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 30,
+                            ),
+                            child: Text(
+                              '제목',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.white,
-                                size: 40,
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: 10,
-                                  right: 15,
-                                ),
-                                child: Text(
-                                  '회차 추가하기',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: SizedBox(
+                            height: 45,
+                            child: TextField(
+                              controller: titleController,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 10),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
                                   ),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade400,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                suffixIcon: const Icon(
+                                  Icons.cancel_outlined,
+                                  color: Colors.black54,
+                                ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: descriptionController,
-                    // expands: true,
-                    maxLines: 10,
-                    decoration: InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade400,
-                          width: 1.0,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade400,
-                          width: 1.0,
+                    const SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.grey.shade400,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      itemCount: newDetailList.length,
+                      itemBuilder: (context, index) {
+                        if (newDetailList.length > 0) {
+                          return GestureDetector(
+                            onTap: () {
+                              onCourseDetailTap(index, newDetailList[index]);
+                            },
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 5,
+                                      horizontal: 5,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFA48AFF),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                              ),
+                                              child: const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 5,
+                                                  horizontal: 15,
+                                                ),
+                                                child: Text(
+                                                  '수업 회차',
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              '${newDetailList[index]['title']}',
+                                              style: const TextStyle(
+                                                fontSize: 17,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFA48AFF),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                              ),
+                                              child: const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 5,
+                                                  horizontal: 15,
+                                                ),
+                                                child: Text(
+                                                  '수업 날짜',
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              newDetailList[index]
+                                                      ['course_date']
+                                                  .split(' ')[0],
+                                              style: const TextStyle(
+                                                fontSize: 17,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xFFA48AFF),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                  ),
+                                                  child: const Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      vertical: 5,
+                                                      horizontal: 15,
+                                                    ),
+                                                    child: Text(
+                                                      '시작 시간',
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 5),
+                                                Text(
+                                                  newDetailList[index]
+                                                      ['start_time'],
+                                                  style: const TextStyle(
+                                                    fontSize: 17,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xFFA48AFF),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                  ),
+                                                  child: const Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      vertical: 5,
+                                                      horizontal: 15,
+                                                    ),
+                                                    child: Text(
+                                                      '종료 시간',
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 5),
+                                                Text(
+                                                  newDetailList[index]
+                                                      ['end_time'],
+                                                  style: const TextStyle(
+                                                    fontSize: 17,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFA48AFF),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                              ),
+                                              child: const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 5,
+                                                  horizontal: 15,
+                                                ),
+                                                child: Text(
+                                                  '수업 장소',
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              newDetailList[index]['address'],
+                                              style: const TextStyle(
+                                                fontSize: 17,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                GestureDetector(
+                                  onTap: () {
+                                    onRemoveTap(newDetailList[index]);
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.redAccent,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Icon(
+                                      Icons.remove_circle_outline,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        return null;
+                      },
+                    ),
+                    GestureDetector(
+                      onTap: onAddTap,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade400,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.add_circle_outline,
+                                  color: Colors.white,
+                                  size: 40,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 10,
+                                    right: 15,
+                                  ),
+                                  child: Text(
+                                    '회차 추가하기',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: descriptionController,
+                      // expands: true,
+                      maxLines: 10,
+                      decoration: InputDecoration(
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 1.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade400,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white24,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: TextButton(
-            onPressed: onSaveTap,
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFFA48AFF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
+        bottomNavigationBar: BottomAppBar(
+          color: Colors.white24,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: TextButton(
+              onPressed: onSaveTap,
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFFA48AFF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
               ),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 3,
-                horizontal: 15,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '저장하기',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: 3,
+                  horizontal: 15,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '저장하기',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

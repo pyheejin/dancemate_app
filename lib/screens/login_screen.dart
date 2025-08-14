@@ -298,210 +298,234 @@ class LoginScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 20,
-          horizontal: 50,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 130),
-            SizedBox(
-              width: 200,
-              height: 120,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/app_logo/detail_2x.png',
-                ),
-              ),
-            ),
-            const SizedBox(height: 80),
-            const Row(
-              children: [
-                Text('이메일'),
-              ],
-            ),
-            const SizedBox(height: 5),
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                hintText: 'Enter your email',
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade400,
-                    width: 1.0,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade400,
-                    width: 1.0,
-                  ),
-                ),
-                suffixIcon: GestureDetector(
-                  onTap: () {
-                    onClearTap(emailController);
-                  },
-                  child: const Icon(
-                    Icons.cancel_outlined,
-                    color: Colors.black54,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 20,
+            horizontal: 50,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 130),
+              GestureDetector(
+                onTap: () async {
+                  // FCM 토큰 발급받기
+                  final req =
+                      await FirebaseMessaging.instance.requestPermission(
+                    alert: true,
+                    badge: true,
+                    sound: true,
+                  );
+
+                  final fcmToken =
+                      await FirebaseMessaging.instance.getAPNSToken();
+                  print(fcmToken);
+                  if (req.authorizationStatus ==
+                          AuthorizationStatus.authorized &&
+                      fcmToken != null) {
+                    print('FCM Token: $fcmToken');
+                  } else {
+                    print('FCM Token: null');
+                  }
+                },
+                child: SizedBox(
+                  width: 200,
+                  height: 120,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/app_logo/detail_2x.png',
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            const Row(
-              children: [
-                Text('비밀번호'),
-              ],
-            ),
-            const SizedBox(height: 5),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: 'Enter your password',
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade400,
-                    width: 1.0,
+              const SizedBox(height: 80),
+              const Row(
+                children: [
+                  Text('이메일'),
+                ],
+              ),
+              const SizedBox(height: 5),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  hintText: 'Enter your email',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.grey.shade400,
+                      width: 1.0,
+                    ),
                   ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade400,
-                    width: 1.0,
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.grey.shade400,
+                      width: 1.0,
+                    ),
                   ),
-                ),
-                suffixIcon: GestureDetector(
-                  onTap: () {
-                    onClearTap(passwordController);
-                  },
-                  child: const Icon(
-                    Icons.cancel_outlined,
-                    color: Colors.black54,
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      onClearTap(emailController);
+                    },
+                    child: const Icon(
+                      Icons.cancel_outlined,
+                      color: Colors.black54,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 40),
-            TextButton(
-              onPressed: onLoginTap,
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFFA48AFF),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
+              const SizedBox(height: 30),
+              const Row(
+                children: [
+                  Text('비밀번호'),
+                ],
+              ),
+              const SizedBox(height: 5),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: 'Enter your password',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.grey.shade400,
+                      width: 1.0,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.grey.shade400,
+                      width: 1.0,
+                    ),
+                  ),
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      onClearTap(passwordController);
+                    },
+                    child: const Icon(
+                      Icons.cancel_outlined,
+                      color: Colors.black54,
+                    ),
+                  ),
                 ),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: 5,
+              const SizedBox(height: 40),
+              TextButton(
+                onPressed: onLoginTap,
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFFA48AFF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '로그인',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Row(
+                children: [
+                  Text(
+                    '비밀번호를 잊으셨나요?',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+              Row(
+                children: [
+                  const Text("Don't have an account?"),
+                  const SizedBox(width: 5),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const SignUpScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      '회원가입',
+                      style: TextStyle(
+                        color: Color(0xFFA48AFF),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 60),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '소셜 로그인',
+                    style: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '로그인',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    GestureDetector(
+                      onTap: () {
+                        onSocialLoginTap(3);
+                      },
+                      child: SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: Image.asset('assets/images/kakao_logo.png'),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        onSocialLoginTap(2);
+                      },
+                      child: SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: Image.asset('assets/images/google_logo.png'),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        onSocialLoginTap(4);
+                      },
+                      child: SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: Image.asset('assets/images/apple_logo.png'),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            const Row(
-              children: [
-                Text(
-                  '비밀번호를 잊으셨나요?',
-                  style: TextStyle(
-                    color: Colors.redAccent,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
-            Row(
-              children: [
-                const Text("Don't have an account?"),
-                const SizedBox(width: 5),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const SignUpScreen(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    '회원가입',
-                    style: TextStyle(
-                      color: Color(0xFFA48AFF),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 60),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '소셜 로그인',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 15,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      onSocialLoginTap(3);
-                    },
-                    child: SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: Image.asset('assets/images/kakao_logo.png'),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      onSocialLoginTap(2);
-                    },
-                    child: SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: Image.asset('assets/images/google_logo.png'),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      onSocialLoginTap(4);
-                    },
-                    child: SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: Image.asset('assets/images/apple_logo.png'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

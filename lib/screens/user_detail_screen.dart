@@ -2,7 +2,7 @@ import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/chat_room_create_screen.dart';
-import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:dancemate_app/screens/photo_screen.dart';
 import 'package:dancemate_app/screens/setting_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
@@ -28,7 +28,7 @@ class UserDetailScreen extends ConsumerWidget {
     void onCourseTap(int courseId) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => CourseDetailScreen(courseId: courseId),
+          builder: (context) => LessonDetailScreen(courseId: courseId),
         ),
       );
     }

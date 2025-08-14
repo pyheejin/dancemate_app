@@ -1,16 +1,17 @@
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/order_screen.dart';
+import 'package:dancemate_app/screens/photo_screen.dart';
 import 'package:dancemate_app/screens/reserve_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class CourseDetailScreen extends ConsumerWidget {
+class LessonDetailScreen extends ConsumerWidget {
   final int courseId;
 
-  const CourseDetailScreen({
+  const LessonDetailScreen({
     super.key,
     required this.courseId,
   });
@@ -26,6 +27,17 @@ class CourseDetailScreen extends ConsumerWidget {
         selectCourseDetailId =
             courseDetailData.value['lesson']['course'][0]['id'];
       }
+    }
+
+    Future<void> onProfileImageTap(String imagePath) async {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PhotoScreen(
+            imagePathList: [imagePath],
+            currentIndex: 0,
+          ),
+        ),
+      );
     }
 
     void onReserveTap(int courseDetailId, int dancerId, int ticketCount) async {
@@ -80,9 +92,22 @@ class CourseDetailScreen extends ConsumerWidget {
             final dancerData = courseDetail['lesson']['dancer'];
             final dancerEmail = dancerData['email'];
             final dancerNickname = dancerData['nickname'];
-            final dancerImageUrl = dancerData['image_url'];
+            String dancerImageUrl = dancerData['image_url'];
 
             final courseDetailList = courseDetail['lesson']['course'];
+
+            ImageProvider finalImageProvider;
+            if (dancerImageUrl.isNotEmpty) {
+              if (dancerImageUrl.split(':')[0] == 'https') {
+                finalImageProvider = NetworkImage(dancerImageUrl);
+              } else {
+                finalImageProvider = AssetImage(dancerImageUrl);
+              }
+            } else {
+              // 기본 이미지 경로 설정
+              dancerImageUrl = 'assets/images/app_logo/chat.png';
+              finalImageProvider = AssetImage(dancerImageUrl);
+            }
             return Column(
               children: [
                 const SizedBox(height: 10),
@@ -153,20 +178,14 @@ class CourseDetailScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          dancerImageUrl == ''
-                              ? const CircleAvatar(
-                                  foregroundImage: AssetImage(
-                                      'assets/images/app_logo/chat.png'),
-                                )
-                              : dancerImageUrl.split(':')[0] == 'https'
-                                  ? CircleAvatar(
-                                      foregroundImage:
-                                          NetworkImage(dancerImageUrl),
-                                    )
-                                  : CircleAvatar(
-                                      foregroundImage:
-                                          AssetImage(dancerImageUrl),
-                                    ),
+                          GestureDetector(
+                            onTap: () {
+                              onProfileImageTap(dancerImageUrl);
+                            },
+                            child: CircleAvatar(
+                              foregroundImage: finalImageProvider,
+                            ),
+                          ),
                           const SizedBox(width: 5),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,99 +239,105 @@ class CourseDetailScreen extends ConsumerWidget {
                             vertical: 10,
                           ),
                           child: ListView.builder(
-                              shrinkWrap: true,
-                              padding: EdgeInsets.zero,
-                              itemCount: courseDetailList.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 5,
-                                    horizontal: 5,
-                                  ),
-                                  child: Row(
-                                    // mainAxisAlignment:
-                                    //     MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade200,
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 5,
-                                            horizontal: 30,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.zero,
+                            itemCount: courseDetailList.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 5,
+                                  horizontal: 5,
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      // mainAxisAlignment:
+                                      //     MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            borderRadius:
+                                                BorderRadius.circular(5),
                                           ),
-                                          child: Text(
-                                            courseDetailList[index]
-                                                ['course_date'],
-                                            style: const TextStyle(
-                                              color: Color(0xff3F51B5),
-                                              fontSize: 15,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 5,
+                                              horizontal: 30,
+                                            ),
+                                            child: Text(
+                                              courseDetailList[index]
+                                                  ['course_date'],
+                                              style: const TextStyle(
+                                                color: Color(0xff3F51B5),
+                                                fontSize: 15,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: const Color(0xff3F51B5),
+                                        Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 10,
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 3,
-                                            horizontal: 20,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: const Color(0xff3F51B5),
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
                                           ),
-                                          child: Text(
-                                            courseDetailList[index]['title'],
-                                            style: const TextStyle(
-                                              fontSize: 15,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 3,
+                                              horizontal: 20,
+                                            ),
+                                            child: Text(
+                                              courseDetailList[index]['title'],
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: const Color(0xff3F51B5),
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: const Color(0xff3F51B5),
                                         ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 3,
-                                            horizontal: 20,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                courseDetailList[index]
-                                                    ['address'],
-                                                style: const TextStyle(
-                                                  fontSize: 15,
-                                                ),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 3,
+                                          horizontal: 20,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              courseDetailList[index]
+                                                  ['address'],
+                                              style: const TextStyle(
+                                                fontSize: 15,
                                               ),
-                                              const SizedBox(width: 5),
-                                              const Icon(
-                                                Icons.location_on_outlined,
-                                                color: Color(0xFFA48AFF),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            const Icon(
+                                              Icons.location_on_outlined,
+                                              color: Color(0xFFA48AFF),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                );
-                              }),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),

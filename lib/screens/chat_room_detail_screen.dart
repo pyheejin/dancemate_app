@@ -1,5 +1,6 @@
 import 'package:dancemate_app/provider/chat_provider.dart';
 import 'package:dancemate_app/screens/chat_room_screen.dart';
+import 'package:dancemate_app/screens/photo_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,99 +42,110 @@ class ChatRoomDetailScreen extends ConsumerWidget {
       }
     }
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        centerTitle: true,
-        automaticallyImplyLeading: true,
-        title: chatRoomData.when(
-          data: (room) {
-            final loginUserId = room['login_user_id'];
-
-            final userData = room['chat_room']['user'];
-            final userId = userData['id'];
-
-            final friendData = room['chat_room']['friend'];
-
-            String nickname = userData['nickname'];
-            if (loginUserId == userId) {
-              nickname = friendData['nickname'];
-            }
-            return Text(nickname);
-          },
-          loading: () => const CircularProgressIndicator(),
-          error: (error, stack) {
-            return SizedBox(
-              width: 300,
-              child: Text('chat room detail error: $error'),
-            );
-          },
-        ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.chevron_left,
-            size: 30,
+    Future<void> onProfileImageTap(String imagePath) async {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PhotoScreen(
+            imagePathList: [imagePath],
+            currentIndex: 0,
           ),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const ChatRoomScreen(),
-              ),
-            );
-            ref.refresh(getChatRoomProvider(1));
-          },
         ),
-        actions: [
-          GestureDetector(
-            onTap: onNoticeTap,
-            child: chatRoomData.when(
-              data: (room) {
-                final isNotice = room['is_notice'];
-                return Icon(
-                  isNotice == 1
-                      ? Icons.notifications_outlined
-                      : Icons.notifications_off_outlined,
-                  size: 27,
-                );
-              },
-              loading: () => const CircularProgressIndicator(),
-              error: (error, stack) {
-                return SizedBox(
-                  width: 300,
-                  child: Text('chat room detail actions error: $error'),
-                );
-              },
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // <-- 키보드 숨기기
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          centerTitle: true,
+          automaticallyImplyLeading: true,
+          title: chatRoomData.when(
+            data: (room) {
+              final loginUserId = room['login_user_id'];
+
+              final userData = room['chat_room']['user'];
+              final userId = userData['id'];
+
+              final friendData = room['chat_room']['friend'];
+
+              String nickname = userData['nickname'];
+              if (loginUserId == userId) {
+                nickname = friendData['nickname'];
+              }
+              return Text(nickname);
+            },
+            loading: () => const CircularProgressIndicator(),
+            error: (error, stack) {
+              return SizedBox(
+                width: 300,
+                child: Text('chat room detail error: $error'),
+              );
+            },
+          ),
+          leading: IconButton(
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 30,
             ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ChatRoomScreen(),
+                ),
+              );
+              ref.refresh(getChatRoomProvider(1));
+            },
           ),
-          const SizedBox(width: 10),
-          GestureDetector(
-            onTap: onExitTap,
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFA48AFF),
-                borderRadius: BorderRadius.circular(5),
+          actions: [
+            GestureDetector(
+              onTap: onNoticeTap,
+              child: chatRoomData.when(
+                data: (room) {
+                  final isNotice = room['is_notice'];
+                  return Icon(
+                    isNotice == 1
+                        ? Icons.notifications_outlined
+                        : Icons.notifications_off_outlined,
+                    size: 27,
+                  );
+                },
+                loading: () => const CircularProgressIndicator(),
+                error: (error, stack) {
+                  return SizedBox(
+                    width: 300,
+                    child: Text('chat room detail actions error: $error'),
+                  );
+                },
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(5),
-                child: Text(
-                  '채팅방 나가기',
-                  style: TextStyle(
-                    color: Colors.white,
+            ),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: onExitTap,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFA48AFF),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    '채팅방 나가기',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 10),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus(); // <-- 가상 키보드 숨기기
-              },
+            const SizedBox(width: 10),
+          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   vertical: 20,
@@ -207,6 +219,25 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                           friendImageUrl =
                                               chatData['user']['image_url'];
                                         }
+
+                                        ImageProvider finalImageProvider;
+                                        if (friendImageUrl != '') {
+                                          if (friendImageUrl.split(':')[0] ==
+                                              'https') {
+                                            finalImageProvider =
+                                                NetworkImage(friendImageUrl);
+                                          } else {
+                                            finalImageProvider =
+                                                AssetImage(friendImageUrl);
+                                          }
+                                        } else {
+                                          // 기본 이미지 경로 설정
+                                          friendImageUrl =
+                                              'assets/images/app_logo/chat.png';
+                                          finalImageProvider =
+                                              AssetImage(friendImageUrl);
+                                        }
+
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(
                                             vertical: 5,
@@ -277,29 +308,20 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                                                 MainAxisAlignment
                                                                     .start,
                                                             children: [
-                                                              SizedBox(
-                                                                width: 50,
-                                                                height: 50,
-                                                                child: friendImageUrl ==
-                                                                        ''
-                                                                    ? const CircleAvatar(
-                                                                        foregroundImage:
-                                                                            AssetImage('assets/images/app_logo/chat.png'),
-                                                                      )
-                                                                    : friendImageUrl.split(':')[0] ==
-                                                                            'https'
-                                                                        ? CircleAvatar(
-                                                                            radius:
-                                                                                50,
-                                                                            foregroundImage:
-                                                                                NetworkImage(friendImageUrl),
-                                                                          )
-                                                                        : CircleAvatar(
-                                                                            radius:
-                                                                                50,
-                                                                            foregroundImage:
-                                                                                AssetImage(friendImageUrl),
-                                                                          ),
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  onProfileImageTap(
+                                                                      friendImageUrl);
+                                                                },
+                                                                child: SizedBox(
+                                                                  width: 50,
+                                                                  height: 50,
+                                                                  child:
+                                                                      CircleAvatar(
+                                                                    foregroundImage:
+                                                                        finalImageProvider,
+                                                                  ),
+                                                                ),
                                                               ),
                                                               const SizedBox(
                                                                   width: 5),
@@ -494,8 +516,8 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

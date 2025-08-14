@@ -96,7 +96,10 @@ class TicketHistoryScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(10),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 15,
+                                      horizontal: 5,
+                                    ),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -104,8 +107,8 @@ class TicketHistoryScreen extends ConsumerWidget {
                                         Row(
                                           children: [
                                             Container(
-                                              width: 70,
-                                              height: 70,
+                                              width: 50,
+                                              height: 50,
                                               decoration: BoxDecoration(
                                                 border: Border.all(
                                                   color: Colors.grey.shade400,
@@ -158,17 +161,17 @@ class TicketHistoryScreen extends ConsumerWidget {
                                                     ),
                                                   ),
                                                 ),
-                                                Text(
-                                                  '@$dancerEmail',
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
+                                                // Text(
+                                                //   '@$dancerEmail',
+                                                //   style: const TextStyle(
+                                                //     fontSize: 15,
+                                                //   ),
+                                                // ),
                                               ],
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 20),
+                                        const SizedBox(height: 25),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -176,14 +179,14 @@ class TicketHistoryScreen extends ConsumerWidget {
                                             Text(
                                               '$count',
                                               style: const TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 15,
                                               ),
                                             ),
                                             const SizedBox(width: 100),
                                             Text(
                                               '$price원',
                                               style: const TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 15,
                                               ),
                                             ),
                                           ],

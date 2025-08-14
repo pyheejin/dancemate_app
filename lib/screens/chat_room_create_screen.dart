@@ -38,7 +38,7 @@ class ChatRoomCreateScreen extends ConsumerWidget {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                FocusScope.of(context).unfocus(); // <-- 가상 키보드 숨기기
+                FocusScope.of(context).unfocus(); // <-- 키보드 숨기기
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(

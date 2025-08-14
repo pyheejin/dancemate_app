@@ -373,9 +373,7 @@ class SignUpScreen extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: 200,
-                    height: 50,
+                  Expanded(
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: '인증번호',
@@ -398,29 +396,32 @@ class SignUpScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      backgroundColor: const Color(0xFFA48AFF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xFFA48AFF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
                       ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 5,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '인증번호 전송',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 5,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '인증번호 전송',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

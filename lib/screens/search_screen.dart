@@ -1,5 +1,5 @@
 import 'package:dancemate_app/provider/search_provider.dart';
-import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,57 +23,63 @@ class SearchScreen extends ConsumerWidget {
       ref.refresh(getSearchPreProvider);
     }
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 80),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: textController,
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // <-- 키보드 숨기기
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 80),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: textController,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade400,
+                              width: 1.0,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 15),
-                  GestureDetector(
-                    onTap: () {
-                      onTap(textController.text);
-                    },
-                    child: const Icon(
-                      Icons.search_outlined,
-                      size: 30,
+                    const SizedBox(width: 15),
+                    GestureDetector(
+                      onTap: () {
+                        onTap(textController.text);
+                      },
+                      child: const Icon(
+                        Icons.search_outlined,
+                        size: 30,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            SearchResult(
-              ref: ref,
-              courses: courses,
-              searchPre: searchPre,
-              text: keyword,
-            ),
-          ],
+              const SizedBox(height: 20),
+              SearchResult(
+                ref: ref,
+                courses: courses,
+                searchPre: searchPre,
+                text: keyword,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -104,7 +110,7 @@ class SearchResult extends StatelessWidget {
     void onCourseTap(int courseId) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => CourseDetailScreen(courseId: courseId),
+          builder: (context) => LessonDetailScreen(courseId: courseId),
         ),
       );
     }

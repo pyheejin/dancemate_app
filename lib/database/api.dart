@@ -37,36 +37,40 @@ class ApiServices {
       String email, String password) async {
     await storage.delete(key: 'login');
 
-    final response = await http.post(
-      Uri.parse('$baseUrl/user/login'),
-      body: {
-        'username': email,
-        'password': password,
-      },
-    );
-
-    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
-
-    if (resultData['result_code'] == 200) {
-      final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-      final userId = responseBody['user_id'];
-      final userType = responseBody['type'];
-      final accessToken = responseBody['access_token'];
-
-      final payload = jsonEncode({
-        'userId': userId,
-        'userType': userType,
-        'email': email,
-        'access_token': accessToken,
-      });
-
-      await storage.write(
-        key: 'login',
-        value: payload,
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/user/login'),
+        body: {
+          'username': email,
+          'password': password,
+        },
       );
-      return responseBody;
-    } else {
-      throw Exception('${resultData['result_msg']}');
+
+      final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+
+      if (resultData['result_code'] == 200) {
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final userId = responseBody['user_id'];
+        final userType = responseBody['type'];
+        final accessToken = responseBody['access_token'];
+
+        final payload = jsonEncode({
+          'userId': userId,
+          'userType': userType,
+          'email': email,
+          'access_token': accessToken,
+        });
+
+        await storage.write(
+          key: 'login',
+          value: payload,
+        );
+        return responseBody;
+      } else {
+        throw Exception('${resultData['result_msg']}');
+      }
+    } catch (e) {
+      throw Exception('login error: $e');
     }
   }
 

@@ -73,6 +73,7 @@ class OrderScreen extends ConsumerWidget {
                   const SizedBox(height: 5),
                   ListView.builder(
                     shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: ticketDetailData.length,
                     itemBuilder: (context, index) {
                       final ticketDetail = ticketDetailData[index];

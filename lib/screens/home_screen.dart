@@ -2,9 +2,10 @@ import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/screens/chat_room_screen.dart';
-import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,7 +37,7 @@ class HomeScreen extends ConsumerWidget {
     void onCourseTap(int courseId) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => CourseDetailScreen(courseId: courseId),
+          builder: (context) => LessonDetailScreen(courseId: courseId),
         ),
       );
     }
@@ -62,20 +63,20 @@ class HomeScreen extends ConsumerWidget {
           GestureDetector(
             onTap: () async {
               // // FCM 토큰 발급받기
-              // final req = await FirebaseMessaging.instance.requestPermission(
-              //   alert: true,
-              //   badge: true,
-              //   sound: true,
-              // );
+              final req = await FirebaseMessaging.instance.requestPermission(
+                alert: true,
+                badge: true,
+                sound: true,
+              );
 
-              // final fcmToken = await FirebaseMessaging.instance.getAPNSToken();
-              // print(fcmToken);
-              // if (req.authorizationStatus == AuthorizationStatus.authorized &&
-              //     fcmToken != null) {
-              //   print('FCM Token: $fcmToken');
-              // } else {
-              //   print('FCM Token: null');
-              // }
+              final fcmToken = await FirebaseMessaging.instance.getAPNSToken();
+              print(fcmToken);
+              if (req.authorizationStatus == AuthorizationStatus.authorized &&
+                  fcmToken != null) {
+                print('FCM Token: $fcmToken');
+              } else {
+                print('FCM Token: null');
+              }
 
               // await FlutterLocalNotification.init();
               // // 3초 후 권한 요청

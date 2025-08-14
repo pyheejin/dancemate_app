@@ -48,7 +48,7 @@ class ChatRoomScreen extends ConsumerWidget {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                FocusScope.of(context).unfocus(); // <-- 가상 키보드 숨기기
+                FocusScope.of(context).unfocus(); // <-- 키보드 숨기기
               },
               child: Align(
                 alignment: Alignment.topCenter,
@@ -72,18 +72,19 @@ class ChatRoomScreen extends ConsumerWidget {
                         final roomNotificationData =
                             roomData['room_notification'];
 
-                        final friendData = roomData['friend'];
-                        String friendNickname = friendData['nickname'];
-                        String friendImageUrl = friendData['image_url'];
-
                         final userData = roomData['user'];
+                        final friendData = roomData['friend'];
+                        String friendNickname = '';
+                        String friendImageUrl = '';
 
-                        if (loginUserId == chatUserId) {
-                          friendNickname = friendData['nickname'];
-                          friendImageUrl = friendData['image_url'];
-                        } else {
-                          friendNickname = userData['nickname'];
-                          friendImageUrl = userData['image_url'];
+                        if (friendData != null) {
+                          if (loginUserId == chatUserId) {
+                            friendNickname = friendData['nickname'];
+                            friendImageUrl = friendData['image_url'];
+                          } else {
+                            friendNickname = userData['nickname'];
+                            friendImageUrl = userData['image_url'];
+                          }
                         }
 
                         int isCheck = 0;

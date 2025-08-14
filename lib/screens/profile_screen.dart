@@ -1,7 +1,7 @@
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
-import 'package:dancemate_app/screens/course_detail_screen.dart';
+import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:dancemate_app/screens/photo_screen.dart';
 import 'package:dancemate_app/screens/setting_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
@@ -24,7 +24,7 @@ class ProfileScreen extends ConsumerWidget {
     void onCourseTap(int courseId) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => CourseDetailScreen(courseId: courseId),
+          builder: (context) => LessonDetailScreen(courseId: courseId),
         ),
       );
     }
@@ -728,152 +728,149 @@ class ProfileScreen extends ConsumerWidget {
                             final dancerImageUrl = dancerData['image_url'];
                             return Padding(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 5,
+                                vertical: 1,
                                 horizontal: 10,
                               ),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color.fromARGB(88, 163, 138, 255),
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(15),
-                                        bottomRight: Radius.circular(15),
-                                      ),
-                                      border: Border(
-                                        right: BorderSide(
-                                          color: Colors.black38,
-                                          style: BorderStyle.solid,
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        color:
+                                            Color.fromARGB(88, 163, 138, 255),
+                                        borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(15),
+                                          bottomRight: Radius.circular(15),
+                                        ),
+                                        border: Border(
+                                          right: BorderSide(
+                                            color: Colors.black38,
+                                            style: BorderStyle.solid,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                        horizontal: 25,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Container(
-                                                width: 70,
-                                                height: 70,
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: Colors.grey.shade400,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(35),
-                                                ),
-                                                child: CircleAvatar(
-                                                  backgroundImage: NetworkImage(
-                                                    dancerImageUrl,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 5),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(
-                                                          0xff6555FF),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 10,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  width: 70,
+                                                  height: 70,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color:
+                                                          Colors.grey.shade400,
                                                     ),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 15),
-                                                      child: Text(
-                                                        dancerNickname,
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16,
-                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            35),
+                                                  ),
+                                                  child: CircleAvatar(
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                      dancerImageUrl,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 5),
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xff6555FF),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 15),
+                                                    child: Text(
+                                                      dancerNickname,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
                                                       ),
                                                     ),
                                                   ),
-                                                  Text(
-                                                    '@$dancerEmail',
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                    ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 15),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  '$count회권',
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
                                                   ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 20),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                '$count회권',
-                                                style: const TextStyle(
-                                                  fontSize: 16,
                                                 ),
-                                              ),
-                                              const SizedBox(width: 100),
-                                              Text(
-                                                '${format.format(price)}원',
-                                                style: const TextStyle(
-                                                  fontSize: 16,
+                                                const SizedBox(width: 100),
+                                                Text(
+                                                  '${format.format(price)}원',
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color.fromARGB(81, 64, 195, 255),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(15),
-                                        bottomLeft: Radius.circular(15),
-                                      ),
-                                      border: Border(
-                                        left: BorderSide(
-                                          color: Colors.black26,
-                                          style: BorderStyle.solid,
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 30,
-                                        horizontal: 12,
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        color: Color.fromARGB(81, 64, 195, 255),
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(15),
+                                          bottomLeft: Radius.circular(15),
+                                        ),
+                                        border: Border(
+                                          left: BorderSide(
+                                            color: Colors.black26,
+                                            style: BorderStyle.solid,
+                                          ),
+                                        ),
                                       ),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            textAlign: TextAlign.center,
-                                            '남은 횟수:\n $remainCount회',
-                                            style: const TextStyle(
-                                              fontSize: 16,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 30,
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              textAlign: TextAlign.center,
+                                              '남은 횟수:\n $remainCount회',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 5),
-                                          Text(
-                                            textAlign: TextAlign.right,
-                                            '$expiredDate',
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.red,
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              textAlign: TextAlign.right,
+                                              '$expiredDate',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.red,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),

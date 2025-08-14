@@ -1,4 +1,5 @@
 import 'package:dancemate_app/provider/chat_provider.dart';
+import 'package:dancemate_app/screens/photo_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,6 +17,17 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
     final scrollController = ScrollController();
     final TextEditingController chatController = TextEditingController();
     final chatRoomData = ref.watch(getChatRoomDetailProvider(chatRoomId));
+
+    Future<void> onProfileImageTap(String imagePath) async {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PhotoScreen(
+            imagePathList: [imagePath],
+            currentIndex: 0,
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -51,8 +63,21 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
           data: (room) {
             String roomTitle = room['lesson']['title'];
             final dancerData = room['dancer'];
-            final dancerImageUrl = dancerData['image_url'];
+            String dancerImageUrl = dancerData['image_url'];
             final dancerNickname = dancerData['nickname'];
+
+            ImageProvider finalImageProvider;
+            if (dancerImageUrl != '') {
+              if (dancerImageUrl.split(':')[0] == 'https') {
+                finalImageProvider = NetworkImage(dancerImageUrl);
+              } else {
+                finalImageProvider = AssetImage(dancerImageUrl);
+              }
+            } else {
+              // 기본 이미지 경로 설정
+              dancerImageUrl = 'assets/images/app_logo/chat.png';
+              finalImageProvider = AssetImage(dancerImageUrl);
+            }
             return Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 10,
@@ -95,21 +120,15 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
                           ),
                           borderRadius: BorderRadius.circular(35),
                         ),
-                        child: dancerImageUrl == ''
-                            ? const CircleAvatar(
-                                foregroundImage: AssetImage(
-                                    'assets/images/app_logo/chat.png'),
-                              )
-                            : dancerImageUrl.split(':')[0] == 'https'
-                                ? CircleAvatar(
-                                    radius: 50,
-                                    foregroundImage:
-                                        NetworkImage(dancerImageUrl),
-                                  )
-                                : CircleAvatar(
-                                    radius: 50,
-                                    foregroundImage: AssetImage(dancerImageUrl),
-                                  ),
+                        child: GestureDetector(
+                          onTap: () {
+                            onProfileImageTap(dancerImageUrl);
+                          },
+                          child: CircleAvatar(
+                            radius: 50,
+                            foregroundImage: finalImageProvider,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 5),
                       Text(
@@ -131,39 +150,45 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
                         final loginUserId = room['login_user_id'];
                         final userData = room['reserve_users'][index]['user'];
                         final userId = userData['id'];
-                        final userImageUrl = userData['image_url'];
+                        String userImageUrl = userData['image_url'];
                         final userNickname = userData['nickname'];
+
+                        ImageProvider finalImageProvider;
+                        if (userImageUrl != '') {
+                          if (userImageUrl.split(':')[0] == 'https') {
+                            finalImageProvider = NetworkImage(userImageUrl);
+                          } else {
+                            finalImageProvider = AssetImage(userImageUrl);
+                          }
+                        } else {
+                          // 기본 이미지 경로 설정
+                          userImageUrl = 'assets/images/app_logo/chat.png';
+                          finalImageProvider = AssetImage(userImageUrl);
+                        }
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 70,
-                                height: 70,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    width: 1,
-                                    color: Colors.grey.shade400,
+                              GestureDetector(
+                                onTap: () {
+                                  onProfileImageTap(userImageUrl);
+                                },
+                                child: Container(
+                                  width: 70,
+                                  height: 70,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 1,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                    borderRadius: BorderRadius.circular(35),
                                   ),
-                                  borderRadius: BorderRadius.circular(35),
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    foregroundImage: finalImageProvider,
+                                  ),
                                 ),
-                                child: userImageUrl == ''
-                                    ? const CircleAvatar(
-                                        foregroundImage: AssetImage(
-                                            'assets/images/app_logo/chat.png'),
-                                      )
-                                    : userImageUrl.split(':')[0] == 'https'
-                                        ? CircleAvatar(
-                                            radius: 50,
-                                            foregroundImage:
-                                                NetworkImage(userImageUrl),
-                                          )
-                                        : CircleAvatar(
-                                            radius: 50,
-                                            foregroundImage:
-                                                AssetImage(userImageUrl),
-                                          ),
                               ),
                               const SizedBox(width: 5),
                               Text(
@@ -199,7 +224,7 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                FocusScope.of(context).unfocus(); // <-- 가상 키보드 숨기기
+                FocusScope.of(context).unfocus(); // <-- 키보드 숨기기
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(

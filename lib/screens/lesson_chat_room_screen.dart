@@ -34,7 +34,7 @@ class LessonChatRoomScreen extends ConsumerWidget {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                FocusScope.of(context).unfocus(); // <-- 가상 키보드 숨기기
+                FocusScope.of(context).unfocus(); // <-- 키보드 숨기기
               },
               child: Align(
                 alignment: Alignment.topCenter,
@@ -147,13 +147,21 @@ class LessonChatRoomScreen extends ConsumerWidget {
                                           Text(
                                             lastChat,
                                             overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
                                 ),
-                                Text(lastChatTime),
+                                Text(
+                                  lastChatTime,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
