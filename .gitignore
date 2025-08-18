@@ -57,3 +57,8 @@ ios/Runner/Info.plist
 config.dart
 .env
 .p8
+*.p8
+/ios/build
+/ios/Runner
+/ios
+/ios
