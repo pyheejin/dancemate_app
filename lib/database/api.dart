@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dancemate_app/contants/api_urls.dart';
 import 'package:dancemate_app/database/model.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -75,6 +76,8 @@ class ApiServices {
   }
 
   Future<Map<String, dynamic>> postUserJoin(UserModel userData) async {
+    var token = await FirebaseMessaging.instance.getToken();
+
     final response = await http.post(
       Uri.parse('$baseUrl/user/join'),
       headers: {
@@ -92,6 +95,7 @@ class ApiServices {
         'image_url': userData.imageUrl,
         'apple_token': userData.appleToken,
         'apple_identifier': userData.appleIdentifier,
+        'fcm_token': token,
       }),
     );
     final resultData = jsonDecode(utf8.decode(response.bodyBytes));
