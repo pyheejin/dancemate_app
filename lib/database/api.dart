@@ -38,12 +38,15 @@ class ApiServices {
       String email, String password) async {
     await storage.delete(key: 'login');
 
+    var token = await FirebaseMessaging.instance.getToken();
+
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/user/login'),
         body: {
           'username': email,
           'password': password,
+          'client_secret': token,
         },
       );
 
