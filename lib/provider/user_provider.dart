@@ -75,3 +75,10 @@ final getUserCourseProvider = FutureProvider<dynamic>((ref) async {
   final result = await api.getUserCourse();
   return result;
 });
+
+final getUserNotificationProvider = FutureProvider<dynamic>((ref) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.getUserNotification();
+  return result;
+});

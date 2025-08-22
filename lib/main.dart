@@ -117,10 +117,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // FCM 토큰 가져오기 및 출력
-  var token = await FirebaseMessaging.instance.getToken();
-  print("🔑 Device Token: ${token ?? 'No Token'}");
-
   // 알림 서비스 인스턴스 생성
   final notificationService = NotificationService();
 
@@ -159,6 +155,17 @@ void main() async {
   initializeDateFormatting().then((_) {
     runApp(const ProviderScope(child: MyApp()));
   });
+
+  // FCM 토큰 가져오기 및 출력
+  try {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+
+    print('FCM Token: $fcmToken');
+    print('APNS Token: $apnsToken');
+  } catch (e) {
+    print('🔑 토큰 가져오기 오류 발생: $e');
+  }
 }
 
 class MyApp extends StatefulWidget {

@@ -6,7 +6,7 @@ import 'package:dancemate_app/screens/dancer_course_screen.dart';
 import 'package:dancemate_app/screens/dancer_ticket_screen.dart';
 import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/screens/my_page_screen.dart';
-import 'package:dancemate_app/screens/notification_screen.dart';
+import 'package:dancemate_app/screens/set_notification_screen.dart';
 import 'package:dancemate_app/screens/qna_screen.dart';
 import 'package:dancemate_app/screens/ticket_history_screen.dart';
 import 'package:dancemate_app/screens/ticket_sales_screen.dart';
@@ -103,7 +103,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             ),
             const SettingMenu(
               name: '알림 설정',
-              screen: NotificationScreen(),
+              screen: SetNotificationScreen(),
             ),
             const SettingMenu(
               name: '문의하기',

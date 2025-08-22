@@ -1,4 +1,4 @@
-import 'package:dancemate_app/provider/notification_provider.dart';
+import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,125 +8,63 @@ class NotificationScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notificationData = ref.watch(getNotificationProvider);
+    final notificationData = ref.watch(getUserNotificationProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('알림설정'),
+        title: const Text('알림'),
       ),
       body: notificationData.when(
-        data: (notification) {
-          bool lessonNotice = notification['lesson'];
-          bool ticketNotice = notification['ticket'];
-          bool communityNotice = notification['community'];
-
+        data: (notifications) {
           return Padding(
             padding: const EdgeInsets.symmetric(
               vertical: 10,
-              horizontal: 20,
+              horizontal: 10,
             ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 5,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '수업 관련 알림',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      CupertinoSwitch(
-                        value: lessonNotice,
-                        activeColor: const Color(0xFFA48AFF),
-                        onChanged: (bool? value) async {
-                          final result = await ref
-                              .read(notificationProvider.notifier)
-                              .postNotification({
-                            'lesson': value!,
-                            'ticket': ticketNotice,
-                            'community': communityNotice,
-                          });
-                          if (result['result_code'] == 200) {
-                            ref.refresh(getNotificationProvider);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 5,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '티켓 관련 알림',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      CupertinoSwitch(
-                        value: ticketNotice,
-                        activeColor: const Color(0xFFA48AFF),
-                        onChanged: (bool? value) async {
-                          final result = await ref
-                              .read(notificationProvider.notifier)
-                              .postNotification({
-                            'lesson': lessonNotice,
-                            'ticket': value!,
-                            'community': communityNotice,
-                          });
-                          if (result['result_code'] == 200) {
-                            ref.refresh(getNotificationProvider);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 5,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '커뮤니티 관련 알림',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      CupertinoSwitch(
-                        value: communityNotice,
-                        activeColor: const Color(0xFFA48AFF),
-                        onChanged: (bool? value) async {
-                          final result = await ref
-                              .read(notificationProvider.notifier)
-                              .postNotification({
-                            'lesson': lessonNotice,
-                            'ticket': ticketNotice,
-                            'community': value!,
-                          });
-                          if (result['result_code'] == 200) {
-                            ref.refresh(getNotificationProvider);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            child: ListView.builder(
+              itemCount: notifications['notices'].length,
+              itemBuilder: (context, index) {
+                final noticeData = notifications['notices'][index];
+                final date = noticeData['date'];
+                final notificationList = noticeData['notification_list'];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(date),
+                    ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 5),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: notificationList.length,
+                      itemBuilder: (context, index) {
+                        final title = notificationList[index]['title'];
+                        final description =
+                            notificationList[index]['description'];
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xAAEFEEEE),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 10,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(title),
+                                Text(description),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
             ),
           );
         },

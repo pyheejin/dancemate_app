@@ -38,7 +38,14 @@ class ApiServices {
       String email, String password) async {
     await storage.delete(key: 'login');
 
-    var token = await FirebaseMessaging.instance.getToken();
+    // 먼저 APNS 토큰을 요청한다.
+    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    print('APNS Token: $apnsToken');
+
+    // 잠시 기다린 후 FCM 토큰을 요청한다.
+    await Future.delayed(const Duration(seconds: 1)); // 1초 대기
+    var token = await FirebaseMessaging.instance.getAPNSToken();
+    print('fcm token: $token');
 
     try {
       final response = await http.post(
@@ -46,7 +53,7 @@ class ApiServices {
         body: {
           'username': email,
           'password': password,
-          'client_secret': token,
+          'client_secret': token ?? '',
         },
       );
 
@@ -885,5 +892,19 @@ class ApiServices {
     final result = jsonDecode(utf8.decode(response.bodyBytes));
 
     return result;
+  }
+
+  Future<dynamic> getUserNotification() async {
+    final accessToken = await getAccessToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/user/notification'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    final resultData =
+        jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
+
+    return resultData;
   }
 }

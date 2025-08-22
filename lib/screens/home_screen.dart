@@ -4,6 +4,7 @@ import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/screens/chat_room_screen.dart';
 import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
+import 'package:dancemate_app/screens/notification_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -61,30 +62,12 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(width: 5),
           GestureDetector(
-            onTap: () async {
-              // // FCM 토큰 발급받기
-              final req = await FirebaseMessaging.instance.requestPermission(
-                alert: true,
-                badge: true,
-                sound: true,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const NotificationScreen(),
+                ),
               );
-
-              final fcmToken = await FirebaseMessaging.instance.getAPNSToken();
-              print(fcmToken);
-              if (req.authorizationStatus == AuthorizationStatus.authorized &&
-                  fcmToken != null) {
-                print('FCM Token: $fcmToken');
-              } else {
-                print('FCM Token: null');
-              }
-
-              // await FlutterLocalNotification.init();
-              // // 3초 후 권한 요청
-              // Future.delayed(
-              //   const Duration(seconds: 1),
-              //   FlutterLocalNotification.requestNotificationPermission(),
-              // );
-              // FlutterLocalNotification.showNotification();
             },
             child: const Icon(
               Icons.notifications_outlined,
