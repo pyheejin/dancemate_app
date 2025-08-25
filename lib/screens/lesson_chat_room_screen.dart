@@ -40,7 +40,7 @@ class LessonChatRoomScreen extends ConsumerWidget {
                 alignment: Alignment.topCenter,
                 child: chatRoomData.when(
                   data: (room) {
-                    if (room.isEmpty) {
+                    if (room == null) {
                       return Container();
                     }
                     return ListView.builder(

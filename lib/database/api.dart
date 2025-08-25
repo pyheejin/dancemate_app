@@ -723,8 +723,12 @@ class ApiServices {
 
   Future<dynamic> getChatRoom(int type) async {
     final accessToken = await getAccessToken();
+
+    int page = 1;
+    int pageSize = 10;
+
     final response = await http.get(
-      Uri.parse('$baseUrl/chat-room?type=$type'),
+      Uri.parse('$baseUrl/chat-room?type=$type&page=$page, pageSize=$pageSize'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
@@ -894,10 +898,10 @@ class ApiServices {
     return result;
   }
 
-  Future<dynamic> getUserNotification() async {
+  Future<dynamic> getUserNotification(int page) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/user/notification'),
+      Uri.parse('$baseUrl/user/notification?page=$page'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
