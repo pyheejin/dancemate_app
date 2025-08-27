@@ -150,10 +150,10 @@ class ApiServices {
     }
   }
 
-  Future<dynamic> getSearch(String keyword) async {
+  Future<dynamic> getSearch(int page, String keyword) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/search?keyword=$keyword'),
+      Uri.parse('$baseUrl/search?keyword=$keyword&page=$page'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },

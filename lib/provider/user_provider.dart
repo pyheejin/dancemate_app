@@ -128,7 +128,6 @@ class UserNotificationListNotifier extends AsyncNotifier<dynamic> {
   }
 }
 
-// Provider 선언
 final userNotificationListProvider =
     AsyncNotifierProvider<UserNotificationListNotifier, dynamic>(() {
   return UserNotificationListNotifier();
