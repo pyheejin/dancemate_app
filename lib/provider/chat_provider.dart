@@ -1,13 +1,70 @@
 import 'package:dancemate_app/database/api.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final getChatRoomProvider =
-    FutureProvider.family<dynamic, int>((ref, type) async {
+class TicketListNotifier extends FamilyAsyncNotifier<dynamic, int> {
   final ApiServices api = ApiServices();
 
-  final result = await api.getChatRoom(type);
-  return result;
+  final int _itemsPerPage = 10; // 한 번에 로드할 아이템 수
+  int _currentPage = 1;
+  bool _noMoreData = false;
+
+  @override
+  Future<dynamic> build(int type) async {
+    return _fetchItems(_currentPage, type);
+  }
+
+  Future<dynamic> _fetchItems(int page, int type) async {
+    final result = await api.getChatRoom(page, _itemsPerPage, type);
+
+    if (result != null) {
+      if (result.length < _itemsPerPage) {
+        _noMoreData = true;
+      }
+      return result;
+    }
+  }
+
+  Future<void> loadMoreItems(int type) async {
+    // 이미 로딩 중이거나 더 이상 데이터가 없으면 중단
+    if (state.isLoading || _noMoreData) return;
+
+    state = const AsyncValue.loading(); // 로딩 상태로 변경
+
+    // 기존 데이터 (현재 리스트의 값)를 가져옴
+    // state.value는 List<dynamic> 타입이므로 캐스팅하여 사용
+    final currentData = state.value is List ? state.value as List : [];
+
+    // 로딩 상태로 변경하되, 기존 데이터를 유지하면서 로딩 인디케이터를 보여줌
+    state = const AsyncValue.loading()
+        .copyWithPrevious(AsyncValue.data(currentData));
+
+    try {
+      _currentPage++;
+      final newItems = await _fetchItems(_currentPage, type);
+
+      state = AsyncValue.data([
+        ...currentData, // 기존 데이터 유지
+        ...newItems, // 새 데이터 추가
+      ]);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st); // 에러 발생 시
+    }
+  }
+}
+
+// Provider 선언
+final getChatRoomProvider =
+    AsyncNotifierProvider.family<TicketListNotifier, dynamic, int>(() {
+  return TicketListNotifier();
 });
+
+// final getChatRoomProvider =
+//     FutureProvider.family<dynamic, int>((ref, type) async {
+//   final ApiServices api = ApiServices();
+
+//   final result = await api.getChatRoom(type);
+//   return result;
+// });
 
 final getChatRoomDetailProvider =
     FutureProvider.family<dynamic, int>((ref, chatRoomId) async {

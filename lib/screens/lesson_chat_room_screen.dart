@@ -3,25 +3,63 @@ import 'package:dancemate_app/screens/lesson_chat_room_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LessonChatRoomScreen extends ConsumerWidget {
+class LessonChatRoomScreen extends ConsumerStatefulWidget {
   const LessonChatRoomScreen({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final chatRoomData = ref.watch(getChatRoomProvider(50));
+  ConsumerState<LessonChatRoomScreen> createState() =>
+      _LessonChatRoomScreenState();
+}
 
-    void onChatRoomTap(int chatRoomId) {
-      ref.refresh(getChatRoomDetailProvider(chatRoomId));
+class _LessonChatRoomScreenState extends ConsumerState<LessonChatRoomScreen>
+    with AutomaticKeepAliveClientMixin {
+  late final ScrollController _scrollController;
 
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) =>
-              LessonChatRoomDetailScreen(chatRoomId: chatRoomId),
-        ),
-      );
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    // 3. initState에서 리스너를 한 번만 등록
+    _scrollController.addListener(_onScroll);
+  }
+
+  // 4. 스크롤 이벤트 핸들러 메서드 생성
+  void _onScroll() {
+    // 스크롤이 끝에 도달했는지 확인
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      ref.read(getChatRoomProvider(50).notifier).loadMoreItems(50);
     }
+  }
+
+  @override
+  void dispose() {
+    // 5. dispose에서 리스너를 제거하고 컨트롤러를 해제
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onChatRoomTap(int chatRoomId) {
+    ref.refresh(getChatRoomDetailProvider(chatRoomId));
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) =>
+            LessonChatRoomDetailScreen(chatRoomId: chatRoomId),
+      ),
+    );
+  }
+
+  // 이 오버라이드를 추가해야 위젯 상태를 유지합니다.
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    final chatRoomData = ref.watch(getChatRoomProvider(50));
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -40,19 +78,14 @@ class LessonChatRoomScreen extends ConsumerWidget {
                 alignment: Alignment.topCenter,
                 child: chatRoomData.when(
                   data: (room) {
-                    if (room == null) {
-                      return Container();
+                    if (room == null || room['chat_rooms'].isEmpty) {
+                      return const Center(child: Text('채팅방이 없습니다.'));
                     }
                     return ListView.builder(
+                      controller: _scrollController,
                       padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
                       itemCount: room['chat_rooms'].length,
                       itemBuilder: (context, index) {
-                        if (room['chat_rooms'].isEmpty) {
-                          return Container();
-                        }
-
                         final roomData = room['chat_rooms'][index];
                         final lastChat = roomData['last_chat'];
                         final lastChatTime = roomData['last_chat_time'];
@@ -68,16 +101,9 @@ class LessonChatRoomScreen extends ConsumerWidget {
                         final lessonData = roomData['lesson'];
                         final lessonImage = lessonData['image_url'];
                         final lessonTitle = lessonData['title'];
-
-                        final dancerData = lessonData['dancer'];
-                        final dancerEmail = dancerData['email'];
-                        final dancerNickname = dancerData['nickname'];
-                        final dancerImage = dancerData['image_url'];
-
                         return GestureDetector(
                           onTap: () {
-                            print(roomData['id']);
-                            onChatRoomTap(roomData['id']);
+                            _onChatRoomTap(roomData['id']);
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
@@ -111,22 +137,20 @@ class LessonChatRoomScreen extends ConsumerWidget {
                                                     lessonImage,
                                                   ),
                                           ),
-                                          isCheck == 0
-                                              ? Positioned(
-                                                  top: 10,
-                                                  left: 5,
-                                                  child: Container(
-                                                    width: 15,
-                                                    height: 15,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.redAccent,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                    ),
-                                                  ),
-                                                )
-                                              : Container(),
+                                          if (isCheck == 0)
+                                            Positioned(
+                                              top: 10,
+                                              left: 5,
+                                              child: Container(
+                                                width: 15,
+                                                height: 15,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.redAccent,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                       const SizedBox(width: 10),
