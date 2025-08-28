@@ -21,11 +21,9 @@ class _LessonChatRoomScreenState extends ConsumerState<LessonChatRoomScreen>
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    // 3. initState에서 리스너를 한 번만 등록
     _scrollController.addListener(_onScroll);
   }
 
-  // 4. 스크롤 이벤트 핸들러 메서드 생성
   void _onScroll() {
     // 스크롤이 끝에 도달했는지 확인
     if (_scrollController.position.pixels ==
@@ -36,7 +34,6 @@ class _LessonChatRoomScreenState extends ConsumerState<LessonChatRoomScreen>
 
   @override
   void dispose() {
-    // 5. dispose에서 리스너를 제거하고 컨트롤러를 해제
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
@@ -53,7 +50,7 @@ class _LessonChatRoomScreenState extends ConsumerState<LessonChatRoomScreen>
     );
   }
 
-  // 이 오버라이드를 추가해야 위젯 상태를 유지합니다.
+  // 이 오버라이드를 추가해야 위젯 상태를 유지
   @override
   bool get wantKeepAlive => true;
 
@@ -78,17 +75,17 @@ class _LessonChatRoomScreenState extends ConsumerState<LessonChatRoomScreen>
                 alignment: Alignment.topCenter,
                 child: chatRoomData.when(
                   data: (room) {
-                    if (room == null || room['chat_rooms'].isEmpty) {
+                    if (room.isEmpty) {
                       return const Center(child: Text('채팅방이 없습니다.'));
                     }
                     return ListView.builder(
                       controller: _scrollController,
                       padding: EdgeInsets.zero,
-                      itemCount: room['chat_rooms'].length,
+                      itemCount: room.length,
                       itemBuilder: (context, index) {
-                        final roomData = room['chat_rooms'][index];
-                        final lastChat = roomData['last_chat'];
-                        final lastChatTime = roomData['last_chat_time'];
+                        final roomData = room[index];
+                        final lastChat = roomData['last_chat'] ?? '';
+                        final lastChatTime = roomData['last_chat_time'] ?? '';
 
                         final roomNotificationData =
                             roomData['room_notification'];

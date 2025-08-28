@@ -7,6 +7,7 @@ class TicketListNotifier extends FamilyAsyncNotifier<dynamic, int> {
   final int _itemsPerPage = 10; // 한 번에 로드할 아이템 수
   int _currentPage = 1;
   bool _noMoreData = false;
+  int loginUserId = 0;
 
   @override
   Future<dynamic> build(int type) async {
@@ -17,10 +18,11 @@ class TicketListNotifier extends FamilyAsyncNotifier<dynamic, int> {
     final result = await api.getChatRoom(page, _itemsPerPage, type);
 
     if (result != null) {
-      if (result.length < _itemsPerPage) {
+      if (result['chat_rooms'].length < _itemsPerPage) {
         _noMoreData = true;
       }
-      return result;
+      loginUserId = result['login_user_id'];
+      return result['chat_rooms'];
     }
   }
 
@@ -50,21 +52,16 @@ class TicketListNotifier extends FamilyAsyncNotifier<dynamic, int> {
       state = AsyncValue.error(e, st); // 에러 발생 시
     }
   }
+
+  int getLoginUserId() {
+    return loginUserId;
+  }
 }
 
-// Provider 선언
 final getChatRoomProvider =
     AsyncNotifierProvider.family<TicketListNotifier, dynamic, int>(() {
   return TicketListNotifier();
 });
-
-// final getChatRoomProvider =
-//     FutureProvider.family<dynamic, int>((ref, type) async {
-//   final ApiServices api = ApiServices();
-
-//   final result = await api.getChatRoom(type);
-//   return result;
-// });
 
 final getChatRoomDetailProvider =
     FutureProvider.family<dynamic, int>((ref, chatRoomId) async {

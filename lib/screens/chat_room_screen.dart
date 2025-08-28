@@ -4,29 +4,65 @@ import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ChatRoomScreen extends ConsumerWidget {
+class ChatRoomScreen extends ConsumerStatefulWidget {
   const ChatRoomScreen({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final chatRoomData = ref.watch(getChatRoomProvider(1));
+  ConsumerState<ChatRoomScreen> createState() => _ChatRoomScreenState();
+}
 
-    void onChatRoomTap(int chatRoomId) {
-      ref.refresh(getChatRoomDetailProvider(chatRoomId));
+class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen>
+    with AutomaticKeepAliveClientMixin {
+  late final ScrollController _scrollController;
 
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => ChatRoomDetailScreen(chatRoomId: chatRoomId),
-        ),
-      );
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    // 스크롤이 끝에 도달했는지 확인
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      ref.read(getChatRoomProvider(1).notifier).loadMoreItems(1);
     }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onChatRoomTap(int chatRoomId) {
+    ref.refresh(getChatRoomDetailProvider(chatRoomId));
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ChatRoomDetailScreen(chatRoomId: chatRoomId),
+      ),
+    );
+  }
+
+  // 이 오버라이드를 추가해야 위젯 상태를 유지
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    final chatRoomData = ref.watch(getChatRoomProvider(1));
+    final loginUserId =
+        ref.read(getChatRoomProvider(1).notifier).getLoginUserId();
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        automaticallyImplyLeading: true,
+        automaticallyImplyLeading: false,
         title: const Text('DM'),
         leading: IconButton(
           icon: const Icon(
@@ -54,23 +90,26 @@ class ChatRoomScreen extends ConsumerWidget {
                 alignment: Alignment.topCenter,
                 child: chatRoomData.when(
                   data: (room) {
+                    if (room.isEmpty) {
+                      return const Center(child: Text('채팅방이 없습니다.'));
+                    }
                     return ListView.builder(
+                      controller: _scrollController,
                       padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      itemCount: room['chat_rooms'].length,
+                      itemCount: room.length,
                       itemBuilder: (context, index) {
-                        if (room['chat_rooms'].isEmpty) {
-                          return Container();
-                        }
-                        final loginUserId = room['login_user_id'];
-
-                        final roomData = room['chat_rooms'][index];
+                        final roomData = room[index];
                         final chatUserId = roomData['user_id'];
-                        final lastChat = roomData['last_chat'];
-                        final lastChatTime = roomData['last_chat_time'];
+                        final lastChat = roomData['last_chat'] ?? '';
+                        final lastChatTime = roomData['last_chat_time'] ?? '';
+
                         final roomNotificationData =
                             roomData['room_notification'];
+
+                        int isCheck = 0;
+                        if (roomNotificationData.isNotEmpty) {
+                          isCheck = roomNotificationData[0]['status'];
+                        }
 
                         final userData = roomData['user'];
                         final friendData = roomData['friend'];
@@ -86,15 +125,9 @@ class ChatRoomScreen extends ConsumerWidget {
                             friendImageUrl = userData['image_url'];
                           }
                         }
-
-                        int isCheck = 0;
-                        if (roomNotificationData.isNotEmpty) {
-                          isCheck = roomNotificationData[0]['status'];
-                        }
-
                         return GestureDetector(
                           onTap: () {
-                            onChatRoomTap(roomData['id']);
+                            _onChatRoomTap(roomData['id']);
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
@@ -114,38 +147,27 @@ class ChatRoomScreen extends ConsumerWidget {
                                           ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(50),
-                                            child:
-                                                friendImageUrl.split(':')[0] ==
-                                                        'https'
-                                                    ? Image.network(
-                                                        width: 100,
-                                                        height: 100,
-                                                        fit: BoxFit.cover,
-                                                        friendImageUrl,
-                                                      )
-                                                    : Image.asset(
-                                                        width: 100,
-                                                        height: 100,
-                                                        fit: BoxFit.cover,
-                                                        'assets/images/app_logo/chat.png',
-                                                      ),
+                                            child: Image.network(
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                              friendImageUrl,
+                                            ),
                                           ),
-                                          isCheck == 0
-                                              ? Positioned(
-                                                  top: 10,
-                                                  left: 5,
-                                                  child: Container(
-                                                    width: 15,
-                                                    height: 15,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.redAccent,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                    ),
-                                                  ),
-                                                )
-                                              : Container(),
+                                          if (isCheck == 0)
+                                            Positioned(
+                                              top: 10,
+                                              left: 5,
+                                              child: Container(
+                                                width: 15,
+                                                height: 15,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.redAccent,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                       const SizedBox(width: 10),
@@ -166,13 +188,21 @@ class ChatRoomScreen extends ConsumerWidget {
                                           Text(
                                             lastChat,
                                             overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
                                 ),
-                                Text(lastChatTime),
+                                Text(
+                                  lastChatTime,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
