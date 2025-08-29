@@ -161,8 +161,8 @@ void main() async {
     final fcmToken = await FirebaseMessaging.instance.getToken();
     final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
 
-    print('FCM Token: $fcmToken');
-    print('APNS Token: $apnsToken');
+    print('[main.dart] FCM Token: $fcmToken');
+    print('[main.dart] APNS Token: $apnsToken');
   } catch (e) {
     print('🔑 토큰 가져오기 오류 발생: $e');
   }

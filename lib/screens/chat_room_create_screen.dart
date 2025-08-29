@@ -99,11 +99,12 @@ class ChatRoomCreateScreen extends ConsumerWidget {
                                       getChatRoomDetailProvider(chatRoomId));
                                   ref.refresh(getChatRoomProvider(1));
 
-                                  Navigator.of(context).push(
+                                  Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           ChatRoomDetailScreen(
-                                              chatRoomId: chatRoomId),
+                                        chatRoomId: chatRoomId,
+                                      ),
                                     ),
                                   );
                                 }

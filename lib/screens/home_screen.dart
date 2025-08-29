@@ -21,7 +21,9 @@ class HomeScreen extends ConsumerWidget {
       if (userId != loginUserId) {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => UserDetailScreen(userId: userId),
+            builder: (context) => UserDetailScreen(
+              userId: userId,
+            ),
           ),
         );
       } else {

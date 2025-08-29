@@ -44,7 +44,9 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen>
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ChatRoomDetailScreen(chatRoomId: chatRoomId),
+        builder: (context) => ChatRoomDetailScreen(
+          chatRoomId: chatRoomId,
+        ),
       ),
     );
   }

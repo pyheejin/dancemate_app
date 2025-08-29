@@ -107,3 +107,11 @@ final chatRoomProvider =
     StateNotifierProvider<ChatRoomNotifier, dynamic>((ref) {
   return ChatRoomNotifier();
 });
+
+final postChatRoomExistsProvider =
+    FutureProvider.family<dynamic, int>((ref, userId) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.postChatRoomExists(userId);
+  return result;
+});

@@ -1,17 +1,19 @@
-import 'package:dancemate_app/provider/lesson_provider.dart';
-import 'package:dancemate_app/provider/home_provider.dart';
+import 'dart:convert';
+
+import 'package:dancemate_app/provider/chat_provider.dart';
+import 'package:dancemate_app/provider/setting_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/chat_room_create_screen.dart';
+import 'package:dancemate_app/screens/chat_room_detail_screen.dart';
 import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:dancemate_app/screens/photo_screen.dart';
-import 'package:dancemate_app/screens/setting_screen.dart';
-import 'package:dancemate_app/widgets/error.dart';
 import 'package:dancemate_app/widgets/persistent_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 
-class UserDetailScreen extends ConsumerWidget {
+class UserDetailScreen extends ConsumerStatefulWidget {
   final int userId;
 
   const UserDetailScreen({
@@ -20,40 +22,76 @@ class UserDetailScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final userDetail = ref.watch(getUserDetailProvider(userId));
+  ConsumerState<UserDetailScreen> createState() => _UserDetailScreenState();
+}
+
+class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
+  int loginUserId = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    isloginData();
+  }
+
+  Future<void> isloginData() async {
+    const storage = FlutterSecureStorage();
+    String? data = await storage.read(key: 'login');
+    if (data != null) {
+      loginUserId = json.decode(data)['userId'];
+    }
+  }
+
+  void onCourseTap(int courseId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LessonDetailScreen(courseId: courseId),
+      ),
+    );
+  }
+
+  void onChatTap(String nickname) async {
+    // 채팅방이 없을 때만 ChatRoomCreateScreen
+    // 채팅방이 있을 때는 ChatRoomDetailScreen
+    final roomExists =
+        await ref.read(postChatRoomExistsProvider(widget.userId).future);
+    if (roomExists['result_code'] == 200) {
+      if (roomExists['result_data']['exists']) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => ChatRoomDetailScreen(
+              chatRoomId: roomExists['result_data']['chat_room_id'],
+            ),
+          ),
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => ChatRoomCreateScreen(
+              userId: widget.userId,
+              nickname: nickname,
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> onProfileImageTap(String imagePath) async {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => PhotoScreen(
+          imagePathList: [imagePath],
+          currentIndex: 0,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userDetail = ref.watch(getUserDetailProvider(widget.userId));
     NumberFormat format = NumberFormat('###,###,###,###');
-    DateTime today = DateTime.now();
-
-    void onCourseTap(int courseId) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => LessonDetailScreen(courseId: courseId),
-        ),
-      );
-    }
-
-    void onChatTap(String nickname) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => ChatRoomCreateScreen(
-            userId: userId,
-            nickname: nickname,
-          ),
-        ),
-      );
-    }
-
-    Future<void> onProfileImageTap(String imagePath) async {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => PhotoScreen(
-            imagePathList: [imagePath],
-            currentIndex: 0,
-          ),
-        ),
-      );
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -96,7 +134,6 @@ class UserDetailScreen extends ConsumerWidget {
                         if (dataList['user'] == null) {
                           return Container();
                         } else {
-                          final userId = dataList['user']['id'];
                           final nickname = dataList['user']['nickname'];
                           String imageUrl = dataList['user']['image_url'];
 

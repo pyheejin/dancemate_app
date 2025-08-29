@@ -819,6 +819,27 @@ class ApiServices {
     return result;
   }
 
+  Future<dynamic> postChatRoomExists(int userId) async {
+    final accessToken = await getAccessToken();
+
+    dynamic body = {
+      'user_id': userId,
+    };
+    body = jsonEncode(body);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/chat-room/exists'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+    final result = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return result;
+  }
+
   Future<dynamic> getCalendarLessons(int month) async {
     final accessToken = await getAccessToken();
     final response = await http.get(

@@ -1,5 +1,4 @@
 import 'package:dancemate_app/provider/chat_provider.dart';
-import 'package:dancemate_app/screens/chat_room_screen.dart';
 import 'package:dancemate_app/screens/photo_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
@@ -91,11 +90,8 @@ class ChatRoomDetailScreen extends ConsumerWidget {
               size: 30,
             ),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ChatRoomScreen(),
-                ),
-              );
+              Navigator.pop(context);
+
               ref.refresh(getChatRoomProvider(1));
             },
           ),
