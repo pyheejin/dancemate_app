@@ -115,3 +115,15 @@ final postChatRoomExistsProvider =
   final result = await api.postChatRoomExists(userId);
   return result;
 });
+
+final chatRoomNoticeProvider = StateProvider.autoDispose<int>((ref) {
+  return 0;
+});
+
+final postChatRoomDetailNoticeProvider =
+    FutureProvider.family<dynamic, int>((ref, chatRoomId) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.postChatRoomDetailNotice(chatRoomId);
+  return result;
+});

@@ -819,6 +819,21 @@ class ApiServices {
     return result;
   }
 
+  Future<dynamic> postChatRoomDetailNotice(int chatRoomId) async {
+    final accessToken = await getAccessToken();
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/chat-room/$chatRoomId/notice'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+    final result = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return result;
+  }
+
   Future<dynamic> postChatRoomExists(int userId) async {
     final accessToken = await getAccessToken();
 

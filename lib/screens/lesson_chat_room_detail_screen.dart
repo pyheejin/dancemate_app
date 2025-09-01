@@ -17,6 +17,7 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
     final scrollController = ScrollController();
     final TextEditingController chatController = TextEditingController();
     final chatRoomData = ref.watch(getChatRoomDetailProvider(chatRoomId));
+    int roomNotice = ref.watch(chatRoomNoticeProvider);
 
     Future<void> onProfileImageTap(String imagePath) async {
       Navigator.of(context).push(
@@ -61,7 +62,10 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
       endDrawer: Drawer(
         child: chatRoomData.when(
           data: (room) {
-            String roomTitle = room['lesson']['title'];
+            final lessonData = room['lesson'];
+            String roomTitle = lessonData['title'];
+            String roomImageUrl = lessonData['image_url'];
+
             final dancerData = room['dancer'];
             String dancerImageUrl = dancerData['image_url'];
             final dancerNickname = dancerData['nickname'];
@@ -78,14 +82,28 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
               dancerImageUrl = 'assets/images/app_logo/chat.png';
               finalImageProvider = AssetImage(dancerImageUrl);
             }
+
+            ImageProvider finalLessonImageProvider;
+            if (roomImageUrl != '') {
+              if (roomImageUrl.split(':')[0] == 'https') {
+                finalLessonImageProvider = NetworkImage(roomImageUrl);
+              } else {
+                finalLessonImageProvider = AssetImage(roomImageUrl);
+              }
+            } else {
+              // 기본 이미지 경로 설정
+              roomImageUrl = 'assets/images/app_logo/chat.png';
+              finalLessonImageProvider = AssetImage(roomImageUrl);
+            }
             return Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 10,
+                horizontal: 15,
               ),
               child: Column(
                 children: [
                   const SizedBox(height: 70),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
                         icon: const Icon(
@@ -96,12 +114,52 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
                           Navigator.pop(context);
                         },
                       ),
-                      const SizedBox(width: 5),
+                      IconButton(
+                        icon: Icon(
+                          roomNotice == 1
+                              ? Icons.notifications_none_rounded
+                              : Icons.notifications_off_outlined,
+                          size: 25,
+                        ),
+                        onPressed: () async {
+                          final result = await ref.refresh(
+                              postChatRoomDetailNoticeProvider(chatRoomId)
+                                  .future);
+                          if (result['result_code'] == 200) {
+                            ref.read(chatRoomNoticeProvider.notifier).update(
+                                (state) => result['result_data']['is_notice']);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 90,
+                        height: 90,
+                        child: GestureDetector(
+                          onTap: () {
+                            onProfileImageTap(roomImageUrl);
+                          },
+                          child: CircleAvatar(
+                            radius: 50,
+                            foregroundImage: finalLessonImageProvider,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       Text(
                         roomTitle,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 17,
                         ),
                       ),
                     ],
@@ -136,7 +194,7 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
                         style: const TextStyle(
                           color: Color(0xFFA48AFF),
                           fontWeight: FontWeight.bold,
-                          fontSize: 17,
+                          fontSize: 15,
                         ),
                       ),
                     ],
@@ -194,7 +252,7 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
                               Text(
                                 userNickname,
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 15,
                                   color: userId == loginUserId
                                       ? const Color(0xFF74D0FF)
                                       : Colors.black54,

@@ -9,6 +9,8 @@ final selectMonthProvider = StateProvider.autoDispose<int>((ref) {
   return DateTime.now().month;
 });
 
+final focusedDayProvider = StateProvider<DateTime>((ref) => DateTime.now());
+
 final getCalendarLessonProvider =
     FutureProvider.family<dynamic, int>((ref, month) async {
   final ApiServices api = ApiServices();
