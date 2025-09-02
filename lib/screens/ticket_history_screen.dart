@@ -1,7 +1,6 @@
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class TicketHistoryScreen extends ConsumerWidget {
   const TicketHistoryScreen({super.key});
@@ -9,25 +8,24 @@ class TicketHistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ticketData = ref.watch(getUserTicketProvider(0));
-    NumberFormat format = NumberFormat('###,###,###,###');
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('티켓 구매내역'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15,
-            ),
-            child: GestureDetector(
-              onTap: () {},
-              child: const Icon(
-                Icons.sort_rounded,
-                size: 25,
-              ),
-            ),
-          ),
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.symmetric(
+        //       horizontal: 15,
+        //     ),
+        //     child: GestureDetector(
+        //       onTap: () {},
+        //       child: const Icon(
+        //         Icons.sort_rounded,
+        //         size: 25,
+        //       ),
+        //     ),
+        //   ),
+        // ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -97,8 +95,8 @@ class TicketHistoryScreen extends ConsumerWidget {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                      vertical: 15,
-                                      horizontal: 5,
+                                      vertical: 18,
+                                      horizontal: 10,
                                     ),
                                     child: Column(
                                       crossAxisAlignment:

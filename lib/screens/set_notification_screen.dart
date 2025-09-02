@@ -43,7 +43,7 @@ class SetNotificationScreen extends ConsumerWidget {
                       ),
                       CupertinoSwitch(
                         value: lessonNotice,
-                        activeColor: const Color(0xFFA48AFF),
+                        activeTrackColor: const Color(0xFFA48AFF),
                         onChanged: (bool? value) async {
                           final result = await ref
                               .read(notificationProvider.notifier)
@@ -76,7 +76,7 @@ class SetNotificationScreen extends ConsumerWidget {
                       ),
                       CupertinoSwitch(
                         value: ticketNotice,
-                        activeColor: const Color(0xFFA48AFF),
+                        activeTrackColor: const Color(0xFFA48AFF),
                         onChanged: (bool? value) async {
                           final result = await ref
                               .read(notificationProvider.notifier)
@@ -93,39 +93,39 @@ class SetNotificationScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 5,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '커뮤니티 관련 알림',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      CupertinoSwitch(
-                        value: communityNotice,
-                        activeColor: const Color(0xFFA48AFF),
-                        onChanged: (bool? value) async {
-                          final result = await ref
-                              .read(notificationProvider.notifier)
-                              .postNotification({
-                            'lesson': lessonNotice,
-                            'ticket': ticketNotice,
-                            'community': value!,
-                          });
-                          if (result['result_code'] == 200) {
-                            ref.refresh(getNotificationProvider);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(
+                //     vertical: 5,
+                //   ),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       const Text(
+                //         '커뮤니티 관련 알림',
+                //         style: TextStyle(
+                //           fontSize: 18,
+                //           fontWeight: FontWeight.w500,
+                //         ),
+                //       ),
+                //       CupertinoSwitch(
+                //         value: communityNotice,
+                //         activeTrackColor: const Color(0xFFA48AFF),
+                //         onChanged: (bool? value) async {
+                //           final result = await ref
+                //               .read(notificationProvider.notifier)
+                //               .postNotification({
+                //             'lesson': lessonNotice,
+                //             'ticket': ticketNotice,
+                //             'community': value!,
+                //           });
+                //           if (result['result_code'] == 200) {
+                //             ref.refresh(getNotificationProvider);
+                //           }
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           );

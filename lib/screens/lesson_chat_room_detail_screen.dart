@@ -37,6 +37,7 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
         automaticallyImplyLeading: true,
         title: chatRoomData.when(
           data: (room) {
+            print(room);
             String roomTitle = room['lesson']['title'];
             return Text(roomTitle);
           },
@@ -62,6 +63,7 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
       endDrawer: Drawer(
         child: chatRoomData.when(
           data: (room) {
+            print(room);
             final lessonData = room['lesson'];
             String roomTitle = lessonData['title'];
             String roomImageUrl = lessonData['image_url'];

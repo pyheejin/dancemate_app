@@ -17,6 +17,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
     final scrollController = ScrollController();
     final TextEditingController chatController = TextEditingController();
     final chatRoomData = ref.watch(getChatRoomDetailProvider(chatRoomId));
+    int roomNotice = ref.watch(chatRoomNoticeProvider);
 
     void onNoticeTap() async {
       final result = await ref
@@ -34,6 +35,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
           .read(chatRoomProvider.notifier)
           .deleteChatRoomDetail(chatRoomId);
       if (result['result_code'] == 200) {
+        Navigator.pop(context);
         Navigator.pop(context);
         ref.refresh(getChatRoomProvider(1));
       } else {
@@ -84,60 +86,230 @@ class ChatRoomDetailScreen extends ConsumerWidget {
               );
             },
           ),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.chevron_left,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
+        ),
+        endDrawer: Drawer(
+          child: chatRoomData.when(
+            data: (room) {
+              int chatRoomUserId = room['chat_room']['user_id'];
+              int loginUserId = room['login_user_id'];
 
-              ref.refresh(getChatRoomProvider(1));
+              var userData = room['chat_room']['user'];
+              var friendData = room['chat_room']['friend'];
+              if (loginUserId != chatRoomUserId) {
+                userData = room['chat_room']['friend'];
+                friendData = room['chat_room']['user'];
+              }
+              String userImageUrl = userData['image_url'];
+              String userNickname = userData['nickname'];
+              String friendImageUrl = friendData['image_url'];
+              String friendNickname = friendData['nickname'];
+
+              ImageProvider finalUserImageProvider;
+              if (userImageUrl != '') {
+                if (userImageUrl.split(':')[0] == 'https') {
+                  finalUserImageProvider = NetworkImage(userImageUrl);
+                } else {
+                  finalUserImageProvider = AssetImage(userImageUrl);
+                }
+              } else {
+                // 기본 이미지 경로 설정
+                userImageUrl = 'assets/images/app_logo/chat.png';
+                finalUserImageProvider = AssetImage(userImageUrl);
+              }
+
+              ImageProvider finalFriendImageProvider;
+              if (friendImageUrl != '') {
+                if (friendImageUrl.split(':')[0] == 'https') {
+                  finalFriendImageProvider = NetworkImage(friendImageUrl);
+                } else {
+                  finalFriendImageProvider = AssetImage(friendImageUrl);
+                }
+              } else {
+                // 기본 이미지 경로 설정
+                friendImageUrl = 'assets/images/app_logo/chat.png';
+                finalFriendImageProvider = AssetImage(friendImageUrl);
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                ),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 70),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.chevron_left,
+                                  size: 30,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  roomNotice == 1
+                                      ? Icons.notifications_none_rounded
+                                      : Icons.notifications_off_outlined,
+                                  size: 25,
+                                ),
+                                onPressed: () async {
+                                  final result = await ref.refresh(
+                                      postChatRoomDetailNoticeProvider(
+                                              chatRoomId)
+                                          .future);
+                                  if (result['result_code'] == 200) {
+                                    ref
+                                        .read(chatRoomNoticeProvider.notifier)
+                                        .update((state) =>
+                                            result['result_data']['is_notice']);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 90,
+                                height: 90,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    onProfileImageTap(friendImageUrl);
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    foregroundImage: finalFriendImageProvider,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                friendNickname,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 70,
+                                height: 70,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    width: 2,
+                                    color: const Color(0xFFA48AFF),
+                                  ),
+                                  borderRadius: BorderRadius.circular(35),
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    onProfileImageTap(userImageUrl);
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    foregroundImage: finalUserImageProvider,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                userNickname,
+                                style: const TextStyle(
+                                  color: Color(0xFFA48AFF),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 70,
+                                height: 70,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    onProfileImageTap(friendImageUrl);
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    foregroundImage: finalFriendImageProvider,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                friendNickname,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: onExitTap,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color(0xFFA48AFF),
+                                ),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: const Padding(
+                                padding: EdgeInsets.all(5),
+                                child: Center(
+                                  child: Text(
+                                    '채팅방 나가기',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Color(0xFFA48AFF),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              );
+            },
+            loading: () => const CircularProgressIndicator(),
+            error: (error, stack) {
+              return SizedBox(
+                width: 300,
+                child: Text('chat room detail error: $error'),
+              );
             },
           ),
-          actions: [
-            GestureDetector(
-              onTap: onNoticeTap,
-              child: chatRoomData.when(
-                data: (room) {
-                  final isNotice = room['is_notice'];
-                  return Icon(
-                    isNotice == 1
-                        ? Icons.notifications_outlined
-                        : Icons.notifications_off_outlined,
-                    size: 27,
-                  );
-                },
-                loading: () => const CircularProgressIndicator(),
-                error: (error, stack) {
-                  return SizedBox(
-                    width: 300,
-                    child: Text('chat room detail actions error: $error'),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            GestureDetector(
-              onTap: onExitTap,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFA48AFF),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Text(
-                    '채팅방 나가기',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-          ],
         ),
         body: Column(
           children: [

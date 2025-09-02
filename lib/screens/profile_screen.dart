@@ -754,7 +754,7 @@ class ProfileScreen extends ConsumerWidget {
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
-                                          vertical: 10,
+                                          vertical: 11,
                                           horizontal: 10,
                                         ),
                                         child: Column(
