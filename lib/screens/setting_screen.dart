@@ -4,6 +4,7 @@ import 'package:dancemate_app/provider/setting_provider.dart';
 import 'package:dancemate_app/screens/course_history_screen.dart';
 import 'package:dancemate_app/screens/dancer_course_screen.dart';
 import 'package:dancemate_app/screens/dancer_ticket_screen.dart';
+import 'package:dancemate_app/screens/like_course_screen.dart';
 import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/screens/my_page_screen.dart';
 import 'package:dancemate_app/screens/set_notification_screen.dart';
@@ -60,6 +61,10 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SettingMenu(
+              name: '찜한 수업',
+              screen: LikeCourseScreen(),
+            ),
             const SettingMenu(
               name: '마이페이지',
               screen: MyPageScreen(),

@@ -21,20 +21,6 @@ class LikeCourseScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('찜한 수업'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15,
-            ),
-            child: GestureDetector(
-              onTap: () {},
-              child: const Icon(
-                Icons.mode_edit_outline_outlined,
-                size: 25,
-              ),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(

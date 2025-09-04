@@ -6,7 +6,6 @@ import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:dancemate_app/screens/notification_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -107,8 +106,21 @@ class HomeScreen extends ConsumerWidget {
                           final loginUserId = homeData['login_user_id'];
 
                           final userId = userData['id'];
-                          final imageUrl = userData['image_url'];
+                          String imageUrl = userData['image_url'];
                           final nickname = userData['nickname'];
+
+                          ImageProvider finalDancerImageProvider;
+                          if (imageUrl != '') {
+                            if (imageUrl.split(':')[0] == 'https') {
+                              finalDancerImageProvider = NetworkImage(imageUrl);
+                            } else {
+                              finalDancerImageProvider = AssetImage(imageUrl);
+                            }
+                          } else {
+                            // 기본 이미지 경로 설정
+                            imageUrl = 'assets/images/app_logo/chat.png';
+                            finalDancerImageProvider = AssetImage(imageUrl);
+                          }
                           return GestureDetector(
                             onTap: () {
                               onDancerTap(userId, loginUserId);
@@ -126,24 +138,10 @@ class HomeScreen extends ConsumerWidget {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(35),
                                     ),
-                                    child: imageUrl == ''
-                                        ? const CircleAvatar(
-                                            radius: 50,
-                                            foregroundImage: AssetImage(
-                                                'assets/images/app_logo/chat.png'),
-                                          )
-                                        : imageUrl.split(':')[0] == 'https'
-                                            ? CircleAvatar(
-                                                radius: 50,
-                                                foregroundImage:
-                                                    NetworkImage(imageUrl),
-                                                child: Text(nickname),
-                                              )
-                                            : CircleAvatar(
-                                                foregroundImage: AssetImage(
-                                                  imageUrl,
-                                                ),
-                                              ),
+                                    child: CircleAvatar(
+                                      radius: 50,
+                                      foregroundImage: finalDancerImageProvider,
+                                    ),
                                   ),
                                   const SizedBox(height: 5),
                                   Text(nickname),
@@ -197,32 +195,65 @@ class HomeScreen extends ConsumerWidget {
 
                             final dancerData = todayCoursesData['dancer'];
                             final dancerNickname = dancerData['nickname'];
-                            final dancerImageUrl = dancerData['image_url'];
+                            String dancerImageUrl = dancerData['image_url'];
 
+                            String lessonImageUrl =
+                                todayCoursesData['image_url'];
                             final courseDetailData =
                                 todayCoursesData['course'][0];
-                            final courseDate = courseDetailData['course_date'];
                             final courseStartTime =
                                 courseDetailData['start_time'];
                             final courseEndTime = courseDetailData['end_time'];
                             final courseTitle = courseDetailData['title'];
                             bool isCourseLike = courseDetailData['is_like'];
+
+                            ImageProvider finalDancerImageProvider;
+                            if (dancerImageUrl != '') {
+                              if (dancerImageUrl.split(':')[0] == 'https') {
+                                finalDancerImageProvider =
+                                    NetworkImage(dancerImageUrl);
+                              } else {
+                                finalDancerImageProvider =
+                                    AssetImage(dancerImageUrl);
+                              }
+                            } else {
+                              // 기본 이미지 경로 설정
+                              dancerImageUrl =
+                                  'assets/images/app_logo/chat.png';
+                              finalDancerImageProvider =
+                                  AssetImage(dancerImageUrl);
+                            }
+
+                            Image finalLessonImageProvider;
+                            if (lessonImageUrl != '') {
+                              if (lessonImageUrl.split(':')[0] == 'https') {
+                                finalLessonImageProvider = Image.network(
+                                  width: 170,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                  todayCoursesData['image_url'],
+                                );
+                              } else {
+                                finalLessonImageProvider = Image.asset(
+                                  width: 170,
+                                  height: 200,
+                                  fit: BoxFit.fill,
+                                  'assets/images/app_logo/2x.png',
+                                );
+                              }
+                            } else {
+                              // 기본 이미지 경로 설정
+                              lessonImageUrl = 'assets/images/app_logo/2x.png';
+                              finalLessonImageProvider = Image.asset(
+                                width: 170,
+                                height: 200,
+                                fit: BoxFit.fill,
+                                'assets/images/app_logo/2x.png',
+                              );
+                            }
                             return GestureDetector(
                               onTap: () {
                                 onCourseTap(todayCoursesData['id']);
-                              },
-                              onDoubleTap: () async {
-                                final result = await ref.watch(
-                                    postCourseLikeProvider(
-                                            todayCoursesData['id'])
-                                        .future);
-                                print(result['result_code']);
-                                if (result['result_code'] == 200) {
-                                  ref.refresh(getHomeProvider);
-                                  print('찜');
-                                } else {
-                                  print('like fail');
-                                }
                               },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -233,72 +264,52 @@ class HomeScreen extends ConsumerWidget {
                                   children: [
                                     Stack(
                                       children: [
-                                        todayCoursesData['image_url'] == null
-                                            ? Image.asset(
-                                                width: 170,
-                                                height: 200,
-                                                fit: BoxFit.fill,
-                                                'assets/images/app_logo/2x.png',
-                                              )
-                                            : Image.network(
-                                                width: 170,
-                                                height: 200,
-                                                fit: BoxFit.cover,
-                                                todayCoursesData['image_url'],
+                                        finalLessonImageProvider,
+                                        Positioned(
+                                          top: 5,
+                                          left: 5,
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              final result = await ref.refresh(
+                                                  postCourseLikeProvider(
+                                                          courseDetailData[
+                                                              'id'])
+                                                      .future);
+                                              if (result['result_code'] ==
+                                                  200) {
+                                                ref.refresh(getHomeProvider);
+                                                ref.watch(
+                                                    getCourseLikeProvider);
+                                              } else {
+                                                print('like fail');
+                                              }
+                                            },
+                                            child: Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                color: const Color(0xff9475FF),
                                               ),
-                                        // Positioned(
-                                        //   top: 5,
-                                        //   left: 5,
-                                        //   child: GestureDetector(
-                                        //     onTap: () {
-                                        //       print('is click?');
-                                        //       ref.watch(postCourseLikeProvider(
-                                        //           todayCoursesData['id']));
-                                        //       // print(result.value!['result_code']);
-                                        //       // if (result['result_code'] == 200) {
-                                        //       //   ref.refresh(getHomeProvider);
-                                        //       // } else {
-                                        //       //   print('like fail');
-                                        //       // }
-                                        //     },
-                                        //     child: Container(
-                                        //       width: 40,
-                                        //       height: 40,
-                                        //       decoration: BoxDecoration(
-                                        //         borderRadius:
-                                        //             BorderRadius.circular(20),
-                                        //         color: const Color(0xff9475FF),
-                                        //       ),
-                                        //       child: Icon(
-                                        //         isCourseLike
-                                        //             ? Icons.favorite
-                                        //             : Icons.favorite_border,
-                                        //         color: Colors.white,
-                                        //       ),
-                                        //     ),
-                                        //   ),
-                                        // ),
+                                              child: Icon(
+                                                isCourseLike
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                     const SizedBox(height: 10),
                                     Row(
                                       children: [
-                                        dancerImageUrl == ''
-                                            ? const CircleAvatar(
-                                                foregroundImage: AssetImage(
-                                                    'assets/images/app_logo/chat.png'),
-                                              )
-                                            : dancerImageUrl.split(':')[0] ==
-                                                    'https'
-                                                ? CircleAvatar(
-                                                    foregroundImage:
-                                                        NetworkImage(
-                                                            dancerImageUrl),
-                                                  )
-                                                : CircleAvatar(
-                                                    foregroundImage: AssetImage(
-                                                        dancerImageUrl),
-                                                  ),
+                                        CircleAvatar(
+                                          foregroundImage:
+                                              finalDancerImageProvider,
+                                        ),
                                         const SizedBox(width: 5),
                                         Container(
                                           decoration: BoxDecoration(
@@ -405,7 +416,7 @@ class HomeScreen extends ConsumerWidget {
                                 reserveCourseData['lesson']['dancer'];
                             final dancerNickname = dancerData['nickname'];
                             final dancerEmail = dancerData['email'];
-                            final dancerImageUrl = dancerData['image_url'];
+                            String dancerImageUrl = dancerData['image_url'];
 
                             final courseDetailData = reserveCourseData;
                             final courseDetailDate =
@@ -417,8 +428,53 @@ class HomeScreen extends ConsumerWidget {
                             bool isCourseLike = courseDetailData['is_like'];
 
                             final courseData = reserveCourseData['lesson'];
-                            final courseImage = courseData['image_url'];
+                            String courseImage = courseData['image_url'];
                             final courseTitle = courseData['title'];
+
+                            ImageProvider finalDancerImageProvider;
+                            if (dancerImageUrl != '') {
+                              if (dancerImageUrl.split(':')[0] == 'https') {
+                                finalDancerImageProvider =
+                                    NetworkImage(dancerImageUrl);
+                              } else {
+                                finalDancerImageProvider =
+                                    AssetImage(dancerImageUrl);
+                              }
+                            } else {
+                              // 기본 이미지 경로 설정
+                              dancerImageUrl =
+                                  'assets/images/app_logo/chat.png';
+                              finalDancerImageProvider =
+                                  AssetImage(dancerImageUrl);
+                            }
+
+                            Image finalLessonImageProvider;
+                            if (courseImage != '') {
+                              if (courseImage.split(':')[0] == 'https') {
+                                finalLessonImageProvider = Image.network(
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                  courseImage,
+                                );
+                              } else {
+                                finalLessonImageProvider = Image.asset(
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.fill,
+                                  'assets/images/app_logo/2x.png',
+                                );
+                              }
+                            } else {
+                              // 기본 이미지 경로 설정
+                              courseImage = 'assets/images/app_logo/2x.png';
+                              finalLessonImageProvider = Image.asset(
+                                width: 170,
+                                height: 200,
+                                fit: BoxFit.fill,
+                                'assets/images/app_logo/2x.png',
+                              );
+                            }
 
                             return GestureDetector(
                               onTap: () {
@@ -434,44 +490,22 @@ class HomeScreen extends ConsumerWidget {
                                   children: [
                                     Stack(
                                       children: [
-                                        GestureDetector(
-                                          onDoubleTap: () async {
-                                            final result = await ref.watch(
-                                                postCourseLikeProvider(
-                                                        courseData['id'])
-                                                    .future);
-                                            if (result['result_code'] == 200) {
-                                              ref.refresh(getHomeProvider);
-                                            } else {
-                                              print('like fail');
-                                            }
-                                          },
-                                          child: courseImage == null
-                                              ? Image.asset(
-                                                  width: 120,
-                                                  height: 120,
-                                                  fit: BoxFit.cover,
-                                                  'assets/images/app_logo/2x.png',
-                                                )
-                                              : Image.network(
-                                                  width: 120,
-                                                  height: 120,
-                                                  fit: BoxFit.cover,
-                                                  courseImage,
-                                                ),
-                                        ),
+                                        finalLessonImageProvider,
                                         Positioned(
                                           top: 5,
                                           left: 5,
                                           child: GestureDetector(
                                             onTap: () async {
-                                              final result = await ref.watch(
+                                              final result = await ref.refresh(
                                                   postCourseLikeProvider(
-                                                          courseData['id'])
+                                                          reserveCourseData[
+                                                              'id'])
                                                       .future);
                                               if (result['result_code'] ==
                                                   200) {
                                                 ref.refresh(getHomeProvider);
+                                                ref.refresh(
+                                                    getCourseLikeProvider);
                                               } else {
                                                 print('like fail');
                                               }
@@ -502,24 +536,10 @@ class HomeScreen extends ConsumerWidget {
                                       children: [
                                         Row(
                                           children: [
-                                            dancerImageUrl == ''
-                                                ? const CircleAvatar(
-                                                    foregroundImage: AssetImage(
-                                                        'assets/images/app_logo/chat.png'),
-                                                  )
-                                                : dancerImageUrl
-                                                            .split(':')[0] ==
-                                                        'https'
-                                                    ? CircleAvatar(
-                                                        foregroundImage:
-                                                            NetworkImage(
-                                                                dancerImageUrl),
-                                                      )
-                                                    : CircleAvatar(
-                                                        foregroundImage:
-                                                            AssetImage(
-                                                                dancerImageUrl),
-                                                      ),
+                                            CircleAvatar(
+                                              foregroundImage:
+                                                  finalDancerImageProvider,
+                                            ),
                                             const SizedBox(width: 5),
                                             Column(
                                               crossAxisAlignment:
