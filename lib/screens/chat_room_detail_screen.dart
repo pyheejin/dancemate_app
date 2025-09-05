@@ -17,16 +17,12 @@ class ChatRoomDetailScreen extends ConsumerWidget {
     final scrollController = ScrollController();
     final TextEditingController chatController = TextEditingController();
     final chatRoomData = ref.watch(getChatRoomDetailProvider(chatRoomId));
-    int roomNotice = ref.watch(chatRoomNoticeProvider);
 
     void onNoticeTap() async {
       final result = await ref
-          .read(chatRoomProvider.notifier)
-          .putChatRoomDetail(chatRoomId);
+          .refresh(postChatRoomDetailNoticeProvider(chatRoomId).future);
       if (result['result_code'] == 200) {
         ref.refresh(getChatRoomDetailProvider(chatRoomId));
-      } else {
-        errorAlert(context, result['result_msg']);
       }
     }
 
@@ -92,6 +88,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
             data: (room) {
               int chatRoomUserId = room['chat_room']['user_id'];
               int loginUserId = room['login_user_id'];
+              int roomNotice = room['is_notice'];
 
               var userData = room['chat_room']['user'];
               var friendData = room['chat_room']['friend'];
@@ -158,18 +155,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                                       : Icons.notifications_off_outlined,
                                   size: 25,
                                 ),
-                                onPressed: () async {
-                                  final result = await ref.refresh(
-                                      postChatRoomDetailNoticeProvider(
-                                              chatRoomId)
-                                          .future);
-                                  if (result['result_code'] == 200) {
-                                    ref
-                                        .read(chatRoomNoticeProvider.notifier)
-                                        .update((state) =>
-                                            result['result_data']['is_notice']);
-                                  }
-                                },
+                                onPressed: onNoticeTap,
                               ),
                             ],
                           ),
@@ -334,13 +320,7 @@ class ChatRoomDetailScreen extends ConsumerWidget {
                               controller: scrollController,
                               itemCount: room['chats'].length,
                               itemBuilder: (context, index) {
-                                final userData = room['chat_room']['user'];
-                                final userId = userData['id'];
-                                final userNickname = userData['nickname'];
-                                final userImageUrl = userData['image_url'];
-
                                 final friendData = room['chat_room']['friend'];
-                                final friendId = friendData['id'];
                                 String friendNickname = friendData['nickname'];
                                 String friendImageUrl = friendData['image_url'];
 

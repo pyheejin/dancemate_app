@@ -17,7 +17,6 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
     final scrollController = ScrollController();
     final TextEditingController chatController = TextEditingController();
     final chatRoomData = ref.watch(getChatRoomDetailProvider(chatRoomId));
-    int roomNotice = ref.watch(chatRoomNoticeProvider);
 
     Future<void> onProfileImageTap(String imagePath) async {
       Navigator.of(context).push(
@@ -63,10 +62,10 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
       endDrawer: Drawer(
         child: chatRoomData.when(
           data: (room) {
-            print(room);
             final lessonData = room['lesson'];
             String roomTitle = lessonData['title'];
             String roomImageUrl = lessonData['image_url'];
+            int roomNotice = room['is_notice'];
 
             final dancerData = room['dancer'];
             String dancerImageUrl = dancerData['image_url'];
@@ -128,8 +127,7 @@ class LessonChatRoomDetailScreen extends ConsumerWidget {
                               postChatRoomDetailNoticeProvider(chatRoomId)
                                   .future);
                           if (result['result_code'] == 200) {
-                            ref.read(chatRoomNoticeProvider.notifier).update(
-                                (state) => result['result_data']['is_notice']);
+                            ref.refresh(getChatRoomDetailProvider(chatRoomId));
                           }
                         },
                       ),
