@@ -1,7 +1,12 @@
+import 'package:dancemate_app/provider/calendar_provider.dart';
+import 'package:dancemate_app/provider/chat_provider.dart';
+import 'package:dancemate_app/provider/home_provider.dart';
+import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/search_provider.dart';
 import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -118,7 +123,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               const SizedBox(height: 20),
               // SearchResult 위젯의 내용을 여기에 직접 삽입
               Expanded(
-                child: _buildResultBody(keyword, courses, searchPre),
+                child: _buildResultBody(
+                  keyword,
+                  courses,
+                  searchPre,
+                ),
               ),
             ],
           ),
@@ -242,13 +251,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('추천 수업 Top 3',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            const Text(
+              '추천 수업 Top 3',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 10),
             searchPre.when(
               loading: () => const CircularProgressIndicator(),
-              error: (error, stack) =>
-                  SizedBox(width: 300, child: Text('error: $error')),
+              error: (error, stack) => SizedBox(
+                width: 300,
+                child: Text('error: $error'),
+              ),
               data: (dataList) {
                 return ListView.builder(
                   padding: EdgeInsets.zero,
@@ -310,7 +326,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildCourseItem(dynamic courseData) {
     final courseTitle = courseData['title'];
-    final courseImage = courseData['image_url'];
+    String courseImage = courseData['image_url'] ?? '';
 
     final dancerData = courseData['dancer'];
     final dancerNickname = dancerData['nickname'];
@@ -322,6 +338,51 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final courseDetailTitle = courseDetailData['title'];
     final courseDetailStartTime = courseDetailData['start_time'];
     final courseDetailEndTime = courseDetailData['end_time'];
+    bool isCourseLike = courseDetailData['is_like'];
+
+    void onLikeTap(int courseId) async {
+      final result = await ref.refresh(postCourseLikeProvider(courseId).future);
+      if (result['result_code'] == 200) {
+        final dateFormat = DateFormat('yyyy-MM-dd');
+        final selectDay = ref.watch(selectDateProvider);
+
+        ref.refresh(getHomeProvider);
+        ref.refresh(getSearchPreProvider);
+        ref.refresh(getChatRoomProvider(1));
+        ref.refresh(getChatRoomProvider(50));
+        ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
+      } else {
+        print('like fail');
+      }
+    }
+
+    Image finalLessonImageProvider;
+    if (courseImage != '') {
+      if (courseImage.split(':')[0] == 'https') {
+        finalLessonImageProvider = Image.network(
+          width: 120,
+          height: 120,
+          fit: BoxFit.cover,
+          courseImage,
+        );
+      } else {
+        finalLessonImageProvider = Image.asset(
+          width: 120,
+          height: 120,
+          fit: BoxFit.fill,
+          'assets/images/app_logo/2x.png',
+        );
+      }
+    } else {
+      // 기본 이미지 경로 설정
+      courseImage = 'assets/images/app_logo/2x.png';
+      finalLessonImageProvider = Image.asset(
+        width: 120,
+        height: 120,
+        fit: BoxFit.fill,
+        'assets/images/app_logo/2x.png',
+      );
+    }
 
     return GestureDetector(
       onTap: () => _onCourseTap(courseData['id']),
@@ -332,17 +393,32 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           children: [
             Stack(
               children: [
-                courseImage == null
-                    ? Image.asset(
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        'assets/images/app_logo/2x.png')
-                    : Image.network(
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        courseImage),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: finalLessonImageProvider,
+                ),
+                Positioned(
+                  top: 5,
+                  left: 5,
+                  child: GestureDetector(
+                    onTap: () {
+                      onLikeTap(courseDetailData['id']);
+                    },
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color(0xff9475FF),
+                      ),
+                      child: Icon(
+                        isCourseLike ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(width: 10),
@@ -373,24 +449,42 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               child: Text(
                                 dancerNickname,
                                 style: const TextStyle(
-                                    color: Colors.white, fontSize: 16),
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
-                            Text(dancerEmail,
-                                style: const TextStyle(fontSize: 16)),
+                            Text(
+                              dancerEmail,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text(courseTitle,
-                      style: const TextStyle(
-                          color: Color(0xff3F51B5), fontSize: 17)),
-                  Text('$courseDetailDate $courseDetailTitle',
-                      style: const TextStyle(fontSize: 15)),
-                  Text('$courseDetailStartTime - $courseDetailEndTime',
-                      style: const TextStyle(fontSize: 15)),
+                  Text(
+                    courseTitle,
+                    style: const TextStyle(
+                      color: Color(0xff3F51B5),
+                      fontSize: 17,
+                    ),
+                  ),
+                  Text(
+                    '$courseDetailDate $courseDetailTitle',
+                    style: const TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
+                  Text(
+                    '$courseDetailStartTime - $courseDetailEndTime',
+                    style: const TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
                 ],
               ),
             ),

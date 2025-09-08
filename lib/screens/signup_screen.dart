@@ -1,10 +1,16 @@
 import 'package:dancemate_app/database/model.dart';
+import 'package:dancemate_app/provider/calendar_provider.dart';
+import 'package:dancemate_app/provider/chat_provider.dart';
+import 'package:dancemate_app/provider/home_provider.dart';
+import 'package:dancemate_app/provider/lesson_provider.dart';
+import 'package:dancemate_app/provider/search_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dancemate_app/contants/contants.dart';
+import 'package:intl/intl.dart';
 
 class SignUpScreen extends ConsumerWidget {
   const SignUpScreen({
@@ -52,6 +58,14 @@ class SignUpScreen extends ConsumerWidget {
             builder: (context) => const MainNavigationScreen(),
           ),
         );
+        final dateFormat = DateFormat('yyyy-MM-dd');
+        final selectDay = ref.watch(selectDateProvider);
+
+        ref.refresh(getHomeProvider);
+        ref.refresh(getSearchPreProvider);
+        ref.refresh(getChatRoomProvider(1));
+        ref.refresh(getChatRoomProvider(50));
+        ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
       } else {
         errorAlert(context, result['result_msg']);
       }
@@ -119,7 +133,7 @@ class SignUpScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               const Row(
                 children: [
                   Text(
@@ -270,164 +284,164 @@ class SignUpScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              const Row(
-                children: [
-                  Text(
-                    '*',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 17,
-                    ),
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    '이름',
-                    style: TextStyle(
-                      fontSize: 17,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              SizedBox(
-                height: 50,
-                child: TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    hintText: '',
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.grey.shade400,
-                        width: 1.0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.grey.shade400,
-                        width: 1.0,
-                      ),
-                    ),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        onClearTap(nameController);
-                      },
-                      child: const Icon(
-                        Icons.cancel_outlined,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Row(
-                children: [
-                  Text(
-                    '*',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 17,
-                    ),
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    '본인인증',
-                    style: TextStyle(
-                      fontSize: 17,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              SizedBox(
-                height: 50,
-                child: TextField(
-                  controller: phoneController,
-                  decoration: InputDecoration(
-                    hintText: '핸드폰 번호(숫자만 입력)',
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.grey.shade400,
-                        width: 1.0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.grey.shade400,
-                        width: 1.0,
-                      ),
-                    ),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        onClearTap(phoneController);
-                      },
-                      child: const Icon(
-                        Icons.cancel_outlined,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 5),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: '인증번호',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade400,
-                            width: 1.0,
-                          ),
-                        ),
-                        suffixIcon: const Icon(
-                          Icons.cancel_outlined,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        backgroundColor: const Color(0xFFA48AFF),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 5,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '인증번호 전송',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 17,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
+              // const Row(
+              //   children: [
+              //     Text(
+              //       '*',
+              //       style: TextStyle(
+              //         color: Colors.red,
+              //         fontSize: 17,
+              //       ),
+              //     ),
+              //     SizedBox(width: 5),
+              //     Text(
+              //       '이름',
+              //       style: TextStyle(
+              //         fontSize: 17,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 5),
+              // SizedBox(
+              //   height: 50,
+              //   child: TextField(
+              //     controller: nameController,
+              //     decoration: InputDecoration(
+              //       hintText: '',
+              //       enabledBorder: OutlineInputBorder(
+              //         borderSide: BorderSide(
+              //           color: Colors.grey.shade400,
+              //           width: 1.0,
+              //         ),
+              //       ),
+              //       focusedBorder: OutlineInputBorder(
+              //         borderSide: BorderSide(
+              //           color: Colors.grey.shade400,
+              //           width: 1.0,
+              //         ),
+              //       ),
+              //       suffixIcon: GestureDetector(
+              //         onTap: () {
+              //           onClearTap(nameController);
+              //         },
+              //         child: const Icon(
+              //           Icons.cancel_outlined,
+              //           color: Colors.black54,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(height: 20),
+              // const Row(
+              //   children: [
+              //     Text(
+              //       '*',
+              //       style: TextStyle(
+              //         color: Colors.red,
+              //         fontSize: 17,
+              //       ),
+              //     ),
+              //     SizedBox(width: 5),
+              //     Text(
+              //       '본인인증',
+              //       style: TextStyle(
+              //         fontSize: 17,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 5),
+              // SizedBox(
+              //   height: 50,
+              //   child: TextField(
+              //     controller: phoneController,
+              //     decoration: InputDecoration(
+              //       hintText: '핸드폰 번호(숫자만 입력)',
+              //       enabledBorder: OutlineInputBorder(
+              //         borderSide: BorderSide(
+              //           color: Colors.grey.shade400,
+              //           width: 1.0,
+              //         ),
+              //       ),
+              //       focusedBorder: OutlineInputBorder(
+              //         borderSide: BorderSide(
+              //           color: Colors.grey.shade400,
+              //           width: 1.0,
+              //         ),
+              //       ),
+              //       suffixIcon: GestureDetector(
+              //         onTap: () {
+              //           onClearTap(phoneController);
+              //         },
+              //         child: const Icon(
+              //           Icons.cancel_outlined,
+              //           color: Colors.black54,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(height: 5),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Expanded(
+              //       child: TextField(
+              //         decoration: InputDecoration(
+              //           hintText: '인증번호',
+              //           enabledBorder: OutlineInputBorder(
+              //             borderSide: BorderSide(
+              //               color: Colors.grey.shade400,
+              //               width: 1.0,
+              //             ),
+              //           ),
+              //           focusedBorder: OutlineInputBorder(
+              //             borderSide: BorderSide(
+              //               color: Colors.grey.shade400,
+              //               width: 1.0,
+              //             ),
+              //           ),
+              //           suffixIcon: const Icon(
+              //             Icons.cancel_outlined,
+              //             color: Colors.black54,
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     const SizedBox(width: 5),
+              //     Expanded(
+              //       child: TextButton(
+              //         onPressed: () {},
+              //         style: TextButton.styleFrom(
+              //           backgroundColor: const Color(0xFFA48AFF),
+              //           shape: RoundedRectangleBorder(
+              //             borderRadius: BorderRadius.circular(5),
+              //           ),
+              //         ),
+              //         child: const Padding(
+              //           padding: EdgeInsets.symmetric(
+              //             vertical: 5,
+              //           ),
+              //           child: Row(
+              //             mainAxisAlignment: MainAxisAlignment.center,
+              //             children: [
+              //               Text(
+              //                 '인증번호 전송',
+              //                 style: TextStyle(
+              //                   color: Colors.white,
+              //                   fontSize: 17,
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 20),
               const Row(
                 children: [
                   Text(

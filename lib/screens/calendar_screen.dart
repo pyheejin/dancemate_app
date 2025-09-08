@@ -1,5 +1,8 @@
 import 'package:dancemate_app/provider/calendar_provider.dart';
+import 'package:dancemate_app/provider/chat_provider.dart';
+import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/lesson_provider.dart';
+import 'package:dancemate_app/provider/search_provider.dart';
 import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -180,7 +183,7 @@ class CalendarScreen extends ConsumerWidget {
   }
 }
 
-class CourseListItem extends StatelessWidget {
+class CourseListItem extends ConsumerWidget {
   const CourseListItem({
     super.key,
     required this.courseData,
@@ -195,40 +198,104 @@ class CourseListItem extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final courseDate = courseData['course_date'];
     final courseTitle = courseData['title'];
     final courseStartTime = courseData['start_time'];
     final courseEndTime = courseData['end_time'];
 
-    final lessonImage = lessonData['image_url'];
+    String lessonImage = lessonData['image_url'] ?? '';
     final lessonTitle = lessonData['title'];
+    bool isCourseLike = courseData['is_like'];
+    print('$lessonTitle($courseTitle) - $isCourseLike');
 
     final dancerNickname = dancerData['nickname'];
     final dancerEmail = dancerData['email'];
     final dancerImageUrl = dancerData['image_url'];
 
+    final dateFormat = DateFormat('yyyy-MM-dd');
+    final selectDay = ref.watch(selectDateProvider);
+
+    void onLikeTap(int courseId) async {
+      final result = await ref.refresh(postCourseLikeProvider(courseId).future);
+      if (result['result_code'] == 200) {
+        ref.refresh(getHomeProvider);
+        ref.refresh(getSearchPreProvider);
+        ref.refresh(getChatRoomProvider(1));
+        ref.refresh(getChatRoomProvider(50));
+        ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
+      } else {
+        print('like fail');
+      }
+    }
+
+    Image finalLessonImageProvider;
+    if (lessonImage != '') {
+      if (lessonImage.split(':')[0] == 'https') {
+        finalLessonImageProvider = Image.network(
+          width: 120,
+          height: 120,
+          fit: BoxFit.cover,
+          lessonImage,
+        );
+      } else {
+        finalLessonImageProvider = Image.asset(
+          width: 120,
+          height: 120,
+          fit: BoxFit.fill,
+          'assets/images/app_logo/2x.png',
+        );
+      }
+    } else {
+      // 기본 이미지 경로 설정
+      lessonImage = 'assets/images/app_logo/2x.png';
+      finalLessonImageProvider = Image.asset(
+        width: 120,
+        height: 120,
+        fit: BoxFit.fill,
+        'assets/images/app_logo/2x.png',
+      );
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        padding: const EdgeInsets.symmetric(
+          vertical: 5,
+          horizontal: 5,
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                lessonImage ?? 'assets/images/app_logo/2x.png',
-                width: 120,
-                height: 120,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Image.asset(
-                  'assets/images/app_logo/2x.png',
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: finalLessonImageProvider,
                 ),
-              ),
+                Positioned(
+                  top: 5,
+                  left: 5,
+                  child: GestureDetector(
+                    onTap: () {
+                      onLikeTap(courseData['id']);
+                    },
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color(0xff9475FF),
+                      ),
+                      child: Icon(
+                        isCourseLike ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(width: 10),
             Expanded(

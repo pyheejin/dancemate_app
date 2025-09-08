@@ -57,6 +57,16 @@ class ChatRoomDetailScreen extends ConsumerWidget {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 30,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              ref.refresh(getChatRoomProvider(1));
+            },
+          ),
           centerTitle: true,
           automaticallyImplyLeading: true,
           title: chatRoomData.when(

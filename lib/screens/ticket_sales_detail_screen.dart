@@ -323,7 +323,7 @@ class _TicketSalesDetailScreenState
                                         ),
                                         child: const Padding(
                                           padding: EdgeInsets.symmetric(
-                                            vertical: 55,
+                                            vertical: 79,
                                             horizontal: 20,
                                           ),
                                           child: Text(

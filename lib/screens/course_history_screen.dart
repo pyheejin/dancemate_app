@@ -53,12 +53,40 @@ class CourseHistoryScreen extends ConsumerWidget {
 
                 final lessonData = courseData['lesson'];
                 final lessonTitle = lessonData['title'];
-                final lessonImage = lessonData['image_url'];
+                String lessonImage = lessonData['image_url'];
 
                 final dancerData = lessonData['dancer'];
                 final dancerNickname = dancerData['nickname'];
                 final dancerEmail = dancerData['email'];
                 final dancerImageUrl = dancerData['image_url'];
+
+                Image finalLessonImageProvider;
+                if (lessonImage != '') {
+                  if (lessonImage.split(':')[0] == 'https') {
+                    finalLessonImageProvider = Image.network(
+                      width: 110,
+                      height: 110,
+                      fit: BoxFit.cover,
+                      lessonImage,
+                    );
+                  } else {
+                    finalLessonImageProvider = Image.asset(
+                      width: 110,
+                      height: 110,
+                      fit: BoxFit.fill,
+                      'assets/images/app_logo/2x.png',
+                    );
+                  }
+                } else {
+                  // 기본 이미지 경로 설정
+                  lessonImage = 'assets/images/app_logo/2x.png';
+                  finalLessonImageProvider = Image.asset(
+                    width: 110,
+                    height: 110,
+                    fit: BoxFit.fill,
+                    'assets/images/app_logo/2x.png',
+                  );
+                }
                 return GestureDetector(
                   onTap: () {
                     onCourseTap(lessonData['id']);
@@ -84,20 +112,11 @@ class CourseHistoryScreen extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            lessonImage == null
-                                ? Image.asset(
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                    'assets/images/app_logo/2x.png',
-                                  )
-                                : Image.network(
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                    lessonImage,
-                                  ),
-                            const SizedBox(width: 5),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: finalLessonImageProvider,
+                            ),
+                            const SizedBox(width: 10),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [

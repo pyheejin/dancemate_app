@@ -264,7 +264,11 @@ class HomeScreen extends ConsumerWidget {
                                   children: [
                                     Stack(
                                       children: [
-                                        finalLessonImageProvider,
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: finalLessonImageProvider,
+                                        ),
                                         Positioned(
                                           top: 5,
                                           left: 5,
@@ -469,8 +473,8 @@ class HomeScreen extends ConsumerWidget {
                               // 기본 이미지 경로 설정
                               courseImage = 'assets/images/app_logo/2x.png';
                               finalLessonImageProvider = Image.asset(
-                                width: 170,
-                                height: 200,
+                                width: 120,
+                                height: 120,
                                 fit: BoxFit.fill,
                                 'assets/images/app_logo/2x.png',
                               );
@@ -490,7 +494,11 @@ class HomeScreen extends ConsumerWidget {
                                   children: [
                                     Stack(
                                       children: [
-                                        finalLessonImageProvider,
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: finalLessonImageProvider,
+                                        ),
                                         Positioned(
                                           top: 5,
                                           left: 5,
@@ -511,8 +519,8 @@ class HomeScreen extends ConsumerWidget {
                                               }
                                             },
                                             child: Container(
-                                              width: 40,
-                                              height: 40,
+                                              width: 30,
+                                              height: 30,
                                               decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(20),
@@ -523,6 +531,7 @@ class HomeScreen extends ConsumerWidget {
                                                     ? Icons.favorite
                                                     : Icons.favorite_border,
                                                 color: Colors.white,
+                                                size: 20,
                                               ),
                                             ),
                                           ),
