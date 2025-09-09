@@ -207,7 +207,6 @@ class CourseListItem extends ConsumerWidget {
     String lessonImage = lessonData['image_url'] ?? '';
     final lessonTitle = lessonData['title'];
     bool isCourseLike = courseData['is_like'];
-    print('$lessonTitle($courseTitle) - $isCourseLike');
 
     final dancerNickname = dancerData['nickname'];
     final dancerEmail = dancerData['email'];

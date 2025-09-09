@@ -76,7 +76,14 @@ class _LessonChatRoomScreenState extends ConsumerState<LessonChatRoomScreen>
                 child: chatRoomData.when(
                   data: (room) {
                     if (room.isEmpty) {
-                      return const Center(child: Text('채팅방이 없습니다.'));
+                      return const Center(
+                        child: Text(
+                          '수업톡이 없습니다.',
+                          style: TextStyle(
+                            fontSize: 17,
+                          ),
+                        ),
+                      );
                     }
                     return ListView.builder(
                       controller: _scrollController,

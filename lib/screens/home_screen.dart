@@ -198,7 +198,7 @@ class HomeScreen extends ConsumerWidget {
                             String dancerImageUrl = dancerData['image_url'];
 
                             String lessonImageUrl =
-                                todayCoursesData['image_url'];
+                                todayCoursesData['image_url'] ?? '';
                             final courseDetailData =
                                 todayCoursesData['course'][0];
                             final courseStartTime =
