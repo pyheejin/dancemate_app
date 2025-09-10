@@ -1,4 +1,8 @@
+import 'package:dancemate_app/provider/calendar_provider.dart';
+import 'package:dancemate_app/provider/chat_provider.dart';
+import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/lesson_provider.dart';
+import 'package:dancemate_app/provider/search_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/order_screen.dart';
 import 'package:dancemate_app/screens/photo_screen.dart';
@@ -7,6 +11,7 @@ import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:intl/intl.dart';
 
 class LessonDetailScreen extends ConsumerWidget {
   final int courseId;
@@ -59,6 +64,25 @@ class LessonDetailScreen extends ConsumerWidget {
       }
     }
 
+    void onLikeTap(int courseId) async {
+      final result = await ref.refresh(postCourseLikeProvider(courseId).future);
+      if (result['result_code'] == 200) {
+        final dateFormat = DateFormat('yyyy-MM-dd');
+        final selectDay = ref.watch(selectDateProvider);
+        final selectMonth = ref.watch(selectMonthProvider);
+
+        ref.refresh(getHomeProvider);
+        ref.refresh(getSearchPreProvider);
+        ref.refresh(getChatRoomProvider(1));
+        ref.refresh(getChatRoomProvider(50));
+        ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
+        ref.refresh(getCourseLikeProvider);
+        ref.watch(getCalendarLessonProvider(selectMonth));
+      } else {
+        print('like fail');
+      }
+    }
+
     int initialImagePage = ref.watch(initialImagePageProvider);
 
     final pageController = PageController(
@@ -108,65 +132,99 @@ class LessonDetailScreen extends ConsumerWidget {
               dancerImageUrl = 'assets/images/app_logo/chat.png';
               finalImageProvider = AssetImage(dancerImageUrl);
             }
+
             return Column(
               children: [
                 const SizedBox(height: 10),
-                lessonImages.isEmpty
-                    ? Image.asset(
-                        height: 270,
-                        'assets/images/app_logo/detail_2x.png',
-                      )
-                    : SizedBox(
-                        height: 220,
-                        child: Stack(
-                          children: [
-                            ListView.builder(
-                              controller: pageController,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: lessonImages.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                final path = lessonImages[index]['image_url'];
-                                return Image.network(
-                                  width: 430,
-                                  height: 220,
-                                  fit: BoxFit.fill,
-                                  path,
-                                );
-                              },
-                            ),
-                            lessonImages.isEmpty
-                                ? Container()
-                                : Positioned(
-                                    left: (MediaQuery.of(context).size.width /
-                                            2) -
-                                        (lessonImages.length * 10),
-                                    bottom: 10,
-                                    child: Row(
-                                      children: [
-                                        Center(
-                                          child: SmoothPageIndicator(
-                                            controller: pageController,
-                                            count: lessonImages.length,
-                                            effect: const SwapEffect(
-                                              dotHeight: 12,
-                                              dotWidth: 12,
-                                              dotColor: Color(0xFFA48AFF),
-                                              activeDotColor: Color(0xFF74D0FF),
+                Stack(
+                  children: [
+                    lessonImages.isEmpty
+                        ? Image.asset(
+                            height: 270,
+                            'assets/images/app_logo/detail_2x.png',
+                          )
+                        : SizedBox(
+                            height: 220,
+                            child: Stack(
+                              children: [
+                                ListView.builder(
+                                  controller: pageController,
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: lessonImages.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final path =
+                                        lessonImages[index]['image_url'];
+                                    return Image.network(
+                                      width: 430,
+                                      height: 220,
+                                      fit: BoxFit.fill,
+                                      path,
+                                    );
+                                  },
+                                ),
+                                lessonImages.isEmpty
+                                    ? Container()
+                                    : Positioned(
+                                        left:
+                                            (MediaQuery.of(context).size.width /
+                                                    2) -
+                                                (lessonImages.length * 10),
+                                        bottom: 10,
+                                        child: Row(
+                                          children: [
+                                            Center(
+                                              child: SmoothPageIndicator(
+                                                controller: pageController,
+                                                count: lessonImages.length,
+                                                effect: const SwapEffect(
+                                                  dotHeight: 12,
+                                                  dotWidth: 12,
+                                                  dotColor: Color(0xFFA48AFF),
+                                                  activeDotColor:
+                                                      Color(0xFF74D0FF),
+                                                ),
+                                                onDotClicked: (index) {
+                                                  ref
+                                                      .read(
+                                                          initialImagePageProvider
+                                                              .notifier)
+                                                      .update((state) => index);
+                                                },
+                                              ),
                                             ),
-                                            onDotClicked: (index) {
-                                              ref
-                                                  .read(initialImagePageProvider
-                                                      .notifier)
-                                                  .update((state) => index);
-                                            },
-                                          ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  )
-                          ],
-                        ),
-                      ),
+                                      )
+                              ],
+                            ),
+                          ),
+                    // Positioned(
+                    //   top: 5,
+                    //   left: 5,
+                    //   child: GestureDetector(
+                    //     onTap: () {
+                    //       onLikeTap(reserveCourseData['id']);
+                    //     },
+                    //     child: Container(
+                    //       width: 30,
+                    //       height: 30,
+                    //       decoration: BoxDecoration(
+                    //         borderRadius: BorderRadius.circular(20),
+                    //         color: const Color(0xff9475FF),
+                    //       ),
+                    //       child: Icon(
+                    //         isCourseLike
+                    //             ? Icons.favorite
+                    //             : Icons.favorite_border,
+                    //         color: Colors.white,
+                    //         size: 20,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
+                ),
                 const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(

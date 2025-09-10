@@ -223,6 +223,7 @@ class CourseListItem extends ConsumerWidget {
         ref.refresh(getChatRoomProvider(1));
         ref.refresh(getChatRoomProvider(50));
         ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
+        ref.refresh(getCourseLikeProvider);
       } else {
         print('like fail');
       }
@@ -272,28 +273,28 @@ class CourseListItem extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                   child: finalLessonImageProvider,
                 ),
-                Positioned(
-                  top: 5,
-                  left: 5,
-                  child: GestureDetector(
-                    onTap: () {
-                      onLikeTap(courseData['id']);
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: const Color(0xff9475FF),
-                      ),
-                      child: Icon(
-                        isCourseLike ? Icons.favorite : Icons.favorite_border,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   top: 5,
+                //   left: 5,
+                //   child: GestureDetector(
+                //     onTap: () {
+                //       onLikeTap(courseData['id']);
+                //     },
+                //     child: Container(
+                //       width: 30,
+                //       height: 30,
+                //       decoration: BoxDecoration(
+                //         borderRadius: BorderRadius.circular(20),
+                //         color: const Color(0xff9475FF),
+                //       ),
+                //       child: Icon(
+                //         isCourseLike ? Icons.favorite : Icons.favorite_border,
+                //         color: Colors.white,
+                //         size: 20,
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             const SizedBox(width: 10),

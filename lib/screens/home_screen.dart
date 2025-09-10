@@ -1,6 +1,9 @@
+import 'package:dancemate_app/provider/calendar_provider.dart';
+import 'package:dancemate_app/provider/chat_provider.dart';
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/main_tap_provider.dart';
+import 'package:dancemate_app/provider/search_provider.dart';
 import 'package:dancemate_app/screens/chat_room_screen.dart';
 import 'package:dancemate_app/screens/lesson_detail_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
@@ -8,6 +11,7 @@ import 'package:dancemate_app/screens/notification_screen.dart';
 import 'package:dancemate_app/screens/user_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -15,6 +19,23 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeData = ref.watch(getHomeProvider);
+
+    final dateFormat = DateFormat('yyyy-MM-dd');
+    final selectDay = ref.watch(selectDateProvider);
+
+    void onLikeTap(int courseId) async {
+      final result = await ref.refresh(postCourseLikeProvider(courseId).future);
+      if (result['result_code'] == 200) {
+        ref.refresh(getHomeProvider);
+        ref.refresh(getSearchPreProvider);
+        ref.refresh(getChatRoomProvider(1));
+        ref.refresh(getChatRoomProvider(50));
+        ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
+        ref.refresh(getCourseLikeProvider);
+      } else {
+        print('like fail');
+      }
+    }
 
     void onDancerTap(int userId, int loginUserId) {
       if (userId != loginUserId) {
@@ -273,20 +294,8 @@ class HomeScreen extends ConsumerWidget {
                                           top: 5,
                                           left: 5,
                                           child: GestureDetector(
-                                            onTap: () async {
-                                              final result = await ref.refresh(
-                                                  postCourseLikeProvider(
-                                                          courseDetailData[
-                                                              'id'])
-                                                      .future);
-                                              if (result['result_code'] ==
-                                                  200) {
-                                                ref.refresh(getHomeProvider);
-                                                ref.watch(
-                                                    getCourseLikeProvider);
-                                              } else {
-                                                print('like fail');
-                                              }
+                                            onTap: () {
+                                              onLikeTap(courseDetailData['id']);
                                             },
                                             child: Container(
                                               width: 40,
@@ -503,20 +512,9 @@ class HomeScreen extends ConsumerWidget {
                                           top: 5,
                                           left: 5,
                                           child: GestureDetector(
-                                            onTap: () async {
-                                              final result = await ref.refresh(
-                                                  postCourseLikeProvider(
-                                                          reserveCourseData[
-                                                              'id'])
-                                                      .future);
-                                              if (result['result_code'] ==
-                                                  200) {
-                                                ref.refresh(getHomeProvider);
-                                                ref.refresh(
-                                                    getCourseLikeProvider);
-                                              } else {
-                                                print('like fail');
-                                              }
+                                            onTap: () {
+                                              onLikeTap(
+                                                  reserveCourseData['id']);
                                             },
                                             child: Container(
                                               width: 30,
