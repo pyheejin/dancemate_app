@@ -65,7 +65,7 @@ class LessonDetailScreen extends ConsumerWidget {
     }
 
     void onLikeTap(int courseId) async {
-      final result = await ref.refresh(postCourseLikeProvider(courseId).future);
+      final result = await ref.refresh(postLessonLikeProvider(courseId).future);
       if (result['result_code'] == 200) {
         final dateFormat = DateFormat('yyyy-MM-dd');
         final selectDay = ref.watch(selectDateProvider);
@@ -76,7 +76,7 @@ class LessonDetailScreen extends ConsumerWidget {
         ref.refresh(getChatRoomProvider(1));
         ref.refresh(getChatRoomProvider(50));
         ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
-        ref.refresh(getCourseLikeProvider);
+        ref.refresh(getLessonLikeProvider);
         ref.watch(getCalendarLessonProvider(selectMonth));
       } else {
         print('like fail');

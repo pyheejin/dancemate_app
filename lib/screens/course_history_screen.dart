@@ -93,10 +93,10 @@ class CourseHistoryScreen extends ConsumerWidget {
                   },
                   onLongPress: () async {
                     final result = await ref
-                        .watch(postCourseLikeProvider(courseData['id']).future);
+                        .watch(postLessonLikeProvider(courseData['id']).future);
                     print(result['result_code']);
                     if (result['result_code'] == 200) {
-                      ref.refresh(getCourseLikeProvider);
+                      ref.refresh(getLessonLikeProvider);
                     } else {
                       print('delete fail');
                     }

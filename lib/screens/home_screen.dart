@@ -24,14 +24,14 @@ class HomeScreen extends ConsumerWidget {
     final selectDay = ref.watch(selectDateProvider);
 
     void onLikeTap(int courseId) async {
-      final result = await ref.refresh(postCourseLikeProvider(courseId).future);
+      final result = await ref.refresh(postLessonLikeProvider(courseId).future);
       if (result['result_code'] == 200) {
         ref.refresh(getHomeProvider);
         ref.refresh(getSearchPreProvider);
         ref.refresh(getChatRoomProvider(1));
         ref.refresh(getChatRoomProvider(50));
         ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
-        ref.refresh(getCourseLikeProvider);
+        ref.refresh(getLessonLikeProvider);
       } else {
         print('like fail');
       }
@@ -226,7 +226,7 @@ class HomeScreen extends ConsumerWidget {
                                 courseDetailData['start_time'];
                             final courseEndTime = courseDetailData['end_time'];
                             final courseTitle = courseDetailData['title'];
-                            bool isCourseLike = courseDetailData['is_like'];
+                            // bool isCourseLike = todayCoursesData['is_like'];
 
                             ImageProvider finalDancerImageProvider;
                             if (dancerImageUrl != '') {
@@ -290,30 +290,30 @@ class HomeScreen extends ConsumerWidget {
                                               BorderRadius.circular(10),
                                           child: finalLessonImageProvider,
                                         ),
-                                        Positioned(
-                                          top: 5,
-                                          left: 5,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              onLikeTap(courseDetailData['id']);
-                                            },
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                color: const Color(0xff9475FF),
-                                              ),
-                                              child: Icon(
-                                                isCourseLike
-                                                    ? Icons.favorite
-                                                    : Icons.favorite_border,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        // Positioned(
+                                        //   top: 5,
+                                        //   left: 5,
+                                        //   child: GestureDetector(
+                                        //     onTap: () {
+                                        //       onLikeTap(courseDetailData['id']);
+                                        //     },
+                                        //     child: Container(
+                                        //       width: 40,
+                                        //       height: 40,
+                                        //       decoration: BoxDecoration(
+                                        //         borderRadius:
+                                        //             BorderRadius.circular(20),
+                                        //         color: const Color(0xff9475FF),
+                                        //       ),
+                                        //       child: Icon(
+                                        //         isCourseLike
+                                        //             ? Icons.favorite
+                                        //             : Icons.favorite_border,
+                                        //         color: Colors.white,
+                                        //       ),
+                                        //     ),
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                     const SizedBox(height: 10),
@@ -438,7 +438,8 @@ class HomeScreen extends ConsumerWidget {
                                 courseDetailData['start_time'];
                             final courseEndTime = courseDetailData['end_time'];
                             final courseDetailTitle = courseDetailData['title'];
-                            bool isCourseLike = courseDetailData['is_like'];
+                            // bool isCourseLike =
+                            //     reserveCourseData['lesson']['is_like'];
 
                             final courseData = reserveCourseData['lesson'];
                             String courseImage = courseData['image_url'];
@@ -508,32 +509,32 @@ class HomeScreen extends ConsumerWidget {
                                               BorderRadius.circular(10),
                                           child: finalLessonImageProvider,
                                         ),
-                                        Positioned(
-                                          top: 5,
-                                          left: 5,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              onLikeTap(
-                                                  reserveCourseData['id']);
-                                            },
-                                            child: Container(
-                                              width: 30,
-                                              height: 30,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                color: const Color(0xff9475FF),
-                                              ),
-                                              child: Icon(
-                                                isCourseLike
-                                                    ? Icons.favorite
-                                                    : Icons.favorite_border,
-                                                color: Colors.white,
-                                                size: 20,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        // Positioned(
+                                        //   top: 5,
+                                        //   left: 5,
+                                        //   child: GestureDetector(
+                                        //     onTap: () {
+                                        //       onLikeTap(
+                                        //           reserveCourseData['id']);
+                                        //     },
+                                        //     child: Container(
+                                        //       width: 30,
+                                        //       height: 30,
+                                        //       decoration: BoxDecoration(
+                                        //         borderRadius:
+                                        //             BorderRadius.circular(20),
+                                        //         color: const Color(0xff9475FF),
+                                        //       ),
+                                        //       child: Icon(
+                                        //         isCourseLike
+                                        //             ? Icons.favorite
+                                        //             : Icons.favorite_border,
+                                        //         color: Colors.white,
+                                        //         size: 20,
+                                        //       ),
+                                        //     ),
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                     const SizedBox(width: 10),

@@ -206,7 +206,7 @@ class CourseListItem extends ConsumerWidget {
 
     String lessonImage = lessonData['image_url'] ?? '';
     final lessonTitle = lessonData['title'];
-    bool isCourseLike = courseData['is_like'];
+    // bool isCourseLike = lessonData['is_like'];
 
     final dancerNickname = dancerData['nickname'];
     final dancerEmail = dancerData['email'];
@@ -216,14 +216,14 @@ class CourseListItem extends ConsumerWidget {
     final selectDay = ref.watch(selectDateProvider);
 
     void onLikeTap(int courseId) async {
-      final result = await ref.refresh(postCourseLikeProvider(courseId).future);
+      final result = await ref.refresh(postLessonLikeProvider(courseId).future);
       if (result['result_code'] == 200) {
         ref.refresh(getHomeProvider);
         ref.refresh(getSearchPreProvider);
         ref.refresh(getChatRoomProvider(1));
         ref.refresh(getChatRoomProvider(50));
         ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
-        ref.refresh(getCourseLikeProvider);
+        ref.refresh(getLessonLikeProvider);
       } else {
         print('like fail');
       }

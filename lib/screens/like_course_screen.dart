@@ -28,12 +28,13 @@ class _LikeCourseScreenState extends ConsumerState<LikeCourseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final courseData = ref.watch(getCourseLikeProvider);
+    final lessonData = ref.watch(getLessonLikeProvider);
+    print(lessonData);
 
-    void onCourseTap(int courseId) {
+    void onLessonTap(int lessonId) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => LessonDetailScreen(courseId: courseId),
+          builder: (context) => LessonDetailScreen(courseId: lessonId),
         ),
       );
     }
@@ -47,40 +48,34 @@ class _LikeCourseScreenState extends ConsumerState<LikeCourseScreen> {
           vertical: 10,
           horizontal: 10,
         ),
-        child: courseData.when(
-          data: (courseList) {
-            if (courseList['courses'].isEmpty) {
+        child: lessonData.when(
+          data: (lessonList) {
+            if (lessonList['lessons'].isEmpty) {
               return const Center(child: Text('찜한 수업이 없습니다.'));
             }
             return ListView.builder(
               padding: EdgeInsets.zero,
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
-              itemCount: courseList['courses'].length,
+              itemCount: lessonList['lessons'].length,
               itemBuilder: (context, index) {
-                final courseDetailData = courseList['courses'][index];
-                final courseDetailTitle = courseDetailData['title'];
-                final courseDetailDate = courseDetailData['course_date'];
-                final courseDetailStartTime = courseDetailData['start_time'];
-                final courseDetailEndTime = courseDetailData['end_time'];
+                final lessonData = lessonList['lessons'][index];
+                final lessonTitle = lessonData['title'];
+                String lessonImage = lessonData['image_url'] ?? '';
 
-                final courseData = courseDetailData['lesson'];
-                final courseTitle = courseData['title'];
-                String courseImage = courseData['image_url'] ?? '';
-
-                final dancerData = courseData['dancer'];
+                final dancerData = lessonData['dancer'];
                 final dancerNickname = dancerData['nickname'];
                 final dancerEmail = dancerData['email'];
                 final dancerImageUrl = dancerData['image_url'];
 
                 Image finalLessonImageProvider;
-                if (courseImage != '') {
-                  if (courseImage.split(':')[0] == 'https') {
+                if (lessonImage != '') {
+                  if (lessonImage.split(':')[0] == 'https') {
                     finalLessonImageProvider = Image.network(
                       width: 120,
                       height: 120,
                       fit: BoxFit.cover,
-                      courseImage,
+                      lessonImage,
                     );
                   } else {
                     finalLessonImageProvider = Image.asset(
@@ -91,7 +86,7 @@ class _LikeCourseScreenState extends ConsumerState<LikeCourseScreen> {
                     );
                   }
                 } else {
-                  courseImage = 'assets/images/app_logo/2x.png';
+                  lessonImage = 'assets/images/app_logo/2x.png';
                   finalLessonImageProvider = Image.asset(
                     width: 120,
                     height: 120,
@@ -103,8 +98,8 @@ class _LikeCourseScreenState extends ConsumerState<LikeCourseScreen> {
                   key: UniqueKey(),
                   direction: DismissDirection.endToStart,
                   onDismissed: (direction) async {
-                    final result = await ref.watch(
-                        postCourseLikeProvider(courseDetailData['id']).future);
+                    final result = await ref
+                        .watch(postLessonLikeProvider(lessonData['id']).future);
                     if (result['result_code'] == 200) {
                       final dateFormat = DateFormat('yyyy-MM-dd');
                       final selectDay = ref.watch(selectDateProvider);
@@ -116,7 +111,7 @@ class _LikeCourseScreenState extends ConsumerState<LikeCourseScreen> {
                       ref.refresh(getChatRoomProvider(50));
                       ref.refresh(
                           getLessonProvider(dateFormat.format(selectDay)));
-                      ref.refresh(getCourseLikeProvider);
+                      ref.refresh(getLessonLikeProvider);
                       ref.watch(getCalendarLessonProvider(selectMonth));
                     } else {
                       print('delete fail');
@@ -139,14 +134,14 @@ class _LikeCourseScreenState extends ConsumerState<LikeCourseScreen> {
                   ),
                   child: GestureDetector(
                     onTap: () {
-                      onCourseTap(courseData['id']);
+                      onLessonTap(lessonData['id']);
                     },
                     onLongPress: () async {
                       final result = await ref.watch(
-                          postCourseLikeProvider(courseData['id']).future);
+                          postLessonLikeProvider(lessonData['id']).future);
                       print(result['result_code']);
                       if (result['result_code'] == 200) {
-                        ref.refresh(getCourseLikeProvider);
+                        ref.refresh(getLessonLikeProvider);
                       } else {
                         print('delete fail');
                       }
@@ -216,26 +211,26 @@ class _LikeCourseScreenState extends ConsumerState<LikeCourseScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 5),
+                              const SizedBox(height: 10),
                               Text(
-                                courseTitle,
+                                lessonTitle,
                                 style: const TextStyle(
                                   color: Color(0xff3F51B5),
                                   fontSize: 17,
                                 ),
                               ),
-                              Text(
-                                '$courseDetailDate $courseDetailTitle',
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                ),
-                              ),
-                              Text(
-                                '$courseDetailStartTime - $courseDetailEndTime',
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                ),
-                              ),
+                              // Text(
+                              //   '$lessonDate $lessonTitle',
+                              //   style: const TextStyle(
+                              //     fontSize: 15,
+                              //   ),
+                              // ),
+                              // Text(
+                              //   '$lessonStartTime - $lessonEndTime',
+                              //   style: const TextStyle(
+                              //     fontSize: 15,
+                              //   ),
+                              // ),
                             ],
                           ),
                         ],

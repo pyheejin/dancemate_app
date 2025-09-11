@@ -30,14 +30,14 @@ final selectCourseDetailIdProvider = StateProvider.autoDispose<int>((ref) {
   return 0;
 });
 
-final getCourseLikeProvider = FutureProvider<dynamic>((ref) async {
+final getLessonLikeProvider = FutureProvider<dynamic>((ref) async {
   final ApiServices api = ApiServices();
 
-  final result = await api.getCourseLike();
+  final result = await api.getLessonLike();
   return result;
 });
 
-final postCourseLikeProvider =
+final postLessonLikeProvider =
     FutureProvider.family<Map<String, dynamic>, int>((ref, courseId) async {
   final ApiServices api = ApiServices();
 

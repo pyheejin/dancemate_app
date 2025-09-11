@@ -338,10 +338,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final courseDetailTitle = courseDetailData['title'];
     final courseDetailStartTime = courseDetailData['start_time'];
     final courseDetailEndTime = courseDetailData['end_time'];
-    bool isCourseLike = courseDetailData['is_like'];
+    // bool isCourseLike = courseDetailData['is_like'];
 
     void onLikeTap(int courseId) async {
-      final result = await ref.refresh(postCourseLikeProvider(courseId).future);
+      final result = await ref.refresh(postLessonLikeProvider(courseId).future);
       if (result['result_code'] == 200) {
         final dateFormat = DateFormat('yyyy-MM-dd');
         final selectDay = ref.watch(selectDateProvider);
@@ -397,28 +397,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   borderRadius: BorderRadius.circular(10),
                   child: finalLessonImageProvider,
                 ),
-                Positioned(
-                  top: 5,
-                  left: 5,
-                  child: GestureDetector(
-                    onTap: () {
-                      onLikeTap(courseDetailData['id']);
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: const Color(0xff9475FF),
-                      ),
-                      child: Icon(
-                        isCourseLike ? Icons.favorite : Icons.favorite_border,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   top: 5,
+                //   left: 5,
+                //   child: GestureDetector(
+                //     onTap: () {
+                //       onLikeTap(courseDetailData['id']);
+                //     },
+                //     child: Container(
+                //       width: 30,
+                //       height: 30,
+                //       decoration: BoxDecoration(
+                //         borderRadius: BorderRadius.circular(20),
+                //         color: const Color(0xff9475FF),
+                //       ),
+                //       child: Icon(
+                //         isCourseLike ? Icons.favorite : Icons.favorite_border,
+                //         color: Colors.white,
+                //         size: 20,
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             const SizedBox(width: 10),

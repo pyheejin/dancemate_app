@@ -481,10 +481,10 @@ class ApiServices {
     return resultData;
   }
 
-  Future<dynamic> getCourseLike() async {
+  Future<dynamic> getLessonLike() async {
     final accessToken = await getAccessToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/course/like'),
+      Uri.parse('$baseUrl/lesson/like'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
