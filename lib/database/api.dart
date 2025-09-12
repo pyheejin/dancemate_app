@@ -495,10 +495,10 @@ class ApiServices {
     return resultData;
   }
 
-  Future<dynamic> postCourseDetailLike(int courseId) async {
+  Future<dynamic> postLessonDetailLike(int lessonId) async {
     final accessToken = await getAccessToken();
     final response = await http.post(
-      Uri.parse('$baseUrl/course/$courseId/like'),
+      Uri.parse('$baseUrl/lesson/$lessonId/like'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },

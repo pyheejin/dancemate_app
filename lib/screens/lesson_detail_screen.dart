@@ -3,27 +3,25 @@ import 'package:dancemate_app/provider/chat_provider.dart';
 import 'package:dancemate_app/provider/home_provider.dart';
 import 'package:dancemate_app/provider/lesson_provider.dart';
 import 'package:dancemate_app/provider/search_provider.dart';
-import 'package:dancemate_app/provider/user_provider.dart';
 import 'package:dancemate_app/screens/order_screen.dart';
 import 'package:dancemate_app/screens/photo_screen.dart';
 import 'package:dancemate_app/screens/reserve_screen.dart';
-import 'package:dancemate_app/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:intl/intl.dart';
 
 class LessonDetailScreen extends ConsumerWidget {
-  final int courseId;
+  final int lessonId;
 
   const LessonDetailScreen({
     super.key,
-    required this.courseId,
+    required this.lessonId,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final courseDetailData = ref.watch(getLessonDetailProvider(courseId));
+    final courseDetailData = ref.watch(getLessonDetailProvider(lessonId));
 
     dynamic selectCourseDetailId = ref.watch(selectCourseDetailIdProvider);
 
@@ -64,8 +62,8 @@ class LessonDetailScreen extends ConsumerWidget {
       }
     }
 
-    void onLikeTap(int courseId) async {
-      final result = await ref.refresh(postLessonLikeProvider(courseId).future);
+    void onLikeTap(int lessonId) async {
+      final result = await ref.refresh(postLessonLikeProvider(lessonId).future);
       if (result['result_code'] == 200) {
         final dateFormat = DateFormat('yyyy-MM-dd');
         final selectDay = ref.watch(selectDateProvider);
@@ -77,9 +75,10 @@ class LessonDetailScreen extends ConsumerWidget {
         ref.refresh(getChatRoomProvider(50));
         ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
         ref.refresh(getLessonLikeProvider);
-        ref.watch(getCalendarLessonProvider(selectMonth));
+        ref.refresh(getCalendarLessonProvider(selectMonth));
+        ref.refresh(getLessonDetailProvider(lessonId));
       } else {
-        print('like fail');
+        print('[${result['result_code']}] ${result['result_msg']}');
       }
     }
 
@@ -109,16 +108,18 @@ class LessonDetailScreen extends ConsumerWidget {
             );
           },
           data: (courseDetail) {
-            final lessonTitle = courseDetail['lesson']['title'];
-            final lessonImages = courseDetail['lesson']['lesson_image'];
-            final lessonDescription = courseDetail['lesson']['description'];
+            final lessonData = courseDetail['lesson'];
+            final lessonTitle = lessonData['title'];
+            final lessonImages = lessonData['lesson_image'];
+            final lessonDescription = lessonData['description'];
+            bool isCourseLike = lessonData['is_like'];
 
-            final dancerData = courseDetail['lesson']['dancer'];
+            final dancerData = lessonData['dancer'];
             final dancerEmail = dancerData['email'];
             final dancerNickname = dancerData['nickname'];
             String dancerImageUrl = dancerData['image_url'];
 
-            final courseDetailList = courseDetail['lesson']['course'];
+            final courseDetailList = lessonData['course'];
 
             ImageProvider finalImageProvider;
             if (dancerImageUrl.isNotEmpty) {
@@ -199,30 +200,31 @@ class LessonDetailScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
-                    // Positioned(
-                    //   top: 5,
-                    //   left: 5,
-                    //   child: GestureDetector(
-                    //     onTap: () {
-                    //       onLikeTap(reserveCourseData['id']);
-                    //     },
-                    //     child: Container(
-                    //       width: 30,
-                    //       height: 30,
-                    //       decoration: BoxDecoration(
-                    //         borderRadius: BorderRadius.circular(20),
-                    //         color: const Color(0xff9475FF),
-                    //       ),
-                    //       child: Icon(
-                    //         isCourseLike
-                    //             ? Icons.favorite
-                    //             : Icons.favorite_border,
-                    //         color: Colors.white,
-                    //         size: 20,
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: GestureDetector(
+                        onTap: () {
+                          onLikeTap(lessonId);
+                          print('isCourseLike: $isCourseLike');
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: const Color(0xff9475FF),
+                          ),
+                          child: Icon(
+                            isCourseLike
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 10),

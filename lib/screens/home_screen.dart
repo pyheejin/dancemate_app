@@ -20,20 +20,23 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeData = ref.watch(getHomeProvider);
 
-    final dateFormat = DateFormat('yyyy-MM-dd');
-    final selectDay = ref.watch(selectDateProvider);
-
-    void onLikeTap(int courseId) async {
-      final result = await ref.refresh(postLessonLikeProvider(courseId).future);
+    void onLikeTap(int lessonId) async {
+      final result = await ref.refresh(postLessonLikeProvider(lessonId).future);
       if (result['result_code'] == 200) {
+        final dateFormat = DateFormat('yyyy-MM-dd');
+        final selectDay = ref.watch(selectDateProvider);
+        final selectMonth = ref.watch(selectMonthProvider);
+
         ref.refresh(getHomeProvider);
         ref.refresh(getSearchPreProvider);
         ref.refresh(getChatRoomProvider(1));
         ref.refresh(getChatRoomProvider(50));
         ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
         ref.refresh(getLessonLikeProvider);
+        ref.refresh(getCalendarLessonProvider(selectMonth));
+        ref.refresh(getLessonDetailProvider(lessonId));
       } else {
-        print('like fail');
+        print('[${result['result_code']}] ${result['result_msg']}');
       }
     }
 
@@ -60,7 +63,7 @@ class HomeScreen extends ConsumerWidget {
     void onCourseTap(int courseId) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => LessonDetailScreen(courseId: courseId),
+          builder: (context) => LessonDetailScreen(lessonId: courseId),
         ),
       );
     }
@@ -226,7 +229,7 @@ class HomeScreen extends ConsumerWidget {
                                 courseDetailData['start_time'];
                             final courseEndTime = courseDetailData['end_time'];
                             final courseTitle = courseDetailData['title'];
-                            // bool isCourseLike = todayCoursesData['is_like'];
+                            bool isCourseLike = todayCoursesData['is_like'];
 
                             ImageProvider finalDancerImageProvider;
                             if (dancerImageUrl != '') {
@@ -290,30 +293,30 @@ class HomeScreen extends ConsumerWidget {
                                               BorderRadius.circular(10),
                                           child: finalLessonImageProvider,
                                         ),
-                                        // Positioned(
-                                        //   top: 5,
-                                        //   left: 5,
-                                        //   child: GestureDetector(
-                                        //     onTap: () {
-                                        //       onLikeTap(courseDetailData['id']);
-                                        //     },
-                                        //     child: Container(
-                                        //       width: 40,
-                                        //       height: 40,
-                                        //       decoration: BoxDecoration(
-                                        //         borderRadius:
-                                        //             BorderRadius.circular(20),
-                                        //         color: const Color(0xff9475FF),
-                                        //       ),
-                                        //       child: Icon(
-                                        //         isCourseLike
-                                        //             ? Icons.favorite
-                                        //             : Icons.favorite_border,
-                                        //         color: Colors.white,
-                                        //       ),
-                                        //     ),
-                                        //   ),
-                                        // ),
+                                        Positioned(
+                                          top: 5,
+                                          left: 5,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              onLikeTap(todayCoursesData['id']);
+                                            },
+                                            child: Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                color: const Color(0xff9475FF),
+                                              ),
+                                              child: Icon(
+                                                isCourseLike
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                     const SizedBox(height: 10),

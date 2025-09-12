@@ -64,7 +64,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _onCourseTap(int courseId) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => LessonDetailScreen(courseId: courseId),
+        builder: (context) => LessonDetailScreen(lessonId: courseId),
       ),
     );
   }
@@ -137,18 +137,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Widget _buildResultBody(
-      String keyword, AsyncValue courses, AsyncValue searchPre) {
+    String keyword,
+    AsyncValue courses,
+    AsyncValue searchPre,
+  ) {
     if (keyword.isEmpty) {
       return CustomScrollView(
         slivers: [
           _buildRecentKeywords(searchPre),
           _buildRecommendedKeywords(searchPre),
-          _buildRecommendedCourses(searchPre),
+          _buildRecommendedCourses(searchPre, keyword),
         ],
       );
     } else {
       newKeyword = keyword;
-      return _buildSearchResults(courses);
+      return _buildSearchResults(courses, keyword);
     }
   }
 
@@ -244,7 +247,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildRecommendedCourses(AsyncValue searchPre) {
+  Widget _buildRecommendedCourses(AsyncValue searchPre, String keyword) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -274,7 +277,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   itemCount: dataList['recommend_courses'].length,
                   itemBuilder: (context, index) {
                     final courseData = dataList['recommend_courses'][index];
-                    return _buildCourseItem(courseData);
+                    return _buildCourseItem(courseData, keyword);
                   },
                 );
               },
@@ -285,7 +288,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildSearchResults(AsyncValue courses) {
+  Widget _buildSearchResults(AsyncValue courses, String keyword) {
     return courses.when(
       data: (courseList) {
         if (courseList.isEmpty) {
@@ -311,7 +314,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 itemCount: courseList.length,
                 itemBuilder: (context, index) {
                   final courseData = courseList[index];
-                  return _buildCourseItem(courseData);
+                  return _buildCourseItem(courseData, keyword);
                 },
               ),
             ),
@@ -324,9 +327,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildCourseItem(dynamic courseData) {
+  Widget _buildCourseItem(dynamic courseData, String keyword) {
     final courseTitle = courseData['title'];
     String courseImage = courseData['image_url'] ?? '';
+    bool isCourseLike = courseData['is_like'];
 
     final dancerData = courseData['dancer'];
     final dancerNickname = dancerData['nickname'];
@@ -338,21 +342,26 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final courseDetailTitle = courseDetailData['title'];
     final courseDetailStartTime = courseDetailData['start_time'];
     final courseDetailEndTime = courseDetailData['end_time'];
-    // bool isCourseLike = courseDetailData['is_like'];
 
-    void onLikeTap(int courseId) async {
-      final result = await ref.refresh(postLessonLikeProvider(courseId).future);
+    void onLikeTap(int lessonId) async {
+      final result = await ref.refresh(postLessonLikeProvider(lessonId).future);
+      print(result);
       if (result['result_code'] == 200) {
         final dateFormat = DateFormat('yyyy-MM-dd');
         final selectDay = ref.watch(selectDateProvider);
+        final selectMonth = ref.watch(selectMonthProvider);
 
         ref.refresh(getHomeProvider);
         ref.refresh(getSearchPreProvider);
+        ref.refresh(getSearchProvider(keyword));
         ref.refresh(getChatRoomProvider(1));
         ref.refresh(getChatRoomProvider(50));
         ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
+        ref.refresh(getLessonLikeProvider);
+        ref.refresh(getCalendarLessonProvider(selectMonth));
+        ref.refresh(getLessonDetailProvider(lessonId));
       } else {
-        print('like fail');
+        print('[${result['result_code']}] ${result['result_msg']}');
       }
     }
 
@@ -397,28 +406,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   borderRadius: BorderRadius.circular(10),
                   child: finalLessonImageProvider,
                 ),
-                // Positioned(
-                //   top: 5,
-                //   left: 5,
-                //   child: GestureDetector(
-                //     onTap: () {
-                //       onLikeTap(courseDetailData['id']);
-                //     },
-                //     child: Container(
-                //       width: 30,
-                //       height: 30,
-                //       decoration: BoxDecoration(
-                //         borderRadius: BorderRadius.circular(20),
-                //         color: const Color(0xff9475FF),
-                //       ),
-                //       child: Icon(
-                //         isCourseLike ? Icons.favorite : Icons.favorite_border,
-                //         color: Colors.white,
-                //         size: 20,
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                Positioned(
+                  top: 5,
+                  left: 5,
+                  child: GestureDetector(
+                    onTap: () {
+                      onLikeTap(courseData['id']);
+                    },
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color(0xff9475FF),
+                      ),
+                      child: Icon(
+                        isCourseLike ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(width: 10),

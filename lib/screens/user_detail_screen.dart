@@ -45,7 +45,7 @@ class _UserDetailScreenState extends ConsumerState<UserDetailScreen> {
   void onCourseTap(int courseId) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => LessonDetailScreen(courseId: courseId),
+        builder: (context) => LessonDetailScreen(lessonId: courseId),
       ),
     );
   }

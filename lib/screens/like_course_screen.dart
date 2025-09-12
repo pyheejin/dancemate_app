@@ -29,12 +29,11 @@ class _LikeCourseScreenState extends ConsumerState<LikeCourseScreen> {
   @override
   Widget build(BuildContext context) {
     final lessonData = ref.watch(getLessonLikeProvider);
-    print(lessonData);
 
     void onLessonTap(int lessonId) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => LessonDetailScreen(courseId: lessonId),
+          builder: (context) => LessonDetailScreen(lessonId: lessonId),
         ),
       );
     }

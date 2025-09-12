@@ -24,10 +24,10 @@ class CalendarScreen extends ConsumerWidget {
         ref.watch(getLessonProvider(dateFormat.format(selectDay)));
     final coursesForMonth = ref.watch(getCalendarLessonProvider(selectMonth));
 
-    void navigateToLessonDetail(int courseId) {
+    void onLessonDetailTap(int lessonId) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => LessonDetailScreen(courseId: courseId),
+          builder: (context) => LessonDetailScreen(lessonId: lessonId),
         ),
       );
     }
@@ -153,7 +153,12 @@ class CalendarScreen extends ConsumerWidget {
                 data: (reserveCourseList) {
                   if (reserveCourseList == null || reserveCourseList.isEmpty) {
                     return const Center(
-                      child: Text('선택한 날짜에 수업이 없습니다.'),
+                      child: Text(
+                        '선택한 날짜에 수업이 없습니다.',
+                        style: TextStyle(
+                          fontSize: 17,
+                        ),
+                      ),
                     );
                   }
 
@@ -169,7 +174,7 @@ class CalendarScreen extends ConsumerWidget {
                         courseData: courseData,
                         lessonData: lessonData,
                         dancerData: dancerData,
-                        onTap: () => navigateToLessonDetail(lessonData['id']),
+                        onTap: () => onLessonDetailTap(lessonData['id']),
                       );
                     },
                   );
@@ -206,26 +211,30 @@ class CourseListItem extends ConsumerWidget {
 
     String lessonImage = lessonData['image_url'] ?? '';
     final lessonTitle = lessonData['title'];
-    // bool isCourseLike = lessonData['is_like'];
+    final lessonId = courseData['lesson']['id'];
+    bool isCourseLike = courseData['lesson']['is_like'];
 
     final dancerNickname = dancerData['nickname'];
     final dancerEmail = dancerData['email'];
     final dancerImageUrl = dancerData['image_url'];
 
-    final dateFormat = DateFormat('yyyy-MM-dd');
-    final selectDay = ref.watch(selectDateProvider);
-
-    void onLikeTap(int courseId) async {
-      final result = await ref.refresh(postLessonLikeProvider(courseId).future);
+    void onLikeTap(int lessonId) async {
+      final result = await ref.refresh(postLessonLikeProvider(lessonId).future);
       if (result['result_code'] == 200) {
+        final dateFormat = DateFormat('yyyy-MM-dd');
+        final selectDay = ref.watch(selectDateProvider);
+        final selectMonth = ref.watch(selectMonthProvider);
+
         ref.refresh(getHomeProvider);
         ref.refresh(getSearchPreProvider);
         ref.refresh(getChatRoomProvider(1));
         ref.refresh(getChatRoomProvider(50));
         ref.refresh(getLessonProvider(dateFormat.format(selectDay)));
         ref.refresh(getLessonLikeProvider);
+        ref.refresh(getCalendarLessonProvider(selectMonth));
+        ref.refresh(getLessonDetailProvider(lessonId));
       } else {
-        print('like fail');
+        print('[${result['result_code']}] ${result['result_msg']}');
       }
     }
 
@@ -273,28 +282,28 @@ class CourseListItem extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                   child: finalLessonImageProvider,
                 ),
-                // Positioned(
-                //   top: 5,
-                //   left: 5,
-                //   child: GestureDetector(
-                //     onTap: () {
-                //       onLikeTap(courseData['id']);
-                //     },
-                //     child: Container(
-                //       width: 30,
-                //       height: 30,
-                //       decoration: BoxDecoration(
-                //         borderRadius: BorderRadius.circular(20),
-                //         color: const Color(0xff9475FF),
-                //       ),
-                //       child: Icon(
-                //         isCourseLike ? Icons.favorite : Icons.favorite_border,
-                //         color: Colors.white,
-                //         size: 20,
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                Positioned(
+                  top: 5,
+                  left: 5,
+                  child: GestureDetector(
+                    onTap: () {
+                      onLikeTap(lessonId);
+                    },
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color(0xff9475FF),
+                      ),
+                      child: Icon(
+                        isCourseLike ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(width: 10),

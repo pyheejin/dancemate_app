@@ -41,7 +41,7 @@ final postLessonLikeProvider =
     FutureProvider.family<Map<String, dynamic>, int>((ref, courseId) async {
   final ApiServices api = ApiServices();
 
-  final result = await api.postCourseDetailLike(courseId);
+  final result = await api.postLessonDetailLike(courseId);
   return result;
 });
 
