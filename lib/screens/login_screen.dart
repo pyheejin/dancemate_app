@@ -308,34 +308,12 @@ class LoginScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 130),
-              GestureDetector(
-                onTap: () async {
-                  // FCM 토큰 발급받기
-                  final req =
-                      await FirebaseMessaging.instance.requestPermission(
-                    alert: true,
-                    badge: true,
-                    sound: true,
-                  );
-
-                  final fcmToken =
-                      await FirebaseMessaging.instance.getAPNSToken();
-                  print(fcmToken);
-                  if (req.authorizationStatus ==
-                          AuthorizationStatus.authorized &&
-                      fcmToken != null) {
-                    print('FCM Token: $fcmToken');
-                  } else {
-                    print('FCM Token: null');
-                  }
-                },
-                child: SizedBox(
-                  width: 200,
-                  height: 120,
-                  child: Center(
-                    child: Image.asset(
-                      'assets/images/app_logo/detail_2x.png',
-                    ),
+              SizedBox(
+                width: 200,
+                height: 120,
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/app_logo/detail_2x.png',
                   ),
                 ),
               ),

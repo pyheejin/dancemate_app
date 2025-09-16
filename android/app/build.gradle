@@ -1,11 +1,11 @@
 plugins {
     id "com.android.application"
-    // START: FlutterFire Configuration
-    id 'com.google.gms.google-services'
-    // END: FlutterFire Configuration
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
 }
 
 android {
@@ -16,6 +16,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -43,5 +44,22 @@ android {
 }
 
 flutter {
-    source = "../.."
+    source "../.."
+}
+
+dependencies {
+    // 여기에 필요한 라이브러리를 추가합니다.
+    // core library desugaring을 위한 의존성
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+
+    // 디슈가링 충돌 보완
+    implementation 'androidx.window:window:1.0.0'
+    implementation 'androidx.window:window-java:1.0.0'
+}
+
+afterEvaluate {
+    def processGoogleServices = tasks.findByName('processDebugGoogleServices')
+    if (processGoogleServices) {
+        tasks.findByName('mapDebugSourceSetPaths').dependsOn(processGoogleServices)
+    }
 }

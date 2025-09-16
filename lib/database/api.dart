@@ -4,6 +4,7 @@ import 'package:dancemate_app/contants/api_urls.dart';
 import 'package:dancemate_app/database/model.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -38,14 +39,24 @@ class ApiServices {
       String email, String password) async {
     await storage.delete(key: 'login');
 
-    // 먼저 APNS 토큰을 요청한다.
-    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-    print('APNS Token: $apnsToken');
+    String? token;
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    // 잠시 기다린 후 FCM 토큰을 요청한다.
-    await Future.delayed(const Duration(seconds: 1)); // 1초 대기
-    var token = await FirebaseMessaging.instance.getAPNSToken();
-    print('fcm token: $token');
+    // 플랫폼 별 토큰
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      token = await messaging.getAPNSToken();
+    } else {
+      token = await messaging.getToken();
+    }
+
+    // // 먼저 APNS 토큰을 요청한다.
+    // final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    // print('APNS Token: $apnsToken');
+
+    // // 잠시 기다린 후 FCM 토큰을 요청한다.
+    // await Future.delayed(const Duration(seconds: 1)); // 1초 대기
+    // var token = await FirebaseMessaging.instance.getToken();
+    // print('fcm token: $token');
 
     try {
       final response = await http.post(

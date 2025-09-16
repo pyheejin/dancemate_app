@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -158,11 +159,24 @@ void main() async {
 
   // FCM 토큰 가져오기 및 출력
   try {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    String? token;
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    print('[main.dart] FCM Token: $fcmToken');
-    print('[main.dart] APNS Token: $apnsToken');
+    // 플랫폼 별 토큰
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      token = await messaging.getAPNSToken();
+    } else {
+      token = await messaging.getToken();
+    }
+    print('[main.dart] [$defaultTargetPlatform]\nToken: $token');
+
+    // final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    // print('[main.dart] APNS Token: $apnsToken');
+
+    // await Future.delayed(const Duration(seconds: 1)); // 1초 대기
+
+    // final fcmToken = await FirebaseMessaging.instance.getToken();
+    // print('[main.dart] FCM Token: $fcmToken');
   } catch (e) {
     print('🔑 토큰 가져오기 오류 발생: $e');
   }
