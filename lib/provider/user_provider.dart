@@ -1,7 +1,6 @@
 import 'package:dancemate_app/contants/contants.dart';
 import 'package:dancemate_app/database/api.dart';
 import 'package:dancemate_app/database/model.dart';
-import 'package:dancemate_app/screens/signup_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final postUserLoginProvider =
@@ -24,10 +23,27 @@ final postUserJoinProvider =
   return result;
 });
 
+final putUserChangePasswordProvider =
+    FutureProvider.family<Map<String, dynamic>, Map<String, dynamic>>(
+        (ref, request) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.putUserChangePassword(request);
+  return result;
+});
+
 final userTypeProvider = StateProvider<UserType?>((ref) => UserType.Mate);
 
 final profileImagePathProvider = StateProvider.autoDispose<String>((ref) {
   return '';
+});
+
+final getUsersProvider =
+    FutureProvider.family<dynamic, String>((ref, email) async {
+  final ApiServices api = ApiServices();
+
+  final result = await api.getUsers(email);
+  return result;
 });
 
 final getUserProfileProvider = FutureProvider<dynamic>((ref) async {

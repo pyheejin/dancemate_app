@@ -1,14 +1,17 @@
+import 'dart:convert';
+
 import 'package:dancemate_app/database/model.dart';
 import 'package:dancemate_app/google_sign_in_service.dart';
 import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
+import 'package:dancemate_app/screens/search_user_screen.dart';
 import 'package:dancemate_app/screens/signup_screen.dart';
 import 'package:dancemate_app/widgets/error.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_template.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -35,6 +38,25 @@ class LoginScreen extends ConsumerWidget {
       final result = await ref.watch(postUserLoginProvider(args).future);
 
       if (result['result_code'] == 200) {
+        const storage = FlutterSecureStorage();
+        await storage.delete(key: 'login');
+
+        final userId = result['user_id'];
+        final userType = result['type'];
+        final accessToken = result['access_token'];
+
+        final payload = jsonEncode({
+          'userId': userId,
+          'userType': userType,
+          'email': emailController.text,
+          'access_token': accessToken,
+        });
+
+        await storage.write(
+          key: 'login',
+          value: payload,
+        );
+
         ref.read(mainTapProvider.notifier).update((state) => 0);
 
         Navigator.of(context).push(
@@ -42,20 +64,8 @@ class LoginScreen extends ConsumerWidget {
             builder: (context) => const MainNavigationScreen(),
           ),
         );
-
-        // // FCM 토큰 발급받기
-        // final req = await FirebaseMessaging.instance.requestPermission(
-        //   alert: true,
-        //   badge: true,
-        //   sound: true,
-        // );
-        // final fcmToken = await FirebaseMessaging.instance.getToken();
-        // if (req.authorizationStatus == AuthorizationStatus.authorized &&
-        //     fcmToken != null) {
-        //   print('FCM Token: $fcmToken');
-        // } else {
-        //   print('FCM Token: null');
-        // }
+      } else {
+        errorAlert(context, result['result_msg']);
       }
     }
 
@@ -297,6 +307,14 @@ class LoginScreen extends ConsumerWidget {
       }
     }
 
+    void onChangePasswordTap() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const SearchUserScreen(),
+        ),
+      );
+    }
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -415,12 +433,15 @@ class LoginScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              const Row(
+              Row(
                 children: [
-                  Text(
-                    '비밀번호를 잊으셨나요?',
-                    style: TextStyle(
-                      color: Colors.redAccent,
+                  GestureDetector(
+                    onTap: onChangePasswordTap,
+                    child: const Text(
+                      '비밀번호를 잊으셨나요?',
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                      ),
                     ),
                   ),
                 ],

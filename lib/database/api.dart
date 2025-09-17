@@ -49,15 +49,6 @@ class ApiServices {
       token = await messaging.getToken();
     }
 
-    // // 먼저 APNS 토큰을 요청한다.
-    // final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-    // print('APNS Token: $apnsToken');
-
-    // // 잠시 기다린 후 FCM 토큰을 요청한다.
-    // await Future.delayed(const Duration(seconds: 1)); // 1초 대기
-    // var token = await FirebaseMessaging.instance.getToken();
-    // print('fcm token: $token');
-
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/user/login'),
@@ -69,28 +60,7 @@ class ApiServices {
       );
 
       final resultData = jsonDecode(utf8.decode(response.bodyBytes));
-
-      if (resultData['result_code'] == 200) {
-        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-        final userId = responseBody['user_id'];
-        final userType = responseBody['type'];
-        final accessToken = responseBody['access_token'];
-
-        final payload = jsonEncode({
-          'userId': userId,
-          'userType': userType,
-          'email': email,
-          'access_token': accessToken,
-        });
-
-        await storage.write(
-          key: 'login',
-          value: payload,
-        );
-        return responseBody;
-      } else {
-        throw Exception('${resultData['result_msg']}');
-      }
+      return resultData;
     } catch (e) {
       throw Exception('login error: $e');
     }
@@ -161,6 +131,29 @@ class ApiServices {
     }
   }
 
+  Future<Map<String, dynamic>> putUserChangePassword(
+    Map<String, dynamic> request,
+  ) async {
+    try {
+      final body = jsonEncode(request);
+      print('body: $body');
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/user/change-password'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      final resultData = jsonDecode(utf8.decode(response.bodyBytes));
+      print('resultData: $resultData');
+      return resultData;
+    } catch (e) {
+      throw Exception('change password error: $e');
+    }
+  }
+
   Future<dynamic> getSearch(int page, String keyword) async {
     final accessToken = await getAccessToken();
     final response = await http.get(
@@ -186,6 +179,14 @@ class ApiServices {
     final resultData =
         jsonDecode(utf8.decode(response.bodyBytes))['result_data'];
 
+    return resultData;
+  }
+
+  Future<dynamic> getUsers(String email) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/user?email=$email'),
+    );
+    final resultData = jsonDecode(utf8.decode(response.bodyBytes));
     return resultData;
   }
 
