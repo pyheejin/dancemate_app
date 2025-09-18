@@ -338,7 +338,12 @@ class LoginScreen extends ConsumerWidget {
               const SizedBox(height: 80),
               const Row(
                 children: [
-                  Text('이메일'),
+                  Text(
+                    '이메일',
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 5),
@@ -372,7 +377,12 @@ class LoginScreen extends ConsumerWidget {
               const SizedBox(height: 30),
               const Row(
                 children: [
-                  Text('비밀번호'),
+                  Text(
+                    '비밀번호',
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 5),
@@ -441,6 +451,7 @@ class LoginScreen extends ConsumerWidget {
                       '비밀번호를 잊으셨나요?',
                       style: TextStyle(
                         color: Colors.redAccent,
+                        fontSize: 15,
                       ),
                     ),
                   ),
@@ -449,7 +460,12 @@ class LoginScreen extends ConsumerWidget {
               const SizedBox(height: 30),
               Row(
                 children: [
-                  const Text("Don't have an account?"),
+                  const Text(
+                    "Don't have an account?",
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
                   const SizedBox(width: 5),
                   GestureDetector(
                     onTap: () {
@@ -464,6 +480,7 @@ class LoginScreen extends ConsumerWidget {
                       style: TextStyle(
                         color: Color(0xFFA48AFF),
                         fontWeight: FontWeight.bold,
+                        fontSize: 15,
                       ),
                     ),
                   ),
@@ -478,6 +495,7 @@ class LoginScreen extends ConsumerWidget {
                     style: TextStyle(
                       color: Colors.grey.shade500,
                       fontWeight: FontWeight.bold,
+                      fontSize: 15,
                     ),
                   ),
                 ],

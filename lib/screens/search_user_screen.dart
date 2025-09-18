@@ -32,10 +32,20 @@ class SearchUserScreen extends ConsumerWidget {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(
+            vertical: 200,
+            horizontal: 20,
+          ),
           child: Column(
             children: [
-              const SizedBox(height: 300),
+              const Text(
+                '비밀번호 찾기',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 70),
               const Row(
                 children: [
                   Text(

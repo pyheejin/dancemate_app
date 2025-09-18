@@ -35,7 +35,6 @@ class ChangePasswordScreen extends ConsumerWidget {
       };
       final changePasswordResult =
           await ref.watch(putUserChangePasswordProvider(body).future);
-      print('========$changePasswordResult');
       if (changePasswordResult['result_code'] == 200) {
         // 재 로그인
         List<dynamic> args = [
@@ -80,114 +79,130 @@ class ChangePasswordScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 250,
-            horizontal: 50,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Row(
-                children: [
-                  Text('비밀번호'),
-                ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 200,
+          horizontal: 20,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              '계정 선택하기',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 5),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Enter your password',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade400,
-                      width: 1.0,
-                    ),
+            ),
+            const SizedBox(height: 50),
+            const Row(
+              children: [
+                Text(
+                  '비밀번호',
+                  style: TextStyle(
+                    fontSize: 15,
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade400,
-                      width: 1.0,
-                    ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Enter your password',
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1.0,
                   ),
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      onClearTap(passwordController);
-                    },
-                    child: const Icon(
-                      Icons.cancel_outlined,
-                      color: Colors.black54,
-                    ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1.0,
+                  ),
+                ),
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    onClearTap(passwordController);
+                  },
+                  child: const Icon(
+                    Icons.cancel_outlined,
+                    color: Colors.black54,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Row(
-                children: [
-                  Text('비밀번호 재입력'),
-                ],
-              ),
-              const SizedBox(height: 5),
-              TextField(
-                controller: passwordAgainController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Enter your password again',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade400,
-                      width: 1.0,
-                    ),
+            ),
+            const SizedBox(height: 20),
+            const Row(
+              children: [
+                Text(
+                  '비밀번호 확인',
+                  style: TextStyle(
+                    fontSize: 15,
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade400,
-                      width: 1.0,
-                    ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            TextField(
+              controller: passwordAgainController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Enter your password again',
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1.0,
                   ),
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      onClearTap(passwordController);
-                    },
-                    child: const Icon(
-                      Icons.cancel_outlined,
-                      color: Colors.black54,
-                    ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1.0,
+                  ),
+                ),
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    onClearTap(passwordController);
+                  },
+                  child: const Icon(
+                    Icons.cancel_outlined,
+                    color: Colors.black54,
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
-              TextButton(
-                onPressed: onChangePasswordTap,
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFFA48AFF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
+            ),
+            const SizedBox(height: 40),
+            TextButton(
+              onPressed: onChangePasswordTap,
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFFA48AFF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 5,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '비밀번호 재설정',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: 5,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '비밀번호 재설정',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -136,7 +136,6 @@ class ApiServices {
   ) async {
     try {
       final body = jsonEncode(request);
-      print('body: $body');
 
       final response = await http.put(
         Uri.parse('$baseUrl/user/change-password'),
@@ -147,7 +146,6 @@ class ApiServices {
       );
 
       final resultData = jsonDecode(utf8.decode(response.bodyBytes));
-      print('resultData: $resultData');
       return resultData;
     } catch (e) {
       throw Exception('change password error: $e');
