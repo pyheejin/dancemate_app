@@ -566,7 +566,7 @@ class ProfileScreen extends ConsumerWidget {
                                                           horizontal: 30,
                                                         ),
                                                         child: Container(
-                                                          height: 160,
+                                                          height: 170,
                                                           decoration:
                                                               const BoxDecoration(
                                                             borderRadius:
@@ -581,7 +581,7 @@ class ProfileScreen extends ConsumerWidget {
                                                               const SizedBox(
                                                                   height: 15),
                                                               const Text(
-                                                                '예약 취소 후 초대된 톡방도 나갈까요?',
+                                                                '예약 취소하시겠습니까?',
                                                                 style:
                                                                     TextStyle(
                                                                   fontSize: 19,
@@ -614,7 +614,7 @@ class ProfileScreen extends ConsumerWidget {
                                                                               10),
                                                                       child:
                                                                           Text(
-                                                                        '톡방 나가기',
+                                                                        '돌아가기',
                                                                         style:
                                                                             TextStyle(
                                                                           fontSize:
@@ -661,7 +661,7 @@ class ProfileScreen extends ConsumerWidget {
                                                                             EdgeInsets.all(10),
                                                                         child:
                                                                             Text(
-                                                                          '예약 취소만 하기',
+                                                                          '예약 취소',
                                                                           style:
                                                                               TextStyle(
                                                                             fontSize:

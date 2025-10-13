@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dancemate_app/database/model.dart';
+import 'package:dancemate_app/widgets/validation.dart';
 import 'package:dancemate_app/google_sign_in_service.dart';
 import 'package:dancemate_app/provider/main_tap_provider.dart';
 import 'package:dancemate_app/provider/user_provider.dart';
@@ -16,189 +17,171 @@ import 'package:kakao_flutter_sdk/kakao_flutter_sdk_talk.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk_template.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-class LoginScreen extends ConsumerWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
 
-    void onClearTap(TextEditingController controller) {
-      controller.clear();
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  bool isValidEmail = true;
+  bool isEmailFieldTouched = false;
+
+  bool isValidPassword = true;
+  bool isPasswordFieldTouched = false;
+
+  @override
+  void initState() {
+    super.initState();
+    emailController.addListener(_validateEmail);
+    passwordController.addListener(_validatePassword);
+  }
+
+  void _validateEmail() {
+    isEmailFieldTouched = true;
+    final bool currentValidation = isEmailValid(emailController.text);
+
+    setState(() {
+      isValidEmail = currentValidation;
+    });
+  }
+
+  void _validatePassword() {
+    isPasswordFieldTouched = true;
+    final bool currentValidation = isPasswordValid(passwordController.text);
+
+    setState(() {
+      isValidPassword = currentValidation;
+    });
+  }
+
+  @override
+  void dispose() {
+    emailController.removeListener(_validateEmail);
+    passwordController.removeListener(_validatePassword);
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void onClearTap(TextEditingController controller) {
+    controller.clear();
+  }
+
+  void onLoginTap() async {
+    // _validateEmail();
+    // _validatePassword();
+
+    if (!isValidEmail || !isValidPassword) {
+      errorAlert(context, '이메일 혹은 비밀번호를 확인해주세요.');
+      return;
     }
 
-    void onLoginTap() async {
-      List<dynamic> args = [
-        emailController.text,
-        passwordController.text,
-      ];
-      final result = await ref.watch(postUserLoginProvider(args).future);
+    List<dynamic> args = [
+      emailController.text,
+      passwordController.text,
+    ];
+    final result = await ref.watch(postUserLoginProvider(args).future);
 
-      if (result['result_code'] == 200) {
-        const storage = FlutterSecureStorage();
-        await storage.delete(key: 'login');
+    if (result['result_code'] == 200) {
+      const storage = FlutterSecureStorage();
+      await storage.delete(key: 'login');
 
-        final userId = result['user_id'];
-        final userType = result['type'];
-        final accessToken = result['access_token'];
+      final userId = result['user_id'];
+      final userType = result['type'];
+      final accessToken = result['access_token'];
 
-        final payload = jsonEncode({
-          'userId': userId,
-          'userType': userType,
-          'email': emailController.text,
-          'access_token': accessToken,
-        });
+      final payload = jsonEncode({
+        'userId': userId,
+        'userType': userType,
+        'email': emailController.text,
+        'access_token': accessToken,
+      });
 
-        await storage.write(
-          key: 'login',
-          value: payload,
-        );
+      await storage.write(
+        key: 'login',
+        value: payload,
+      );
 
-        ref.read(mainTapProvider.notifier).update((state) => 0);
+      ref.read(mainTapProvider.notifier).update((state) => 0);
 
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const MainNavigationScreen(),
-          ),
-        );
-      } else {
-        errorAlert(context, result['result_msg']);
-      }
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const MainNavigationScreen(),
+        ),
+      );
+    } else {
+      errorAlert(context, result['result_msg']);
     }
+  }
 
-    void onSocialLoginTap(int method) async {
-      await dotenv.load();
-      final String privateKey = [
-        dotenv.env['APPLE_PRIVATE_KEY_LINE1']!,
-        dotenv.env['APPLE_PRIVATE_KEY_LINE2']!,
-        dotenv.env['APPLE_PRIVATE_KEY_LINE3']!,
-        dotenv.env['APPLE_PRIVATE_KEY_LINE4']!,
-        dotenv.env['APPLE_PRIVATE_KEY_LINE5']!,
-        dotenv.env['APPLE_PRIVATE_KEY_LINE6']!,
-      ].join('\\n');
+  void onSocialLoginTap(int method) async {
+    await dotenv.load();
+    final String privateKey = [
+      dotenv.env['APPLE_PRIVATE_KEY_LINE1']!,
+      dotenv.env['APPLE_PRIVATE_KEY_LINE2']!,
+      dotenv.env['APPLE_PRIVATE_KEY_LINE3']!,
+      dotenv.env['APPLE_PRIVATE_KEY_LINE4']!,
+      dotenv.env['APPLE_PRIVATE_KEY_LINE5']!,
+      dotenv.env['APPLE_PRIVATE_KEY_LINE6']!,
+    ].join('\\n');
 
-      if (method == 2) {
-        final GoogleSignInService signInService = GoogleSignInService();
-        final account = await signInService.signInWithGoogle();
-        if (account != null) {
-          if (account.additionalUserInfo != null) {
-            final isNewUser = account.additionalUserInfo!.isNewUser;
-            final credential = '${account.credential!.token}';
+    if (method == 2) {
+      final GoogleSignInService signInService = GoogleSignInService();
+      final account = await signInService.signInWithGoogle();
+      if (account != null) {
+        if (account.additionalUserInfo != null) {
+          final isNewUser = account.additionalUserInfo!.isNewUser;
+          final credential = '${account.credential!.token}';
 
-            final userData = account.additionalUserInfo!.profile;
-            final email = userData!['email'];
-            final password = '${account.credential!.token}';
-            final nickname = userData['given_name'];
-            final name = userData['name'];
-            final imageUrl = userData['picture'];
-            const phone = '';
-            const introduction = '';
-            if (isNewUser) {
-              // 신규 회원일 경우에만 회원가입 진행
-              UserModel user = UserModel(
-                type: 1,
-                method: method,
-                email: email,
-                password: password,
-                nickname: nickname,
-                name: name,
-                phone: phone,
-                introduction: introduction,
-                imageUrl: imageUrl,
-                appleToken: '',
-                appleIdentifier: '',
-              );
-
-              final result = await ref.watch(postUserJoinProvider(user).future);
-              if (result['result_code'] == 200) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const MainNavigationScreen(),
-                  ),
-                );
-              } else {
-                errorAlert(context, result['result_msg']);
-              }
-            } else {
-              List<dynamic> args = [
-                email,
-                credential,
-              ];
-              final result =
-                  await ref.watch(postUserLoginProvider(args).future);
-
-              if (result['result_code'] == 200) {
-                ref.read(mainTapProvider.notifier).update((state) => 0);
-
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const MainNavigationScreen(),
-                  ),
-                );
-              }
-            }
-          }
-        }
-      } else if (method == 3) {
-        // 휴대폰에 카카오톡이 깔려있는지 bool 값으로 반환해주는 함수
-        bool installed = await isKakaoTalkInstalled();
-
-        // 깔려있다면 UserApi.instance.loginWithKakaoTalk() 으로 카카오톡 오픈 후 동의
-        // 깔려있지 않다면 UserApi.instance.loginWithKakaoAccount() 으로 웹을 통한 인증
-        OAuthToken token = installed
-            ? await UserApi.instance.loginWithKakaoTalk()
-            : await UserApi.instance.loginWithKakaoAccount();
-
-        // 위 두가지 방법으로 인증 로그인 성공 후 유저 정보 가져오기
-        User user = await UserApi.instance.me();
-
-        final id = user.id.toString();
-        final email = user.kakaoAccount!.email.toString();
-        final nickname = user.properties!['nickname'].toString();
-        final imageUrl = user.properties!['profile_image'].toString();
-
-        // 서버로 유저 정보 전송하여 데이터베이스에 저장하기
-        UserModel userData = UserModel(
-          type: 1,
-          method: method,
-          email: email,
-          password: id,
-          nickname: nickname,
-          name: nickname,
-          phone: '',
-          introduction: '',
-          imageUrl: imageUrl,
-          appleToken: '',
-          appleIdentifier: '',
-        );
-
-        try {
-          final result = await ref.watch(postUserJoinProvider(userData).future);
-          if (result['result_code'] == 200) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const MainNavigationScreen(),
-              ),
+          final userData = account.additionalUserInfo!.profile;
+          final email = userData!['email'];
+          final password = '${account.credential!.token}';
+          final nickname = userData['given_name'];
+          final name = userData['name'];
+          final imageUrl = userData['picture'];
+          const phone = '';
+          const introduction = '';
+          if (isNewUser) {
+            // 신규 회원일 경우에만 회원가입 진행
+            UserModel user = UserModel(
+              type: 1,
+              method: method,
+              email: email,
+              password: password,
+              nickname: nickname,
+              name: name,
+              phone: phone,
+              introduction: introduction,
+              imageUrl: imageUrl,
+              appleToken: '',
+              appleIdentifier: '',
             );
+
+            final result = await ref.watch(postUserJoinProvider(user).future);
+            if (result['result_code'] == 200) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const MainNavigationScreen(),
+                ),
+              );
+            } else {
+              errorAlert(context, result['result_msg']);
+            }
           } else {
-            print(result['result_msg']);
-            errorAlert(context, result['result_msg']);
-          }
-        } catch (e) {
-          final resultCode = e.toString().split(' ')[1];
-          if (resultCode == '207') {
-            // 이미 가입된 이메일이면 로그인처리
             List<dynamic> args = [
               email,
-              id,
+              credential,
             ];
-            final loginResult =
-                await ref.watch(postUserLoginProvider(args).future);
+            final result = await ref.watch(postUserLoginProvider(args).future);
 
-            if (loginResult['result_code'] == 200) {
+            if (result['result_code'] == 200) {
               ref.read(mainTapProvider.notifier).update((state) => 0);
 
               Navigator.of(context).push(
@@ -206,60 +189,62 @@ class LoginScreen extends ConsumerWidget {
                   builder: (context) => const MainNavigationScreen(),
                 ),
               );
-            } else {
-              print(loginResult['result_msg']);
-              errorAlert(context, loginResult['result_msg']);
             }
           }
         }
-      } else if (method == 4) {
-        final credential = await SignInWithApple.getAppleIDCredential(
-          scopes: [
-            AppleIDAuthorizationScopes.email,
-            AppleIDAuthorizationScopes.fullName,
-          ],
-        );
+      }
+    } else if (method == 3) {
+      // 휴대폰에 카카오톡이 깔려있는지 bool 값으로 반환해주는 함수
+      bool installed = await isKakaoTalkInstalled();
 
-        // print(credential);
+      // 깔려있다면 UserApi.instance.loginWithKakaoTalk() 으로 카카오톡 오픈 후 동의
+      // 깔려있지 않다면 UserApi.instance.loginWithKakaoAccount() 으로 웹을 통한 인증
+      OAuthToken token = installed
+          ? await UserApi.instance.loginWithKakaoTalk()
+          : await UserApi.instance.loginWithKakaoAccount();
 
-        // // 사용자 이메일
-        // // 사용자 설정에 따라서 비공개 이메일이 올 수 있음.
-        // // 첫 로그인시에만 오고 그 후로는 null 반환.
-        // print(credential.email ?? '');
+      // 위 두가지 방법으로 인증 로그인 성공 후 유저 정보 가져오기
+      User user = await UserApi.instance.me();
 
-        // // 사용자 이름 (성)
-        // // 첫 로그인시에만 오고 그 후로는 null 반환.
-        // print(credential.familyName ?? '');
+      final id = user.id.toString();
+      final email = user.kakaoAccount!.email.toString();
+      final nickname = user.properties!['nickname'].toString();
+      final imageUrl = user.properties!['profile_image'].toString();
 
-        // // 사용자 이름 (이름)
-        // // 첫 로그인시에만 오고 그 후로는 null 반환.
-        // print(credential.givenName ?? '');
+      // 서버로 유저 정보 전송하여 데이터베이스에 저장하기
+      UserModel userData = UserModel(
+        type: 1,
+        method: method,
+        email: email,
+        password: id,
+        nickname: nickname,
+        name: nickname,
+        phone: '',
+        introduction: '',
+        imageUrl: imageUrl,
+        appleToken: '',
+        appleIdentifier: '',
+      );
 
-        // // Apple에서 발급하는 해당앱의 유저 고유 식별자.
-        // print(credential.userIdentifier ?? '');
-
-        // // Apple에서 발급하는 JWT 형식의 신원 확인 토큰.
-        // print(credential.identityToken);
-
-        // // 짧은 기간 유효한 인증 코드로, 서버에서 Apple과 통신해 사용자 인증을 확인할 때 사용됩니다.
-        // print(credential.authorizationCode);
-
-        final email = credential.email ?? '';
-        final password = credential.userIdentifier ?? '';
-        final nickname = credential.givenName ?? '';
-        final appleToken = credential.identityToken.toString();
-        final appleIdentifier = credential.userIdentifier ?? '';
-
-        // print('email: $email');
-        // print('password: $password');
-        // print('nickname: $nickname');
-        // print('appleToken: $appleToken');
-
-        if (email == '') {
+      try {
+        final result = await ref.watch(postUserJoinProvider(userData).future);
+        if (result['result_code'] == 200) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const MainNavigationScreen(),
+            ),
+          );
+        } else {
+          print(result['result_msg']);
+          errorAlert(context, result['result_msg']);
+        }
+      } catch (e) {
+        final resultCode = e.toString().split(' ')[1];
+        if (resultCode == '207') {
           // 이미 가입된 이메일이면 로그인처리
           List<dynamic> args = [
-            password,
-            password,
+            email,
+            id,
           ];
           final loginResult =
               await ref.watch(postUserLoginProvider(args).future);
@@ -276,45 +261,83 @@ class LoginScreen extends ConsumerWidget {
             print(loginResult['result_msg']);
             errorAlert(context, loginResult['result_msg']);
           }
-        } else {
-          // 서버로 유저 정보 전송하여 데이터베이스에 저장하기
-          UserModel userData = UserModel(
-            type: 1,
-            method: method,
-            email: email,
-            password: password,
-            nickname: nickname,
-            name: nickname,
-            phone: '',
-            introduction: '',
-            imageUrl: '',
-            appleToken: appleToken,
-            appleIdentifier: appleIdentifier,
-          );
+        }
+      }
+    } else if (method == 4) {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
 
-          final result = await ref.watch(postUserJoinProvider(userData).future);
-          if (result['result_code'] == 200) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const MainNavigationScreen(),
-              ),
-            );
-          } else {
-            print(result['result_msg']);
-            errorAlert(context, result['result_msg']);
-          }
+      final email = credential.email ?? '';
+      final password = credential.userIdentifier ?? '';
+      final nickname = credential.givenName ?? '';
+      final appleToken = credential.identityToken.toString();
+      final appleIdentifier = credential.userIdentifier ?? '';
+
+      if (email == '') {
+        // 이미 가입된 이메일이면 로그인처리
+        List<dynamic> args = [
+          password,
+          password,
+        ];
+        final loginResult = await ref.watch(postUserLoginProvider(args).future);
+
+        if (loginResult['result_code'] == 200) {
+          ref.read(mainTapProvider.notifier).update((state) => 0);
+
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const MainNavigationScreen(),
+            ),
+          );
+        } else {
+          print(loginResult['result_msg']);
+          errorAlert(context, loginResult['result_msg']);
+        }
+      } else {
+        // 서버로 유저 정보 전송하여 데이터베이스에 저장하기
+        UserModel userData = UserModel(
+          type: 1,
+          method: method,
+          email: email,
+          password: password,
+          nickname: nickname,
+          name: nickname,
+          phone: '',
+          introduction: '',
+          imageUrl: '',
+          appleToken: appleToken,
+          appleIdentifier: appleIdentifier,
+        );
+
+        final result = await ref.watch(postUserJoinProvider(userData).future);
+        if (result['result_code'] == 200) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const MainNavigationScreen(),
+            ),
+          );
+        } else {
+          print(result['result_msg']);
+          errorAlert(context, result['result_msg']);
         }
       }
     }
+  }
 
-    void onChangePasswordTap() {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const SearchUserScreen(),
-        ),
-      );
-    }
+  void onChangePasswordTap() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SearchUserScreen(),
+      ),
+    );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -351,6 +374,11 @@ class LoginScreen extends ConsumerWidget {
                 controller: emailController,
                 decoration: InputDecoration(
                   hintText: 'Enter your email',
+                  errorText: isEmailFieldTouched &&
+                          emailController.text.isNotEmpty &&
+                          !isValidEmail
+                      ? '이메일 형식을 입력해주세요'
+                      : null,
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
                       color: Colors.grey.shade400,
@@ -391,6 +419,11 @@ class LoginScreen extends ConsumerWidget {
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: 'Enter your password',
+                  errorText: isPasswordFieldTouched &&
+                          passwordController.text.isNotEmpty &&
+                          !isValidPassword
+                      ? '비밀번호는 8~15자 이내로 입력해주세요'
+                      : null,
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
                       color: Colors.grey.shade400,
