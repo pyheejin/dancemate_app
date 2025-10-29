@@ -12,6 +12,7 @@ import 'package:kakao_flutter_sdk_template/kakao_flutter_sdk_template.dart';
 import 'package:dancemate_app/config.dart';
 import 'package:dancemate_app/screens/login_screen.dart';
 import 'package:dancemate_app/screens/main_tab_screen.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 
 // 백그라운드에서 FCM 메시지를 처리하는 핸들러.
 @pragma('vm:entry-point')
@@ -159,24 +160,28 @@ void main() async {
 
   // FCM 토큰 가져오기 및 출력
   try {
-    String? token;
+    String? fcmToken;
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    // 플랫폼 별 토큰
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      token = await messaging.getAPNSToken();
-    } else {
-      token = await messaging.getToken();
+    fcmToken = await messaging.getToken();
+
+    if (fcmToken != null) {
+      print('[main.dart] [$defaultTargetPlatform] FCM Token: $fcmToken');
+      // TODO: 최초 획득한 FCM 토큰을 백엔드 서버에 전송하는 함수 호출 (sendTokenToServer 구현 필요)
     }
-    print('[main.dart] [$defaultTargetPlatform]\nToken: $token');
 
-    // final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-    // print('[main.dart] APNS Token: $apnsToken');
+    messaging.onTokenRefresh.listen((newToken) {
+      print('✅ 토큰 갱신 리스너 작동!');
+      // TODO: 갱신된 토큰을 백엔드 서버에 전송하고 저장
+      print("새로운 FCM 토큰이 발급되었습니다: $newToken");
+    }).onError((err) {
+      print('❌ Error receiving token refresh: $err');
+    });
 
-    // await Future.delayed(const Duration(seconds: 1)); // 1초 대기
-
-    // final fcmToken = await FirebaseMessaging.instance.getToken();
-    // print('[main.dart] FCM Token: $fcmToken');
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final apnsToken = await messaging.getAPNSToken();
+      print('[main.dart] APNS Token (iOS Only): $apnsToken');
+    }
   } catch (e) {
     print('🔑 토큰 가져오기 오류 발생: $e');
   }
@@ -205,10 +210,16 @@ class _MyAppState extends State<MyApp> {
       String? data = await storage.read(key: 'login');
       if (data != null) {
         String accessToken = json.decode(data)['access_token'];
+
         if (accessToken.isNotEmpty) {
-          setState(() {
-            _isLoggedIn = true;
-          });
+          bool isExpired = Jwt.isExpired(accessToken);
+          print('isExpired: $isExpired');
+
+          if (!isExpired) {
+            setState(() {
+              _isLoggedIn = true;
+            });
+          }
         }
       }
     } catch (e) {
